@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#16306e">
-<title>Syboe 的电子笔记 — 川大电子信息学习博客</title>
+<title>MorGlory 的电子笔记 — 川大电子信息学习博客</title>
 <style>
   :root{
     --ink:#1c2333; --sub:#5a6478; --faint:#8a94a8;
@@ -71,7 +71,14 @@
   .profile{text-align:center}
   .profile .pa{width:68px;height:68px;border-radius:50%;margin:2px auto 10px;
     background:linear-gradient(135deg,#3563e9,#7c3aed);color:#fff;display:flex;align-items:center;
-    justify-content:center;font-size:24px;font-weight:800}
+    justify-content:center;font-size:24px;font-weight:800;cursor:pointer;overflow:hidden;position:relative}
+  .js-avatar{overflow:hidden}
+  .js-avatar img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%}
+  .js-avatar.hasimg{background:none}
+  .pahint{font-size:11.5px;color:var(--faint);margin:-4px 0 8px}
+  .pahint button{border:1px dashed var(--line);background:none;color:var(--sub);font-size:11.5px;
+    border-radius:999px;padding:3px 12px;cursor:pointer}
+  .pahint button:hover{color:var(--blue);border-color:var(--blue)}
   .profile .pn{font-weight:800;font-size:16px}
   .profile .pd{font-size:12.5px;color:var(--sub);margin-top:5px;line-height:1.6}
   .profile .pstats{display:flex;margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
@@ -111,7 +118,7 @@
 
 <header class="top">
   <div class="topin">
-    <a class="brand" href="index.html"><span class="avatar">S</span><span>Syboe 的电子笔记</span></a>
+    <a class="brand" href="index.html"><span class="avatar js-avatar">M</span><span>MorGlory 的电子笔记</span></a>
     <nav class="topnav">
       <a href="index.html" class="cur">文章</a>
       <a href="baoyan.html">保研手册</a>
@@ -131,7 +138,7 @@
     <text x="288" y="180" font-size="20" fill="#fff" stroke="none" opacity=".9">&lt;/&gt;</text>
   </svg>
   <div class="in">
-    <h1>Syboe 的电子笔记</h1>
+    <h1>MorGlory 的电子笔记</h1>
     <p class="sig">四川大学 · 电子信息类 · 大一在读 —— 记录课程笔记、自制学习工具与保研进度。</p>
     <div class="stat"><span><b>4</b>篇长文/工具</span><span><b>3</b>个交互项目</span><span><b>11</b>章 C 语言教程</span><span>最近更新 2026-11-17</span></div>
   </div>
@@ -176,8 +183,11 @@
 
   <aside>
     <div class="box profile">
-      <div class="pa">S</div>
-      <div class="pn">Syboe</div>
+      <div class="pa js-avatar" id="avatarBox" title="点击上传头像">M</div>
+      <input type="file" id="avatarFile" accept="image/*" hidden>
+      <div class="pahint"><button type="button" id="avatarBtn">上传头像</button>
+        <button type="button" id="avatarReset" style="display:none">恢复默认</button></div>
+      <div class="pn">MorGlory</div>
       <div class="pd">四川大学 电子信息类 大一<br>目标：保研 · 竞赛 · 把每门硬课学明白</div>
       <div class="pstats">
         <div><b>4</b><span>文章</span></div>
@@ -211,7 +221,61 @@
   </aside>
 </div>
 
-<footer class="site">Syboe 的电子笔记 · 用业余时间搭建 · 内容如有错漏以教材与官方通知为准</footer>
+<footer class="site">MorGlory 的电子笔记 · 用业余时间搭建 · 内容如有错漏以教材与官方通知为准</footer>
+
+<script>
+(function(){
+  var KEY='blog_avatar';
+  var box=document.getElementById('avatarBox'),
+      file=document.getElementById('avatarFile'),
+      btn=document.getElementById('avatarBtn'),
+      reset=document.getElementById('avatarReset');
+  function applyAvatar(url){
+    document.querySelectorAll('.js-avatar').forEach(function(el){
+      if(url){
+        el.innerHTML='';
+        var img=new Image(); img.src=url; img.alt='avatar';
+        el.appendChild(img); el.classList.add('hasimg');
+      }else{
+        el.classList.remove('hasimg');
+        el.textContent='M';
+      }
+    });
+    if(reset) reset.style.display = url ? '' : 'none';
+  }
+  var saved=null;
+  try{ saved=localStorage.getItem(KEY); }catch(e){}
+  if(saved) applyAvatar(saved);
+  function pick(){ if(file) file.click(); }
+  if(box) box.addEventListener('click',pick);
+  if(btn) btn.addEventListener('click',pick);
+  if(reset) reset.addEventListener('click',function(){
+    try{ localStorage.removeItem(KEY); }catch(e){}
+    applyAvatar(null);
+  });
+  if(file) file.addEventListener('change',function(){
+    var f=file.files&&file.files[0]; if(!f) return;
+    if(!/^image\//.test(f.type)){ alert('请选择图片文件'); return; }
+    var rd=new FileReader();
+    rd.onload=function(){
+      var img=new Image();
+      img.onload=function(){
+        var c=document.createElement('canvas');
+        var s=Math.min(1,256/Math.max(img.width,img.height));
+        c.width=Math.max(1,Math.round(img.width*s));
+        c.height=Math.max(1,Math.round(img.height*s));
+        c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+        var url=c.toDataURL('image/jpeg',0.85);
+        try{ localStorage.setItem(KEY,url); }catch(e){}
+        applyAvatar(url);
+      };
+      img.src=rd.result;
+    };
+    rd.readAsDataURL(f);
+    file.value='';
+  });
+})();
+</script>
 
 </body>
 </html>
