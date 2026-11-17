@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>川大电子信息 · 保研推免资料手册 — Syboe 的电子笔记</title>
+<style>
+  :root{
+    --ink:#1c2333; --sub:#5a6478; --line:#e3e8f2;
+    --blue:#3563e9; --green:#12966e; --orange:#e0642f; --red:#d4452c;
+    --card:#ffffff; --bg:#f4f6fb;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;line-height:1.75}
+  a{color:var(--blue);text-decoration:none}
+  a:hover{text-decoration:underline}
+  code{font-family:Consolas,Menlo,monospace;background:#eef2fb;border-radius:4px;padding:1px 5px;font-size:13px}
+
+  /* ===== 顶栏（与博客首页一致） ===== */
+  header.top{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.92);
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .topin{max-width:1120px;margin:0 auto;padding:0 20px;height:58px;display:flex;align-items:center;gap:10px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;color:var(--ink)}
+  .brand .avatar{width:32px;height:32px;border-radius:50%;
+    background:linear-gradient(135deg,#3563e9,#7c3aed);color:#fff;display:flex;align-items:center;
+    justify-content:center;font-size:13px;font-weight:800}
+  .topnav{margin-left:auto;display:flex;gap:4px}
+  .topnav a{color:var(--sub);font-size:14px;padding:7px 12px;border-radius:8px}
+  .topnav a:hover{background:#eef2fb;text-decoration:none;color:var(--ink)}
+  .topnav a.cur{color:var(--blue);background:#eaf0ff;font-weight:700}
+
+  /* ===== 文章页骨架 ===== */
+  .wrap{max-width:1120px;margin:0 auto;padding:26px 20px 60px;display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:26px}
+  article.post{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:34px 38px;
+    box-shadow:0 8px 30px -22px rgba(23,34,84,.35)}
+  .post .crumb{font-size:13px;color:#8a94a8;margin-bottom:10px}
+  .post h1{font-size:25px;margin:0 0 8px;line-height:1.4}
+  .post .meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;color:#8a94a8;
+    padding-bottom:18px;border-bottom:1px solid var(--line);margin-bottom:20px}
+  .tagchip{background:#eaf0ff;color:#2f55c4;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600}
+  .post h2{font-size:19px;margin:34px 0 12px;padding-left:12px;border-left:4px solid var(--blue)}
+  .post h3{font-size:16px;margin:20px 0 8px}
+  .post p{font-size:14.5px;margin:10px 0}
+  .post ul,.post ol{font-size:14.5px;padding-left:22px;margin:10px 0}
+  .post li{margin:5px 0}
+
+  .note{background:#f4f8ff;border:1px solid #d7e3fb;border-left:4px solid var(--blue);
+    border-radius:10px;padding:11px 14px;font-size:13.5px;margin:14px 0}
+  .warn{background:#fdf1ec;border:1px solid #f4d4c4;border-left:4px solid var(--red);
+    border-radius:10px;padding:11px 14px;font-size:13.5px;margin:14px 0}
+  .ok{background:#eefaf4;border:1px solid #c8ecd9;border-left:4px solid var(--green);
+    border-radius:10px;padding:11px 14px;font-size:13.5px;margin:14px 0}
+
+  table.tb{width:100%;border-collapse:collapse;font-size:13.5px;margin:14px 0;background:#fff}
+  .tscroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+  .tscroll table.tb{margin:0}
+  table.tb th{background:#f6f8fd;text-align:left;padding:9px 11px;border-bottom:2px solid var(--line);white-space:nowrap}
+  table.tb td{padding:9px 11px;border-bottom:1px solid #edf0f6;vertical-align:top}
+  table.tb tr:last-child td{border-bottom:none}
+
+  /* 成绩构成条 */
+  .mixbar{display:flex;height:34px;border-radius:9px;overflow:hidden;margin:10px 0 4px;font-size:12.5px;font-weight:700;color:#fff}
+  .mixbar div{display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden}
+  .mixcap{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--sub);margin-bottom:8px}
+  .mixcap i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+
+  /* 时间线 */
+  .tl{position:relative;margin:16px 0 6px;padding-left:24px}
+  .tl::before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:#dbe3f2}
+  .tl .it{position:relative;padding:0 0 18px 8px}
+  .tl .it::before{content:"";position:absolute;left:-21px;top:7px;width:10px;height:10px;border-radius:50%;
+    background:#fff;border:3px solid var(--blue)}
+  .tl .it.green::before{border-color:var(--green)}
+  .tl .it.orange::before{border-color:var(--orange)}
+  .tl .it.red::before{border-color:var(--red)}
+  .tl .when{font-size:12.5px;font-weight:700;color:var(--blue)}
+  .tl .it.green .when{color:var(--green)} .tl .it.orange .when{color:var(--orange)} .tl .it.red .when{color:var(--red)}
+  .tl .what{font-size:14px;font-weight:700;margin:1px 0}
+  .tl .how{font-size:13px;color:var(--sub)}
+
+  /* 链接卡片 */
+  .linkgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+  a.doc{display:block;border:1px solid var(--line);border-radius:10px;padding:11px 13px;background:#fbfcfe}
+  a.doc:hover{border-color:#b9ccf5;background:#f6f9ff;text-decoration:none}
+  a.doc .t{font-size:13.5px;font-weight:700;color:var(--ink);line-height:1.5}
+  a.doc .u{font-size:11.5px;color:#8a94a8;word-break:break-all;margin-top:3px}
+  a.doc .src{display:inline-block;font-size:11px;background:#eef2fb;color:#5a6478;border-radius:4px;padding:0 6px;margin-top:6px}
+
+  /* 侧栏目录 */
+  aside .box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:16px}
+  aside .bt{font-size:13px;font-weight:800;color:#8a94a8;letter-spacing:1px;margin-bottom:10px}
+  aside nav.toc a{display:block;font-size:13.5px;color:var(--sub);padding:5px 8px;border-radius:7px}
+  aside nav.toc a:hover{background:#f2f5fc;color:var(--blue);text-decoration:none}
+  aside .profile{text-align:center}
+  aside .profile .pa{width:64px;height:64px;border-radius:50%;margin:4px auto 10px;
+    background:linear-gradient(135deg,#3563e9,#7c3aed);color:#fff;display:flex;align-items:center;justify-content:center;
+    font-size:22px;font-weight:800}
+  aside .profile .pn{font-weight:800;font-size:15px}
+  aside .profile .pd{font-size:12.5px;color:var(--sub);margin-top:4px}
+
+  .backhome{display:inline-block;margin-top:26px;font-size:13.5px}
+  footer.site{max-width:1120px;margin:0 auto;padding:22px 20px 34px;color:#96a0b6;font-size:12.5px;text-align:center}
+
+  @media(max-width:900px){
+    .wrap{grid-template-columns:1fr}
+    aside{order:2}
+    aside .box.tocbox{display:none}
+    article.post{padding:24px 18px}
+    .post h1{font-size:21px}
+    .linkgrid{grid-template-columns:1fr}
+    .post{margin-top:0}
+    /* 顶栏单行，工具入口收起 */
+    .topin{height:54px;padding:0 14px;gap:8px}
+    .brand{font-size:15px;white-space:nowrap;min-width:0}
+    .brand span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .brand .avatar{width:28px;height:28px;font-size:12px;flex:0 0 auto}
+    .topnav{flex-wrap:nowrap;gap:0}
+    .topnav a{white-space:nowrap;padding:6px 9px;font-size:13px}
+    .topnav a.n-opt{display:none}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="topin">
+    <a class="brand" href="index.html" style="text-decoration:none">
+      <span class="avatar">S</span><span>Syboe 的电子笔记</span>
+    </a>
+    <nav class="topnav">
+      <a href="index.html">文章</a>
+      <a href="baoyan.html" class="cur">保研手册</a>
+      <a href="c-learner.html" class="n-opt">C 语言</a>
+      <a href="ee-toolbox.html" class="n-opt">工具箱</a>
+      <a href="manuscript/index.html" class="n-opt">机械制图</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <article class="post">
+    <div class="crumb">文章 / 资料整理 / 保研</div>
+    <h1>四川大学电子信息学院 · 保研推免资料手册</h1>
+    <div class="meta">
+      <span>2026-11-17</span><span>·</span><span>整理自官方公开文件</span><span>·</span>
+      <span class="tagchip">保研</span><span class="tagchip">推免</span><span class="tagchip">川大电子信息</span>
+    </div>
+
+    <div class="note">
+      <b>说明：</b>本页内容整理自四川大学教务处、研究生院招生信息网、电子信息学院官网公开发布的文件（原文链接见文末）。
+      政策每年可能微调，<b>一切以当年学院和教务处正式通知为准</b>。本页适合大一～大三用来提前规划。
+    </div>
+
+    <!-- ============ 一 ============ -->
+    <h2 id="s1">一、推免是什么 · 一句话版本</h2>
+    <p>“推免”就是免试（不考初试）读研究生：<b>本校先给你“推荐资格”（看本科前三年的综合排名），你再拿着资格去申请目标院校（接收）</b>。
+      川大电子信息学院的本科生既可以保本院，也可以保外校（清北、电子科大、东南等），两阶段在时间上互不交叉。</p>
+    <ul>
+      <li><b>推荐阶段（每年 9 月，大四开学）</b>：学院按综合成绩排名，按名额确定推荐名单并公示 ≥10 个工作日。</li>
+      <li><b>接收阶段（9 月下旬起）</b>：获得资格者登录教育部“推免服务系统”（yz.chsi.com.cn/tm）填报志愿、确认复试与录取。</li>
+    </ul>
+
+    <!-- ============ 二 ============ -->
+    <h2 id="s2">二、综合成绩怎么算（最核心）</h2>
+    <p>校级《实施办法》规定：综合成绩由<b>课程成绩 + 科研创新潜质与专业能力倾向 + 社会实践活动</b>构成，具体比例由学院细则确定。以电子信息学院近年推荐办法为例：</p>
+
+    <div class="mixcap"><span><i style="background:#3563e9"></i>课程成绩 60%</span><span><i style="background:#12966e"></i>科研创新与专业能力 35%</span><span><i style="background:#e0642f"></i>社会实践与思想品德 5%</span></div>
+    <div class="mixbar">
+      <div style="flex:60;background:#3563e9">课程成绩 ×60%</div>
+      <div style="flex:35;background:#12966e">科研/专业能力 ×35%</div>
+      <div style="flex:5;background:#e0642f">5%</div>
+    </div>
+
+    <h3>课程成绩的三条铁规</h3>
+    <ul>
+      <li><b>只算必修</b>：课程成绩 = Σ(某门必修课成绩 × 学分) ÷ Σ 学分；只计算<b>前三年</b>（四年制）必修课。</li>
+      <li><b>只用第一次成绩</b>：补考、重修、复修成绩<b>不</b>用于推免计算——挂科重修刷分对保研没用，第一次就要考好。</li>
+      <li><b>硬性门槛</b>：必修课须一次性修读合格；前三年所修必修学分不少于教学计划的 3/4；英语须通过四级（425 分是隐性安全线）。</li>
+    </ul>
+
+    <h3>谁能进排名圈</h3>
+    <ul>
+      <li>学院先公示各专业课程成绩排名<b>前 50%</b> 的名单（卓越工程师班为前 60%），进入名单才有资格参与综合排序。</li>
+      <li>若前 50% 人数不足推免指标，可从 50% 以外递补（每次递补 5%）。</li>
+    </ul>
+
+    <div class="warn"><b>大一就要记住：</b>保研本质是<b>前三年每一门必修课</b>的累积赛。大一的高数、线代、大物、电路、C 语言学分都很大，
+      低分飘过会直接把课程成绩拖掉好几名——而这是占比 60% 的大头。</div>
+
+    <!-- ============ 三 ============ -->
+    <h2 id="s3">三、科研 / 竞赛 / 社会实践分怎么拿</h2>
+    <p>科研创新潜质与专业能力倾向通过<b>专家面试 + 材料认定</b>考核，主要看这些东西（学院综合测评办法中的加分参照）：</p>
+
+    <div class="tscroll"><table class="tb">
+      <tr><th>项目</th><th>参考加分（综合测评口径）</th><th>说明</th></tr>
+      <tr><td><b>全国大学生电子设计竞赛</b></td><td>国特/国一 +10，国二 +8，国三 +6；省一 +5</td><td>本院含金量最高的竞赛，8 月省赛、奇数年国赛</td></tr>
+      <tr><td><b>全国大学生数学建模竞赛</b></td><td>国一 +8，国二 +6，国三 +5；省一 +4.5</td><td>每年 9 月，性价比极高</td></tr>
+      <tr><td><b>大创项目（大学生创新创业训练计划）</b></td><td>负责人立项是“创新推免”硬通货</td><td>大二上就要申报，看立项书/进展/结题全过程材料</td></tr>
+      <tr><td><b>论文</b></td><td>SCI 一作 +6，EI 一作 +4，北大核心一作 +1</td><td>需通过查重审核并答辩，杜绝挂名</td></tr>
+      <tr><td><b>专利</b></td><td>发明专利（排名前三）可计入</td><td>实用新型/外观认可度低很多</td></tr>
+      <tr><td><b>英语竞赛 / 光电 / 信息安全等</b></td><td>国一 +2~3 不等</td><td>锦上添花</td></tr>
+      <tr><td><b>社会实践与思想品德（5%）</b></td><td>校级以上奖励的志愿服务、学生组织、省级以上文体竞赛获奖</td><td>占比小但别空着</td></tr>
+    </table></div>
+
+    <div class="note"><b>还有一条“创新推免”通道：</b>创新成果特别突出者（主持大创、省部级以上竞赛获奖、SCI 一作等）可走创新推免生渠道，
+      课程成绩和外语要求可适当放宽——适合绩点不是顶尖但科研竞赛很强的同学。</div>
+
+    <!-- ============ 四 ============ -->
+    <h2 id="s4">四、完整时间线（按你现在是大一算）</h2>
+    <div class="tl">
+      <div class="it green">
+        <div class="when">大一 ~ 大二</div>
+        <div class="what">攒绩点 + 过四六级 + 进实验室</div>
+        <div class="how">必修课第一次就考高分；四级大二上过、六级大二下刷到 425+（夏令营门槛）；联系导师进实验室打杂攒科研经历。</div>
+      </div>
+      <div class="it green">
+        <div class="when">大二上 ~ 大三</div>
+        <div class="what">竞赛 + 大创</div>
+        <div class="how">申报大创（负责人身份）；组队打电子设计竞赛、数学建模；有余力写一篇 EI/核心论文。</div>
+      </div>
+      <div class="it orange">
+        <div class="when">大三下 5~6 月</div>
+        <div class="what">夏令营报名（含本院与外校）</div>
+        <div class="how">川大电子信息学院 2026 夏令营 6 月 30 日 12:00 截止，线上举办；外校夏令营多数也在 6 月截止。要求四/六级 425+，准备成绩单、排名证明、获奖扫描件。</div>
+      </div>
+      <div class="it orange">
+        <div class="when">大三暑假 7~8 月</div>
+        <div class="what">参加夏令营，拿“优秀营员”</div>
+        <div class="how">优营≈拟录取承诺；8 月 31 日是学院认定推免材料的截止时点。</div>
+      </div>
+      <div class="it red">
+        <div class="when">大四上 9 月上旬</div>
+        <div class="what">学院推免遴选（拿资格）</div>
+        <div class="how">9 月动员大会 → 交申请与证明材料 → 课程成绩初排名 → 专家面试 → 综合成绩排序 → 名单公示 ≥10 个工作日。</div>
+      </div>
+      <div class="it red">
+        <div class="when">大四上 9 月中</div>
+        <div class="what">预推免报名（保本院/外校）</div>
+        <div class="how">本院预推免网报（2026 届参考：9 月 11 日 14:00 截止，系统 yz.scu.edu.cn/xly），材料合并为 1 个 PDF 上传，9 月中旬线下复试。</div>
+      </div>
+      <div class="it red">
+        <div class="when">大四上 9 月下旬</div>
+        <div class="what">教育部推免服务系统确认</div>
+        <div class="how">在 yz.chsi.com.cn/tm 填志愿、收复试通知、确认拟录取——到此保研结束。</div>
+      </div>
+    </div>
+
+    <!-- ============ 五 ============ -->
+    <h2 id="s5">五、申请材料清单（预推免口径）</h2>
+    <ol>
+      <li>学生证、第二代身份证复印件；</li>
+      <li>本科成绩单、推免排名证明（加盖培养部门公章）；</li>
+      <li>能力证明材料：四/六级成绩单、获奖证书、代表性论文/出版物/原创成果等复印件；</li>
+      <li>预推免系统生成的报名申请表（先报名生成，再与其他材料合并）；</li>
+      <li>直博（含本硕博连读）另需：直博入学申请表 + 两封专家推荐书 + 成果陈述与证明；</li>
+      <li>以上按顺序扫描合并为 <b>1 个 PDF</b>，按“姓名+本科学校+报考专业”命名上传。</li>
+    </ol>
+
+    <!-- ============ 六 ============ -->
+    <h2 id="s6">六、这些情况会被取消资格</h2>
+    <div class="warn">
+      <ul style="margin:0">
+        <li>申请过程中弄虚作假（直接取消并追责）；</li>
+        <li>入学前未取得学士学位或本科毕业证，或受到处分；</li>
+        <li>取得资格后，毕业学年必修课（含毕业实习、毕设、毕业论文）成绩低于满分的 80%（或良好）。</li>
+      </ul>
+    </div>
+
+    <!-- ============ 七 ============ -->
+    <h2 id="s7">七、官方文件原文（建议收藏）</h2>
+    <div class="linkgrid">
+      <a class="doc" href="https://jwc.scu.edu.cn/__local/4/F0/FB/384FA455825CA414BB4BEB2EE0B_280AD638_A81F6.pdf" target="_blank" rel="noopener">
+        <div class="t">《四川大学推荐优秀应届本科毕业生免试攻读研究生的实施办法》</div>
+        <div class="u">jwc.scu.edu.cn（教务处 PDF）</div>
+        <span class="src">校级总纲：条件 / 成绩构成 / 程序 / 监督</span>
+      </a>
+      <a class="doc" href="https://eie.scu.edu.cn/info/1024/11934.htm" target="_blank" rel="noopener">
+        <div class="t">电子信息学院 2024 届推免研究生推荐办法</div>
+        <div class="u">eie.scu.edu.cn/info/1024/11934.htm</div>
+        <span class="src">学院细则：60/35/5、前 50% 入围、日程</span>
+      </a>
+      <a class="doc" href="https://eie.scu.edu.cn/info/1025/15352.htm" target="_blank" rel="noopener">
+        <div class="t">电子信息学院 2027 年接收推免硕士预报名通知</div>
+        <div class="u">eie.scu.edu.cn/info/1025/15352.htm</div>
+        <span class="src">最新一届：材料清单 / 复试 / 联系方式</span>
+      </a>
+      <a class="doc" href="https://yz.scu.edu.cn/zsxx/Details/0f4bc2fc-e7d8-455d-b0e3-8ad680196df1" target="_blank" rel="noopener">
+        <div class="t">四川大学 2027 年推荐免试研究生招生章程</div>
+        <div class="u">yz.scu.edu.cn（研招网）</div>
+        <span class="src">全校接收口径：2027 拟招推免硕士 3150 名</span>
+      </a>
+      <a class="doc" href="https://eie.scu.edu.cn/info/1025/15213.htm" target="_blank" rel="noopener">
+        <div class="t">电子信息学院 2026 年优秀大学生暑期夏令营通知</div>
+        <div class="u">eie.scu.edu.cn/info/1025/15213.htm</div>
+        <span class="src">夏令营：6 月 30 日截止、四/六级 425+</span>
+      </a>
+      <a class="doc" href="https://yz.chsi.com.cn/tm" target="_blank" rel="noopener">
+        <div class="t">全国推免服务系统（教育部）</div>
+        <div class="u">yz.chsi.com.cn/tm</div>
+        <span class="src">9 月下旬正式报名录取的唯一入口</span>
+      </a>
+    </div>
+    <p style="font-size:13.5px">其他常用入口：川大预推免报名系统 <code>yz.scu.edu.cn/xly</code> ·
+      学院研招办 <code>028-85463874</code>（赖老师，laihua@scu.edu.cn）· 研招办 <code>028-85466153</code>。</p>
+
+    <!-- ============ 八 ============ -->
+    <h2 id="s8">八、给大一的你：现在就能做的 5 件事</h2>
+    <div class="ok">
+      <ol style="margin:0">
+        <li><b>把每门必修课当 90+ 的目标学</b>——课程成绩占 60%，且只用第一次成绩。</li>
+        <li><b>大二上过四级，大二下六级冲 425+</b>——这是夏令营和推免的硬门槛，本博客右侧的六级翻卡就是为这个准备的。</li>
+        <li><b>大二上申报大创、争取当负责人</b>——科研 35% 的大头从这时候开始攒。</li>
+        <li><b>组一支电赛/数模队伍</b>——获奖证书同时服务于推免加分和复试简历。</li>
+        <li><b>大三寒假前收藏本页六个官方链接</b>，5 月起盯学院官网通知，夏令营别错过 6 月底的截止。</li>
+      </ol>
+    </div>
+
+    <a class="backhome" href="index.html">← 返回博客首页</a>
+  </article>
+
+  <aside>
+    <div class="box profile">
+      <div class="pa">S</div>
+      <div class="pn">Syboe</div>
+      <div class="pd">四川大学 · 电子信息<br>大一在读 · 记录学习与保研进度</div>
+    </div>
+    <div class="box tocbox">
+      <div class="bt">本页目录</div>
+      <nav class="toc">
+        <a href="#s1">一、推免是什么</a>
+        <a href="#s2">二、综合成绩怎么算</a>
+        <a href="#s3">三、科研竞赛加分</a>
+        <a href="#s4">四、完整时间线</a>
+        <a href="#s5">五、申请材料清单</a>
+        <a href="#s6">六、取消资格情形</a>
+        <a href="#s7">七、官方文件原文</a>
+        <a href="#s8">八、现在就能做的事</a>
+      </nav>
+    </div>
+    <div class="box">
+      <div class="bt">博客工具</div>
+      <nav class="toc">
+        <a href="c-learner.html">零基础 C 语言教程</a>
+        <a href="ee-toolbox.html">电路与实验工具箱</a>
+        <a href="manuscript/index.html">机械制图 3D 教程</a>
+      </nav>
+    </div>
+  </aside>
+</div>
+
+<footer class="site">Syboe 的电子笔记 · 资料整理自四川大学官方公开文件，请以最新正式通知为准</footer>
+
+</body>
+</html>

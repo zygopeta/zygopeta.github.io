@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>电子信息学习工作台</title>
+<style>
+  *{box-sizing:border-box}
+  :root{
+    --bg:#f4f6fb;
+    --card:#ffffff;
+    --ink:#161b2e;
+    --ink2:#5c6683;
+    --ink3:#8b94ac;
+    --line:#e4e8f2;
+    --accent:#3563e9;
+    --accent2:#6b8cf5;
+    --soft:#eef2ff;
+    --ok:#0f9d76;
+    --warn:#d9622b;
+    --r:14px;
+  }
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    font-size:14px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding:34px 22px 70px}
+  header.top{margin-bottom:26px;position:relative}
+  header.top .backblog{position:absolute;right:0;top:4px;font-size:13px;color:#4a5b8c;
+    text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:4px 12px;background:#fff}
+  header.top .backblog:hover{border-color:#b9ccf5;color:var(--accent)}
+  .eyebrow{
+    display:inline-block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--accent);background:var(--soft);padding:5px 11px;border-radius:999px;font-weight:600;
+  }
+  h1{font-size:29px;margin:12px 0 6px;letter-spacing:-.5px;font-weight:700}
+  .sub{color:var(--ink2);font-size:14px;margin:0;max-width:660px}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:24px 0 20px;border-bottom:1px solid var(--line);padding-bottom:0}
+  .tab{
+    appearance:none;border:none;background:transparent;cursor:pointer;
+    font-family:inherit;font-size:14px;font-weight:600;color:var(--ink2);
+    padding:11px 16px;border-radius:10px 10px 0 0;position:relative;transition:.16s;
+  }
+  .tab:hover{color:var(--ink);background:#eef1f9}
+  .tab.on{color:var(--accent);background:var(--card)}
+  .tab.on::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--accent);border-radius:2px}
+  .panel{display:none}
+  .panel.on{display:block;animation:fade .22s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+    padding:22px;margin-bottom:18px;box-shadow:0 1px 2px rgba(22,27,46,.04);
+  }
+  .card h2{font-size:15px;margin:0 0 4px;font-weight:700;display:flex;align-items:center;gap:8px}
+  .card h2 .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block}
+  .card .hint{color:var(--ink3);font-size:12.5px;margin:0 0 16px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr}}
+  label.f{display:block;font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:6px;letter-spacing:.02em}
+  textarea,input[type=number],input[type=text],select{
+    width:100%;font-family:inherit;font-size:13.5px;color:var(--ink);
+    background:#fbfcfe;border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+    transition:.15s;resize:vertical;
+  }
+  textarea{min-height:78px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;line-height:1.65}
+  textarea:focus,input:focus,select:focus{outline:none;border-color:var(--accent2);background:#fff;box-shadow:0 0 0 3px rgba(53,99,233,.1)}
+  .row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-top:14px}
+  .row > .grow{flex:1;min-width:130px}
+  button.btn{
+    appearance:none;border:none;cursor:pointer;font-family:inherit;font-size:13.5px;font-weight:600;
+    padding:10px 20px;border-radius:10px;background:var(--accent);color:#fff;transition:.15s;
+    box-shadow:0 1px 3px rgba(53,99,233,.3);
+  }
+  button.btn:hover{background:#2b53cf;transform:translateY(-1px)}
+  button.btn:active{transform:none}
+  button.ghost{background:#fff;color:var(--ink2);border:1px solid var(--line);box-shadow:none}
+  button.ghost:hover{background:#f6f8fc;color:var(--ink);border-color:#cfd6e6;transform:none}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:10px;margin-top:18px}
+  .stat{background:#f8fafd;border:1px solid var(--line);border-radius:11px;padding:11px 13px}
+  .stat .k{font-size:11.5px;color:var(--ink3);font-weight:600;letter-spacing:.03em;margin-bottom:3px}
+  .stat .v{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.2px;word-break:break-all}
+  .stat .v small{font-size:11px;font-weight:500;color:var(--ink3)}
+  .stat.hl{background:var(--soft);border-color:#d6e0ff}
+  .stat.hl .v{color:var(--accent)}
+  .result-line{
+    margin-top:14px;background:#0f172a;color:#e8eefc;border-radius:11px;padding:13px 16px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13.5px;
+    display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+  }
+  .result-line .copy{background:rgba(255,255,255,.12);border:none;color:#cfd8ef;cursor:pointer;
+    font-family:inherit;font-size:11.5px;padding:5px 11px;border-radius:7px;font-weight:600}
+  .result-line .copy:hover{background:rgba(255,255,255,.22);color:#fff}
+  canvas{width:100%;height:400px;display:block;border-radius:10px;background:#fff}
+  .canvas-box{margin-top:18px;border:1px solid var(--line);border-radius:12px;padding:9px;background:#fff}
+  .warn{color:var(--warn);font-size:12.5px;margin-top:10px;font-weight:600}
+  .formula-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+  .fcard{background:#f8fafd;border:1px solid var(--line);border-radius:12px;padding:15px 16px}
+  .fcard h3{font-size:13px;margin:0 0 11px;color:var(--accent);font-weight:700;letter-spacing:.02em}
+  .fcard dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:7px 12px;align-items:baseline}
+  .fcard dt{color:var(--ink2);font-size:12.5px;white-space:nowrap}
+  .fcard dd{margin:0;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:12.5px;color:var(--ink);font-weight:600;text-align:right}
+  footer{color:var(--ink3);font-size:12px;text-align:center;margin-top:34px;line-height:1.9}
+  .badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;
+    background:var(--soft);color:var(--accent);margin-left:8px;vertical-align:middle}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--ink2)}
+  .legend i{width:14px;height:3px;border-radius:2px;display:inline-block;margin-right:6px;vertical-align:middle}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <a class="backblog" href="index.html">← 返回博客</a>
+    <span class="eyebrow">EE Freshman Toolkit</span>
+    <h1>电子信息学习工作台</h1>
+    <p class="sub">大物实验数据处理、电路暂态过程、相量分析、常用公式速查。全部离线本地运行，不联网、不上传数据。</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab on" data-panel="p-data">实验数据处理</button>
+    <button class="tab" data-panel="p-wave">电路暂态波形</button>
+    <button class="tab" data-panel="p-phasor">相量图与阻抗</button>
+    <button class="tab" data-panel="p-formula">公式速查</button>
+  </div>
+
+  <!-- ============ 实验数据处理 ============ -->
+  <section class="panel on" id="p-data">
+
+    <div class="card">
+      <h2><span class="dot"></span>线性最小二乘拟合</h2>
+      <p class="hint">两组数据个数需相同。直接粘贴 Excel 一列即可，逗号、空格、换行都能识别。</p>
+      <div class="grid2">
+        <div>
+          <label class="f">自变量 x（如 砝码质量 / 长度）</label>
+          <textarea id="fx" placeholder="10, 20, 30, 40, 50"></textarea>
+        </div>
+        <div>
+          <label class="f">因变量 y（如 伸长量 / 电压）</label>
+          <textarea id="fy" placeholder="2.05, 4.02, 6.11, 7.98, 10.03"></textarea>
+        </div>
+      </div>
+      <div class="row">
+        <button class="btn" id="btnFit">计算并绘图</button>
+        <button class="btn ghost" id="demoFit">填入示例</button>
+        <button class="btn ghost" id="btnPng">导出图片</button>
+        <div class="grow"></div>
+        <div style="width:150px">
+          <label class="f">x 单位</label>
+          <input type="text" id="ux" value="cm" placeholder="可留空">
+        </div>
+        <div style="width:150px">
+          <label class="f">y 单位</label>
+          <input type="text" id="uy" value="mm" placeholder="可留空">
+        </div>
+      </div>
+      <div id="fitOut"></div>
+      <div class="canvas-box"><canvas id="cvFit" height="380"></canvas></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="dot"></span>多次测量不确定度</h2>
+      <p class="hint">A 类按贝塞尔标准差除以 √n；B 类按均匀分布 Δ<sub>仪</sub>/√3；结果按 k=2（置信概率约 95%）给出扩展不确定度。</p>
+      <div class="grid2">
+        <div>
+          <label class="f">测量值（同一物理量的多次读数）</label>
+          <textarea id="um" placeholder="1.234, 1.236, 1.232, 1.238, 1.235, 1.233"></textarea>
+        </div>
+        <div>
+          <label class="f">仪器误差限 Δ<sub>仪</sub>（如 0.002）</label>
+          <input type="number" id="udelta" value="0.002" step="0.001">
+          <label class="f" style="margin-top:12px">物理量名称 / 单位（选填）</label>
+          <input type="text" id="uname" placeholder="如 圆柱直径 d / cm">
+        </div>
+      </div>
+      <div class="row">
+        <button class="btn" id="btnUnc">计算不确定度</button>
+        <button class="btn ghost" id="demoUnc">填入示例</button>
+      </div>
+      <div id="uncOut"></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="dot"></span>逐差法</h2>
+      <p class="hint">适用于等间隔测量（杨氏模量、牛顿环、声速等）。数据个数必须为偶数，会自动分成前后两半对应相减。</p>
+      <div class="grid2">
+        <div>
+          <label class="f">等间隔测量数据（偶数个）</label>
+          <textarea id="dx" placeholder="2.145, 2.240, 2.335, 2.430, 2.525, 2.620, 2.715, 2.810"></textarea>
+        </div>
+        <div>
+          <label class="f">相邻间隔对应的物理量（选填，用于换算）</label>
+          <input type="number" id="dstep" value="1" step="any">
+          <label class="f" style="margin-top:12px">结果名称 / 单位（选填）</label>
+          <input type="text" id="dname" placeholder="如 ΔL / mm">
+        </div>
+      </div>
+      <div class="row">
+        <button class="btn" id="btnDiff">计算逐差</button>
+        <button class="btn ghost" id="demoDiff">填入示例</button>
+      </div>
+      <div id="diffOut"></div>
+    </div>
+
+  </section>
+
+  <!-- ============ 电路暂态波形 ============ -->
+  <section class="panel" id="p-wave">
+    <div class="card">
+      <h2><span class="dot"></span>一阶 / 二阶电路阶跃响应</h2>
+      <p class="hint">切换电路类型，改参数看波形怎么变。曲线已归一化（电压除以稳态值、电流除以稳态值），方便比较相位与快慢。</p>
+      <div class="grid2">
+        <div>
+          <label class="f">电路类型</label>
+          <select id="wType">
+            <option value="rc">RC 串联（电容充电）</option>
+            <option value="rl">RL 串联（电流上升）</option>
+            <option value="rlc">RLC 串联（电容电压阶跃）</option>
+          </select>
+        </div>
+        <div id="wSourceWrap">
+          <label class="f">电源电压 V₀（V）</label>
+          <input type="number" id="wV0" value="10" step="1">
+        </div>
+      </div>
+      <div class="grid2" style="margin-top:14px">
+        <div><label class="f">电阻 R（Ω）</label><input type="number" id="wR" value="1000" step="100"></div>
+        <div><label class="f">电容 C（μF）</label><input type="number" id="wC" value="10" step="1"></div>
+      </div>
+      <div class="grid2" style="margin-top:14px" id="wLwrap">
+        <div><label class="f">电感 L（mH）</label><input type="number" id="wL" value="10" step="1"></div>
+        <div><label class="f">阻尼状态提示</label><input type="text" id="wState" readonly value="—"></div>
+      </div>
+      <div class="row">
+        <button class="btn" id="btnWave">绘制波形</button>
+        <button class="btn ghost" id="btnWaveRst">恢复默认</button>
+      </div>
+      <div id="waveOut"></div>
+      <div class="canvas-box"><canvas id="cvWave" height="400"></canvas></div>
+      <div class="legend">
+        <span id="lgV"><i style="background:#3563e9"></i>电压 / V₀</span>
+        <span id="lgI"><i style="background:#e0642f"></i>电流 / 归一化</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 相量图 ============ -->
+  <section class="panel" id="p-phasor">
+    <div class="card">
+      <h2><span class="dot"></span>串联 RLC 相量图</h2>
+      <p class="hint">以电流 I 为参考方向（相量图 +x 轴）。改频率看 U<sub>L</sub> 与 U<sub>C</sub> 如何互相抵消，找到谐振点。</p>
+      <div class="grid2">
+        <div><label class="f">电阻 R（Ω）</label><input type="number" id="pR" value="50" step="5"></div>
+        <div><label class="f">电感 L（mH）</label><input type="number" id="pL" value="10" step="1"></div>
+      </div>
+      <div class="grid2" style="margin-top:14px">
+        <div><label class="f">电容 C（μF）</label><input type="number" id="pC" value="10" step="1"></div>
+        <div><label class="f">信号频率 f（Hz）</label><input type="number" id="pF" value="503" step="10"></div>
+      </div>
+      <div class="row">
+        <button class="btn" id="btnPhasor">计算并绘制</button>
+        <button class="btn ghost" id="btnReso">跳到谐振频率</button>
+      </div>
+      <div id="phasorOut"></div>
+      <div class="canvas-box"><canvas id="cvPhasor" height="420"></canvas></div>
+      <div class="legend">
+        <span><i style="background:#3563e9"></i>U<sub>R</sub></span>
+        <span><i style="background:#0f9d76"></i>U<sub>L</sub></span>
+        <span><i style="background:#d9622b"></i>U<sub>C</sub></span>
+        <span><i style="background:#7b3fe4"></i>U<sub>总</sub></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 公式速查 ============ -->
+  <section class="panel" id="p-formula">
+    <div class="card">
+      <h2><span class="dot"></span>电路分析</h2>
+      <div class="formula-grid">
+        <div class="fcard">
+          <h3>分压 / 分流</h3>
+          <dl>
+            <dt>串联分压</dt><dd>U₁ = U·R₁/(R₁+R₂)</dd>
+            <dt>并联分流</dt><dd>I₁ = I·R₂/(R₁+R₂)</dd>
+            <dt>两电阻并联</dt><dd>R = R₁R₂/(R₁+R₂)</dd>
+          </dl>
+        </div>
+        <div class="fcard">
+          <h3>一阶电路时间常数</h3>
+          <dl>
+            <dt>RC 电路</dt><dd>τ = RC</dd>
+            <dt>RL 电路</dt><dd>τ = L/R</dd>
+            <dt>三要素法</dt><dd>f(t) = f(∞) + [f(0₊) − f(∞)]e<sup>−t/τ</sup></dd>
+          </dl>
+        </div>
+        <div class="fcard">
+          <h3>RLC 串联</h3>
+          <dl>
+            <dt>谐振角频率</dt><dd>ω₀ = 1/√(LC)</dd>
+            <dt>谐振频率</dt><dd>f₀ = 1/(2π√(LC))</dd>
+            <dt>特性阻抗</dt><dd>ρ = √(L/C)</dd>
+            <dt>品质因数</dt><dd>Q = ρ/R = ω₀L/R</dd>
+            <dt>通频带</dt><dd>BW = f₀/Q</dd>
+          </dl>
+        </div>
+        <div class="fcard">
+          <h3>阻抗与功率</h3>
+          <dl>
+            <dt>复阻抗</dt><dd>Z = R + j(ωL − 1/ωC)</dd>
+            <dt>阻抗模</dt><dd>|Z| = √(R² + X²)</dd>
+            <dt>阻抗角</dt><dd>φ = arctan(X/R)</dd>
+            <dt>有功功率</dt><dd>P = UIcosφ</dd>
+            <dt>功率因数</dt><dd>cosφ = R/|Z|</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="dot"></span>不确定度评定</h2>
+      <div class="formula-grid">
+        <div class="fcard">
+          <h3>A 类分量</h3>
+          <dl>
+            <dt>样本标准差</dt><dd>s = √(Σ(xᵢ−x̄)²/(n−1))</dd>
+            <dt>A 类</dt><dd>u<sub>A</sub> = s/√n</dd>
+            <dt>适用</dt><dd>n ≥ 6 时较可靠</dd>
+          </dl>
+        </div>
+        <div class="fcard">
+          <h3>B 类分量</h3>
+          <dl>
+            <dt>均匀分布</dt><dd>u<sub>B</sub> = Δ<sub>仪</sub>/√3</dd>
+            <dt>正态 (k=3)</dt><dd>u<sub>B</sub> = Δ<sub>仪</sub>/3</dd>
+            <dt>Δ<sub>仪</sub> 取法</dt><dd>量具最小分度值或其一半</dd>
+          </dl>
+        </div>
+        <div class="fcard">
+          <h3>合成与扩展</h3>
+          <dl>
+            <dt>合成</dt><dd>u<sub>C</sub> = √(u<sub>A</sub>² + u<sub>B</sub>²)</dd>
+            <dt>扩展 (k=2)</dt><dd>U = 2u<sub>C</sub></dd>
+            <dt>结果表示</dt><dd>x = (x̄ ± U) 单位</dd>
+            <dt>相对不确定度</dt><dd>E = U/x̄ × 100%</dd>
+          </dl>
+        </div>
+        <div class="fcard">
+          <h3>间接测量传递</h3>
+          <dl>
+            <dt>和差</dt><dd>u<sub>y</sub> = √(u<sub>a</sub>² + u<sub>b</sub>²)</dd>
+            <dt>积商</dt><dd>E<sub>y</sub> = √(E<sub>a</sub>² + E<sub>b</sub>²)</dd>
+            <dt>乘方</dt><dd>E<sub>y</sub> = |n|·E<sub>x</sub></dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="dot"></span>高数常用展开</h2>
+      <div class="formula-grid">
+        <div class="fcard">
+          <h3>泰勒展开（x→0）</h3>
+          <dl>
+            <dt>eˣ</dt><dd>1 + x + x²/2! + x³/3! + ⋯</dd>
+            <dt>sin x</dt><dd>x − x³/3! + x⁵/5! − ⋯</dd>
+            <dt>cos x</dt><dd>1 − x²/2! + x⁴/4! − ⋯</dd>
+            <dt>ln(1+x)</dt><dd>x − x²/2 + x³/3 − ⋯</dd>
+            <dt>(1+x)^α</dt><dd>1 + αx + α(α−1)x²/2! + ⋯</dd>
+          </dl>
+        </div>
+        <div class="fcard">
+          <h3>常用导数</h3>
+          <dl>
+            <dt>(sin x)′</dt><dd>cos x</dd>
+            <dt>(ln x)′</dt><dd>1/x</dd>
+            <dt>(arctan x)′</dt><dd>1/(1+x²)</dd>
+            <dt>(aˣ)′</dt><dd>aˣ ln a</dd>
+          </dl>
+        </div>
+        <div class="fcard">
+          <h3>常用积分</h3>
+          <dl>
+            <dt>∫dx/x</dt><dd>ln|x| + C</dd>
+            <dt>∫e^(ax)dx</dt><dd>e^(ax)/a + C</dd>
+            <dt>∫dx/(1+x²)</dt><dd>arctan x + C</dd>
+            <dt>∫sin²x dx</dt><dd>x/2 − sin2x/4 + C</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    所有计算在浏览器本地完成，关闭页面即清空 · 数据不外传<br>
+    作图与拟合结果可直接截图或导出，粘贴进实验报告
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- 工具函数 ---------- */
+  function $(id){ return document.getElementById(id); }
+
+  function parseList(str){
+    if(!str) return [];
+    return str.split(/[\s,;，、\n\r\t]+/)
+      .map(function(s){ return s.trim(); })
+      .filter(function(s){ return s !== ""; })
+      .map(Number)
+      .filter(function(v){ return isFinite(v); });
+  }
+
+  function fmt(v, p){
+    p = p || 4;
+    if(!isFinite(v)) return "—";
+    var a = Math.abs(v);
+    if(a !== 0 && (a < 1e-4 || a >= 1e6)) return v.toExponential(2);
+    return String(parseFloat(v.toPrecision(p)));
+  }
+
+  function setupCanvas(cv){
+    var rect = cv.getBoundingClientRect();
+    var w = rect.width, h = rect.height;
+    if(w < 10 || h < 10) return null;
+    var dpr = window.devicePixelRatio || 1;
+    cv.width = Math.round(w * dpr);
+    cv.height = Math.round(h * dpr);
+    var ctx = cv.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    return { ctx: ctx, w: w, h: h };
+  }
+
+  function niceStep(range, target){
+    if(!(range > 0)) return 1;
+    var rough = range / target;
+    var mag = Math.pow(10, Math.floor(Math.log10(rough)));
+    var norm = rough / mag;
+    var step;
+    if(norm <= 1) step = 1;
+    else if(norm <= 2) step = 2;
+    else if(norm <= 5) step = 5;
+    else step = 10;
+    return step * mag;
+  }
+
+  function axisFrame(ctx, w, h, pad){
+    ctx.strokeStyle = "#dfe5f0";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(pad.l, pad.t, w - pad.l - pad.r, h - pad.t - pad.b);
+  }
+
+  function drawArrow(ctx, x1, y1, x2, y2, color, lw){
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = lw || 2;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    var ang = Math.atan2(y2 - y1, x2 - x1);
+    var hl = 11;
+    ctx.beginPath();
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - hl * Math.cos(ang - 0.38), y2 - hl * Math.sin(ang - 0.38));
+    ctx.lineTo(x2 - hl * Math.cos(ang + 0.38), y2 - hl * Math.sin(ang + 0.38));
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function sigRound(v, sig){
+    if(v === 0 || !isFinite(v)) return 0;
+    var d = Math.ceil(Math.log10(Math.abs(v)));
+    var f = Math.pow(10, sig - d);
+    return Math.round(v * f) / f;
+  }
+
+  function decimalsOf(v){
+    var dec = 0, t = v;
+    while(Math.abs(t - Math.round(t)) > 1e-9 && dec < 10){ t *= 10; dec++; }
+    return dec;
+  }
+
+  /* ---------- 状态 ---------- */
+  var state = {
+    fit: null,
+    wave: null,
+    phasor: null
+  };
+
+  /* ---------- Tab 切换 ---------- */
+  var tabs = document.querySelectorAll(".tab");
+  for(var i = 0; i < tabs.length; i++){
+    tabs[i].addEventListener("click", function(){
+      var list = document.querySelectorAll(".tab");
+      for(var j = 0; j < list.length; j++) list[j].classList.remove("on");
+      this.classList.add("on");
+      var panels = document.querySelectorAll(".panel");
+      for(var k = 0; k < panels.length; k++) panels[k].classList.remove("on");
+      $(this.dataset.panel).classList.add("on");
+      // 重绘已经算过的图（隐藏时 canvas 尺寸为 0）
+      if(state.fit) drawFit(state.fit);
+      if(state.wave) drawWave(state.wave);
+      if(state.phasor) drawPhasor(state.phasor);
+    });
+  }
+
+  /* =========================================================
+     一、线性最小二乘拟合
+     ========================================================= */
+  function computeFit(xs, ys){
+    var n = xs.length;
+    var sx = 0, sy = 0, i;
+    for(i = 0; i < n; i++){ sx += xs[i]; sy += ys[i]; }
+    var mx = sx / n, my = sy / n;
+    var Sxx = 0, Sxy = 0, Syy = 0;
+    for(i = 0; i < n; i++){
+      var dx = xs[i] - mx, dy = ys[i] - my;
+      Sxx += dx * dx; Sxy += dx * dy; Syy += dy * dy;
+    }
+    if(Sxx === 0) return null;
+    var k = Sxy / Sxx;
+    var b = my - k * mx;
+    var r = Syy > 0 ? Sxy / Math.sqrt(Sxx * Syy) : 1;
+    var RSS = 0;
+    for(i = 0; i < n; i++){
+      var res = ys[i] - (k * xs[i] + b);
+      RSS += res * res;
+    }
+    var s = n > 2 ? Math.sqrt(RSS / (n - 2)) : 0;
+    var uk = s / Math.sqrt(Sxx);
+    var ub = s * Math.sqrt(1 / n + (mx * mx) / Sxx);
+    return {
+      xs: xs, ys: ys, n: n, k: k, b: b, r: r,
+      s: s, uk: uk, ub: ub, mx: mx, my: my
+    };
+  }
+
+  function drawFit(f){
+    var cv = $("cvFit");
+    var env = setupCanvas(cv);
+    if(!env) return;
+    var ctx = env.ctx, w = env.w, h = env.h;
+    var pad = { l: 68, r: 26, t: 26, b: 52 };
+    var pw = w - pad.l - pad.r, ph = h - pad.t - pad.b;
+    if(pw < 40 || ph < 40) return;
+
+    var xs = f.xs, ys = f.ys, k = f.k, b = f.b;
+    var xmin = Math.min.apply(null, xs), xmax = Math.max.apply(null, xs);
+    var ymin = Math.min.apply(null, ys), ymax = Math.max.apply(null, ys);
+    ymin = Math.min(ymin, k * xmin + b, k * xmax + b);
+    ymax = Math.max(ymax, k * xmin + b, k * xmax + b);
+    if(xmax === xmin){ xmax = xmin + 1; }
+    if(ymax === ymin){ ymax = ymin + 1; }
+    var xr = xmax - xmin, yr = ymax - ymin;
+    xmin -= xr * 0.10; xmax += xr * 0.10;
+    ymin -= yr * 0.12; ymax += yr * 0.12;
+
+    var X = function(v){ return pad.l + (v - xmin) / (xmax - xmin) * pw; };
+    var Y = function(v){ return pad.t + ph - (v - ymin) / (ymax - ymin) * ph; };
+
+    // 网格
+    var stepX = niceStep(xmax - xmin, 7);
+    var stepY = niceStep(ymax - ymin, 6);
+    ctx.font = "11px -apple-system,Segoe UI,sans-serif";
+    ctx.textBaseline = "middle";
+
+    ctx.strokeStyle = "#f0f3f9";
+    ctx.lineWidth = 1;
+    for(var gx = Math.ceil(xmin / stepX) * stepX; gx <= xmax; gx += stepX){
+      var px = X(gx);
+      ctx.beginPath(); ctx.moveTo(px, pad.t); ctx.lineTo(px, pad.t + ph); ctx.stroke();
+    }
+    for(var gy = Math.ceil(ymin / stepY) * stepY; gy <= ymax; gy += stepY){
+      var py = Y(gy);
+      ctx.beginPath(); ctx.moveTo(pad.l, py); ctx.lineTo(pad.l + pw, py); ctx.stroke();
+    }
+
+    // 坐标轴
+    ctx.strokeStyle = "#b9c3d8";
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, pad.t + ph); ctx.lineTo(pad.l + pw, pad.t + ph);
+    ctx.stroke();
+
+    // 刻度与标签
+    ctx.fillStyle = "#6b7690";
+    ctx.textAlign = "center";
+    for(var tx = Math.ceil(xmin / stepX) * stepX; tx <= xmax; tx += stepX){
+      var px2 = X(tx);
+      ctx.beginPath();
+      ctx.moveTo(px2, pad.t + ph); ctx.lineTo(px2, pad.t + ph + 4);
+      ctx.strokeStyle = "#b9c3d8"; ctx.lineWidth = 1; ctx.stroke();
+      ctx.fillText(fmt(tx, 3), px2 - 2, pad.t + ph + 16);
+    }
+    ctx.textAlign = "center";
+    for(var ty = Math.ceil(ymin / stepY) * stepY; ty <= ymax; ty += stepY){
+      var py2 = Y(ty);
+      ctx.beginPath();
+      ctx.moveTo(pad.l, py2); ctx.lineTo(pad.l - 4, py2);
+      ctx.strokeStyle = "#b9c3d8"; ctx.lineWidth = 1; ctx.stroke();
+      ctx.textAlign = "right";
+      ctx.fillText(fmt(ty, 3), pad.l - 8, py2);
+    }
+
+    // 拟合直线
+    ctx.strokeStyle = "#3563e9";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(X(xmin), Y(k * xmin + b));
+    ctx.lineTo(X(xmax), Y(k * xmax + b));
+    ctx.stroke();
+
+    // 数据点
+    for(var i = 0; i < xs.length; i++){
+      var cx = X(xs[i]), cy = Y(ys[i]);
+      ctx.beginPath();
+      ctx.arc(cx, cy, 4.5, 0, Math.PI * 2);
+      ctx.fillStyle = "#fff";
+      ctx.fill();
+      ctx.strokeStyle = "#1f3a8a";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    // 轴标题
+    ctx.fillStyle = "#5c6683";
+    ctx.font = "12px -apple-system,Segoe UI,sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("x", pad.l + pw / 2, h - 10);
+    ctx.save();
+    ctx.translate(16, pad.t + ph / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText("y", 0, 0);
+    ctx.restore();
+  }
+
+  function runFit(){
+    var xs = parseList($("fx").value);
+    var ys = parseList($("fy").value);
+    var out = $("fitOut");
+    if(xs.length < 3 || ys.length < 3){
+      out.innerHTML = '<div class="warn">至少需要 3 组数据点。</div>';
+      return;
+    }
+    if(xs.length !== ys.length){
+      out.innerHTML = '<div class="warn">x 有 ' + xs.length + " 个，y 有 " + ys.length + " 个，数量必须一致。</div>";
+      return;
+    }
+    var f = computeFit(xs, ys);
+    if(!f){
+      out.innerHTML = '<div class="warn">所有 x 相同，无法拟合直线。</div>';
+      return;
+    }
+    state.fit = f;
+    drawFit(f);
+
+    var unx = $("ux").value.trim();
+    var uny = $("uy").value.trim();
+    var kUnit = (uny && unx) ? (uny + "/" + unx) : (uny || unx || "");
+    var eq = "y = " + fmt(f.k, 4) + " x " + (f.b >= 0 ? "+ " : "− ") + fmt(Math.abs(f.b), 4)
+           + (uny ? "  (" + uny + ")" : "");
+
+    out.innerHTML =
+      '<div class="stats">' +
+        '<div class="stat hl"><div class="k">斜率 k</div><div class="v">' + fmt(f.k, 5) +
+          (kUnit ? ' <small>' + kUnit + "</small>" : "") + "</div></div>" +
+        '<div class="stat"><div class="k">截距 b</div><div class="v">' + fmt(f.b, 5) +
+          (uny ? ' <small>' + uny + "</small>" : "") + "</div></div>" +
+        '<div class="stat"><div class="k">相关系数 r</div><div class="v">' + f.r.toFixed(5) + "</div></div>" +
+        '<div class="stat"><div class="k">u(k)</div><div class="v">' + fmt(f.uk, 3) + "</div></div>" +
+        '<div class="stat"><div class="k">u(b)</div><div class="v">' + fmt(f.ub, 3) + "</div></div>" +
+        '<div class="stat"><div class="k">数据点数 n</div><div class="v">' + f.n + "</div></div>" +
+      "</div>" +
+      '<div class="result-line"><span>' + eq + "</span>" +
+      '<button class="copy" data-copy="' + eq.replace(/"/g, "&quot;") + '">复制方程</button></div>';
+
+    bindCopy(out);
+  }
+
+  /* =========================================================
+     二、不确定度
+     ========================================================= */
+  function runUnc(){
+    var data = parseList($("um").value);
+    var delta = parseFloat($("udelta").value);
+    var out = $("uncOut");
+    var name = $("uname").value.trim();
+
+    if(data.length < 2){
+      out.innerHTML = '<div class="warn">至少需要 2 个测量值（建议 6 个以上）。</div>';
+      return;
+    }
+    if(!isFinite(delta) || delta <= 0){
+      out.innerHTML = '<div class="warn">请填写正的仪器误差限 Δ仪。</div>';
+      return;
+    }
+
+    var n = data.length, sum = 0, i;
+    for(i = 0; i < n; i++) sum += data[i];
+    var mean = sum / n;
+
+    var ss = 0;
+    for(i = 0; i < n; i++){
+      var d = data[i] - mean;
+      ss += d * d;
+    }
+    var s = Math.sqrt(ss / (n - 1));
+    var uA = s / Math.sqrt(n);
+    var uB = delta / Math.sqrt(3);
+    var uC = Math.sqrt(uA * uA + uB * uB);
+    var U = 2 * uC;
+
+    // 不确定度取 1~2 位有效数字，均值对齐
+    var lead = Math.floor(uC / Math.pow(10, Math.floor(Math.log10(uC))));
+    var sig = lead < 3 ? 2 : 1;
+    var uCR = sigRound(uC, sig);
+    var UR = sigRound(U, sig);
+    var decU = decimalsOf(UR);
+    var meanR = parseFloat(mean.toFixed(decU));
+
+    var label = name || "x";
+    var expr = label + " = (" + meanR.toFixed(decU) + " ± " + UR.toFixed(decU) + ")";
+
+    out.innerHTML =
+      '<div class="stats">' +
+        '<div class="stat hl"><div class="k">平均值 x̄</div><div class="v">' + fmt(mean, 6) + "</div></div>" +
+        '<div class="stat"><div class="k">样本标准差 s</div><div class="v">' + fmt(s, 4) + "</div></div>" +
+        '<div class="stat"><div class="k">u<sub>A</sub></div><div class="v">' + fmt(uA, 3) + "</div></div>" +
+        '<div class="stat"><div class="k">u<sub>B</sub></div><div class="v">' + fmt(uB, 3) + "</div></div>" +
+        '<div class="stat"><div class="k">u<sub>C</sub></div><div class="v">' + fmt(uC, 3) + "</div></div>" +
+        '<div class="stat"><div class="k">U (k=2)</div><div class="v">' + fmt(U, 3) + "</div></div>" +
+        '<div class="stat"><div class="k">相对不确定度</div><div class="v">' + (U / mean * 100).toFixed(2) + "%</div></div>" +
+        '<div class="stat"><div class="k">测量次数 n</div><div class="v">' + n + "</div></div>" +
+      "</div>" +
+      '<div class="result-line"><span>' + expr + "</span>" +
+      '<button class="copy" data-copy="' + expr.replace(/"/g, "&quot;") + '">复制结果</button></div>';
+    bindCopy(out);
+  }
+
+  /* =========================================================
+     三、逐差法
+     ========================================================= */
+  function runDiff(){
+    var data = parseList($("dx").value);
+    var step = parseFloat($("dstep").value);
+    var out = $("diffOut");
+    var name = $("dname").value.trim();
+
+    if(data.length < 4){
+      out.innerHTML = '<div class="warn">至少需要 4 个数据点。</div>';
+      return;
+    }
+    if(data.length % 2 !== 0){
+      out.innerHTML = '<div class="warn">数据个数为 ' + data.length + "，必须为偶数。请检查是否漏填。</div>";
+      return;
+    }
+    if(!isFinite(step) || step === 0) step = 1;
+
+    var m = data.length / 2;
+    var diffs = [], sum = 0, i;
+    for(i = 0; i < m; i++){
+      var dv = data[i + m] - data[i];
+      diffs.push(dv);
+      sum += dv;
+    }
+    var avg = sum / m;
+    var unitVal = avg / step;
+
+    var rows = "";
+    for(i = 0; i < m; i++){
+      rows += "<tr><td>Δ" + (i + 1) + "</td><td>" + fmt(diffs[i], 5) + "</td></tr>";
+    }
+
+    var resTxt = (name || "Δ") + " = " + fmt(avg, 5) + (step !== 1 ? "  →  " + fmt(unitVal, 5) : "");
+
+    out.innerHTML =
+      '<div class="stats">' +
+        '<div class="stat hl"><div class="k">平均逐差 Δ̄</div><div class="v">' + fmt(avg, 5) + "</div></div>" +
+        '<div class="stat"><div class="k">差值组数 m</div><div class="v">' + m + "</div></div>" +
+        '<div class="stat"><div class="k">换算值</div><div class="v">' + fmt(unitVal, 5) + "</div></div>" +
+      "</div>" +
+      '<div class="result-line"><span>' + resTxt + "</span>" +
+      '<button class="copy" data-copy="' + resTxt.replace(/"/g, "&quot;") + '">复制结果</button></div>' +
+      '<table style="width:100%;border-collapse:collapse;margin-top:16px;font-size:13px;font-variant-numeric:tabular-nums">' +
+        '<thead><tr style="text-align:left;color:#8b94ac;font-size:11.5px">' +
+        '<th style="padding:7px 8px;border-bottom:1px solid #e4e8f2">组</th>' +
+        '<th style="padding:7px 8px;border-bottom:1px solid #e4e8f2">x<sub>i+m</sub> − x<sub>i</sub></th></tr></thead>' +
+        "<tbody>" + rows + "</tbody></table>";
+    bindCopy(out);
+  }
+
+  /* ---------- 复制按钮 ---------- */
+  function bindCopy(scope){
+    var btns = scope.querySelectorAll(".copy");
+    for(var i = 0; i < btns.length; i++){
+      btns[i].addEventListener("click", function(){
+        var txt = this.getAttribute("data-copy");
+        var self = this;
+        var done = function(){
+          var old = self.textContent;
+          self.textContent = "已复制";
+          setTimeout(function(){ self.textContent = old; }, 1200);
+        };
+        if(navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(txt).then(done, function(){});
+        } else {
+          var ta = document.createElement("textarea");
+          ta.value = txt;
+          document.body.appendChild(ta);
+          ta.select();
+          try{ document.execCommand("copy"); done(); }catch(e){}
+          document.body.removeChild(ta);
+        }
+      });
+    }
+  }
+
+  /* =========================================================
+     四、暂态波形
+     ========================================================= */
+  function drawWave(cfg){
+    var cv = $("cvWave");
+    var env = setupCanvas(cv);
+    if(!env) return;
+    var ctx = env.ctx, w = env.w, h = env.h;
+    var pad = { l: 62, r: 26, t: 26, b: 50 };
+    var pw = w - pad.l - pad.r, ph = h - pad.t - pad.b;
+    if(pw < 40 || ph < 40) return;
+
+    var N = 1500;
+    var tEnd = cfg.tEnd;
+    var xs = [], vc = [], cur = [];
+    var i, t;
+
+    for(i = 0; i <= N; i++){
+      t = tEnd * i / N;
+      xs.push(t);
+      var r = cfg.fn(t);
+      vc.push(r.v);
+      cur.push(r.i);
+    }
+
+    var yMin = Math.min(0, Math.min.apply(null, vc), Math.min.apply(null, cur));
+    var yMax = Math.max(Math.max.apply(null, vc), Math.max.apply(null, cur));
+    if(!isFinite(yMin) || !isFinite(yMax) || (yMax - yMin) < 1e-9){ yMin = 0; yMax = 1; }
+    var padY = (yMax - yMin) * 0.09;
+    yMin -= padY; yMax += padY;
+
+    // 图例随电路类型更新
+    if($("lgV") && cfg.vLabel) $("lgV").innerHTML = '<i style="background:#3563e9"></i>' + cfg.vLabel;
+    if($("lgI") && cfg.iLabel) $("lgI").innerHTML = '<i style="background:#e0642f"></i>' + cfg.iLabel;
+
+    var X = function(v){ return pad.l + v / tEnd * pw; };
+    var Y = function(v){ return pad.t + ph - (v - yMin) / (yMax - yMin) * ph; };
+
+    // 网格
+    var stepY = niceStep(yMax - yMin, 6);
+    ctx.font = "11px -apple-system,Segoe UI,sans-serif";
+    ctx.strokeStyle = "#f0f3f9";
+    ctx.lineWidth = 1;
+    for(var gy = Math.ceil(yMin / stepY) * stepY; gy <= yMax; gy += stepY){
+      var py = Y(gy);
+      ctx.beginPath(); ctx.moveTo(pad.l, py); ctx.lineTo(pad.l + pw, py); ctx.stroke();
+    }
+    var stepX = niceStep(tEnd, 7);
+    for(var gx = Math.ceil(0 / stepX) * stepX; gx <= tEnd; gx += stepX){
+      var px = X(gx);
+      ctx.beginPath(); ctx.moveTo(px, pad.t); ctx.lineTo(px, pad.t + ph); ctx.stroke();
+    }
+
+    // 轴
+    ctx.strokeStyle = "#b9c3d8";
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, pad.t + ph); ctx.lineTo(pad.l + pw, pad.t + ph);
+    ctx.stroke();
+
+    // 刻度
+    ctx.fillStyle = "#6b7690";
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
+    for(var ty = Math.ceil(yMin / stepY) * stepY; ty <= yMax; ty += stepY){
+      var py2 = Y(ty);
+      ctx.beginPath(); ctx.moveTo(pad.l, py2); ctx.lineTo(pad.l - 4, py2);
+      ctx.strokeStyle = "#b9c3d8"; ctx.lineWidth = 1; ctx.stroke();
+      ctx.fillText(fmt(ty, 2), pad.l - 8, py2);
+    }
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    for(var tx = Math.ceil(0 / stepX) * stepX; tx <= tEnd; tx += stepX){
+      var px2 = X(tx);
+      ctx.fillText(fmt(tx * 1000, 3), px2, pad.t + ph + 8);
+    }
+    ctx.fillStyle = "#5c6683";
+    ctx.font = "12px -apple-system,Segoe UI,sans-serif";
+    ctx.textBaseline = "alphabetic";
+    ctx.fillText("t (ms)", pad.l + pw / 2, h - 8);
+    ctx.save();
+    ctx.translate(15, pad.t + ph / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText("归一化幅值", 0, 0);
+    ctx.restore();
+
+    // 曲线
+    var plot = function(arr, color){
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      for(var j = 0; j <= N; j++){
+        var xx = X(xs[j]), yy = Y(arr[j]);
+        if(j === 0) ctx.moveTo(xx, yy); else ctx.lineTo(xx, yy);
+      }
+      ctx.stroke();
+    };
+    plot(vc, "#3563e9");
+    plot(cur, "#e0642f");
+  }
+
+  function buildWave(){
+    var type = $("wType").value;
+    var V0 = parseFloat($("wV0").value) || 1;
+    var R = parseFloat($("wR").value);
+    var C = parseFloat($("wC").value) * 1e-6;
+    var L = parseFloat($("wL").value) * 1e-3;
+
+    var out = $("waveOut");
+    if(!(R > 0)){
+      out.innerHTML = '<div class="warn">电阻 R 必须为正数。</div>';
+      return;
+    }
+
+    var cfg = { fn: null, tEnd: 1, vLabel: "", iLabel: "" };
+
+    if(type === "rc"){
+      if(!(C > 0)){
+        out.innerHTML = '<div class="warn">电容 C 必须为正数。</div>';
+        return;
+      }
+      var tau = R * C;
+      cfg.tEnd = 6 * tau;
+      cfg.vLabel = "电容电压 v<sub>C</sub> / V₀";
+      cfg.iLabel = "电流 i / (V₀/R)";
+      cfg.fn = function(t){
+        var e = Math.exp(-t / tau);
+        return { v: 1 - e, i: e };
+      };
+      $("wState").value = "一阶 RC";
+      out.innerHTML = statsHtml([
+        ["时间常数 τ", fmt(tau * 1000, 4) + " ms"],
+        ["充到 63.2%", fmt(tau * 1000, 4) + " ms"],
+        ["充到 95%", fmt(3 * tau * 1000, 4) + " ms"],
+        ["充到 99%", fmt(5 * tau * 1000, 4) + " ms"],
+        ["初始电流", fmt(V0 / R * 1000, 4) + " mA"],
+        ["稳态电压", fmt(V0, 4) + " V"]
+      ]);
+    } else if(type === "rl"){
+      var tauL = L / R;
+      cfg.tEnd = 6 * tauL;
+      cfg.vLabel = "电感电压 v<sub>L</sub> / V₀";
+      cfg.iLabel = "电流 i / (V₀/R)";
+      cfg.fn = function(t){
+        var e = Math.exp(-t / tauL);
+        return { v: e, i: 1 - e };
+      };
+      $("wState").value = "一阶 RL";
+      out.innerHTML = statsHtml([
+        ["时间常数 τ", fmt(tauL * 1000, 4) + " ms"],
+        ["上升到 63.2%", fmt(tauL * 1000, 4) + " ms"],
+        ["上升到 95%", fmt(3 * tauL * 1000, 4) + " ms"],
+        ["稳态电流", fmt(V0 / R * 1000, 4) + " mA"],
+        ["初始感应电动势", fmt(V0, 4) + " V"],
+        ["稳态电感电压", "0 V"]
+      ]);
+    } else {
+      if(!(L > 0) || !(C > 0)){
+        out.innerHTML = '<div class="warn">L 和 C 必须为正数。</div>';
+        return;
+      }
+      var w0 = 1 / Math.sqrt(L * C);
+      var zeta = (R / 2) * Math.sqrt(C / L);
+      var f0 = w0 / (2 * Math.PI);
+      var Q = 1 / (2 * zeta);
+      var stateTxt;
+      // 电流统一以 V₀/ρ 归一化（ρ = √(L/C) 特性阻抗），避免不同阻尼下幅值失真
+      cfg.vLabel = "电容电压 v<sub>C</sub> / V₀";
+      cfg.iLabel = "电流 i / (V₀/ρ)　ρ=√(L/C)";
+
+      if(zeta > 1.01){
+        stateTxt = "过阻尼 (ζ>1)";
+        var a1 = w0 * (zeta - Math.sqrt(zeta * zeta - 1));
+        var a2 = w0 * (zeta + Math.sqrt(zeta * zeta - 1));
+        cfg.tEnd = 6 / a1;
+        cfg.fn = function(t){
+          var e1 = Math.exp(-a1 * t), e2 = Math.exp(-a2 * t);
+          var v = 1 - (a2 * e1 - a1 * e2) / (a2 - a1);
+          var i = (1 / w0) * (a1 * a2 / (a2 - a1)) * (e1 - e2);
+          return { v: v, i: i };
+        };
+      } else if(zeta >= 0.99){
+        stateTxt = "临界阻尼 (ζ≈1)";
+        cfg.tEnd = 6 / w0;
+        cfg.fn = function(t){
+          var e = Math.exp(-w0 * t);
+          return { v: 1 - e * (1 + w0 * t), i: w0 * t * e };
+        };
+      } else {
+        stateTxt = "欠阻尼 (ζ<1)，会振荡";
+        var wd = w0 * Math.sqrt(1 - zeta * zeta);
+        cfg.tEnd = 6 / (zeta * w0);
+        cfg.fn = function(t){
+          var e = Math.exp(-zeta * w0 * t);
+          var v = 1 - e * (Math.cos(wd * t) + (zeta * w0 / wd) * Math.sin(wd * t));
+          var i = (w0 / wd) * e * Math.sin(wd * t);
+          return { v: v, i: i };
+        };
+      }
+      $("wState").value = stateTxt;
+      out.innerHTML = statsHtml([
+        ["谐振频率 f₀", fmt(f0, 4) + " Hz"],
+        ["角频率 ω₀", fmt(w0, 4) + " rad/s"],
+        ["阻尼比 ζ", fmt(zeta, 4)],
+        ["品质因数 Q", fmt(Q, 4)],
+        ["特性阻抗 ρ", fmt(Math.sqrt(L / C), 4) + " Ω"],
+        ["振荡频率 f<sub>d</sub>", zeta < 1 ? fmt(f0 * Math.sqrt(1 - zeta * zeta), 4) + " Hz" : "无振荡"]
+      ]);
+    }
+
+    state.wave = cfg;
+    drawWave(cfg);
+  }
+
+  function statsHtml(pairs){
+    var s = '<div class="stats">';
+    for(var i = 0; i < pairs.length; i++){
+      s += '<div class="stat' + (i === 0 ? " hl" : "") + '"><div class="k">' + pairs[i][0] +
+           '</div><div class="v">' + pairs[i][1] + "</div></div>";
+    }
+    return s + "</div>";
+  }
+
+  /* =========================================================
+     五、相量图
+     ========================================================= */
+  function drawPhasor(p){
+    var cv = $("cvPhasor");
+    var env = setupCanvas(cv);
+    if(!env) return;
+    var ctx = env.ctx, w = env.w, h = env.h;
+
+    var cx = w / 2, cy = h / 2 + 8;
+    var maxV = Math.max(p.UR, p.UL, p.UC, p.U, 1e-6);
+    var scale = Math.min(w, h) * 0.36 / maxV;
+
+    // 参考坐标系
+    ctx.strokeStyle = "#eef1f8";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(20, cy); ctx.lineTo(w - 20, cy);
+    ctx.moveTo(cx, 20); ctx.lineTo(cx, h - 20);
+    ctx.stroke();
+
+    var tip = { x: cx, y: cy };
+
+    // UR 沿 +x
+    drawArrow(ctx, cx, cy, cx + p.UR * scale, cy, "#3563e9", 2.4);
+    // UL 沿 +y（画布 y 向下，超前 90° 指向上方）
+    drawArrow(ctx, cx, cy, cx, cy - p.UL * scale, "#0f9d76", 2.4);
+    // UC 沿 -y
+    drawArrow(ctx, cx, cy, cx, cy + p.UC * scale, "#d9622b", 2.4);
+    // 总电压
+    tip.x = cx + p.UR * scale;
+    tip.y = cy - (p.UL - p.UC) * scale;
+    drawArrow(ctx, cx, cy, tip.x, tip.y, "#7b3fe4", 3);
+
+    // 标注
+    ctx.font = "600 12px -apple-system,Segoe UI,sans-serif";
+    ctx.fillStyle = "#5c6683";
+    var lx = tip.x + 8, ly = tip.y - 8;
+    ctx.textAlign = lx > w - 90 ? "right" : "left";
+    ctx.fillText("U总", lx, ly);
+
+    ctx.fillStyle = "#3563e9";
+    ctx.textAlign = "left";
+    ctx.fillText("UR", cx + p.UR * scale * 0.5, cy - 10);
+    ctx.fillStyle = "#0f9d76";
+    ctx.fillText("UL", cx + 8, cy - p.UL * scale * 0.6);
+    ctx.fillStyle = "#d9622b";
+    ctx.fillText("UC", cx + 8, cy + p.UC * scale * 0.6);
+
+    // 角度弧
+    if(Math.abs(p.phi) > 0.01){
+      ctx.strokeStyle = "#c9d2e6";
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 52, 0, -p.phi, p.phi > 0);
+      ctx.stroke();
+      ctx.fillStyle = "#7b3fe4";
+      ctx.textAlign = "left";
+      ctx.fillText("φ=" + (p.phi * 180 / Math.PI).toFixed(1) + "°", cx + 58, cy - 14 * Math.sign(p.phi) - 6);
+    }
+
+    ctx.fillStyle = "#8b94ac";
+    ctx.font = "11px -apple-system,Segoe UI,sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText("+UR (与 I 同相)", 24, cy - 10);
+    ctx.textAlign = "right";
+    ctx.fillText("+UL (超前 90°)", w - 24, 34);
+    ctx.fillText("+UC (滞后 90°)", w - 24, h - 20);
+  }
+
+  function runPhasor(){
+    var R = parseFloat($("pR").value);
+    var L = parseFloat($("pL").value) * 1e-3;
+    var C = parseFloat($("pC").value) * 1e-6;
+    var f = parseFloat($("pF").value);
+    var out = $("phasorOut");
+
+    if(!(R > 0) || !(L > 0) || !(C > 0) || !(f > 0)){
+      out.innerHTML = '<div class="warn">所有参数必须为正数。</div>';
+      return;
+    }
+
+    var wm = 2 * Math.PI * f;
+    var XL = wm * L;
+    var XC = 1 / (wm * C);
+    var X = XL - XC;
+    var Z = Math.sqrt(R * R + X * X);
+    var phi = Math.atan2(X, R);
+    var I = 1;               // 取 1 A 作为参考
+    var UR = I * R, UL = I * XL, UC = I * XC;
+    var U = I * Z;
+
+    var f0 = 1 / (2 * Math.PI * Math.sqrt(L * C));
+    var Q = Math.sqrt(L / C) / R;
+
+    var p = { UR: UR, UL: UL, UC: UC, U: U, phi: phi };
+    state.phasor = p;
+    drawPhasor(p);
+
+    out.innerHTML = statsHtml([
+      ["阻抗 |Z|", fmt(Z, 5) + " Ω"],
+      ["阻抗角 φ", (phi * 180 / Math.PI).toFixed(2) + "°"],
+      ["感抗 X<sub>L</sub>", fmt(XL, 5) + " Ω"],
+      ["容抗 X<sub>C</sub>", fmt(XC, 5) + " Ω"],
+      ["谐振频率 f₀", fmt(f0, 5) + " Hz"],
+      ["品质因数 Q", fmt(Q, 4)],
+      ["电压 U（I=1A）", fmt(U, 5) + " V"],
+      ["功率因数 cosφ", fmt(Math.cos(phi), 4)]
+    ]) +
+    '<div class="result-line"><span>电路呈' +
+      (Math.abs(X) < R * 0.02 ? "阻性（接近谐振）" : (X > 0 ? "感性" : "容性")) +
+      "，电流" + (phi > 0 ? "滞后" : "超前") + "电压 " + Math.abs(phi * 180 / Math.PI).toFixed(1) + "°</span></div>";
+  }
+
+  /* =========================================================
+     事件绑定
+     ========================================================= */
+  $("btnFit").addEventListener("click", runFit);
+  $("demoFit").addEventListener("click", function(){
+    $("fx").value = "10, 20, 30, 40, 50, 60, 70, 80";
+    $("fy").value = "2.05, 4.02, 6.11, 7.98, 10.03, 12.10, 13.95, 16.02";
+    runFit();
+  });
+  $("btnPng").addEventListener("click", function(){
+    var cv = $("cvFit");
+    if(!state.fit){ alert("请先计算拟合结果。"); return; }
+    var a = document.createElement("a");
+    a.download = "fit-plot.png";
+    a.href = cv.toDataURL("image/png");
+    a.click();
+  });
+
+  $("btnUnc").addEventListener("click", runUnc);
+  $("demoUnc").addEventListener("click", function(){
+    $("um").value = "1.234, 1.236, 1.232, 1.238, 1.235, 1.233";
+    $("udelta").value = "0.002";
+    runUnc();
+  });
+
+  $("btnDiff").addEventListener("click", runDiff);
+  $("demoDiff").addEventListener("click", function(){
+    $("dx").value = "2.145, 2.240, 2.335, 2.430, 2.525, 2.620, 2.715, 2.810";
+    runDiff();
+  });
+
+  $("btnWave").addEventListener("click", buildWave);
+  $("btnWaveRst").addEventListener("click", function(){
+    $("wR").value = 1000; $("wC").value = 10; $("wL").value = 10; $("wV0").value = 10;
+    buildWave();
+  });
+  $("wType").addEventListener("change", function(){
+    var t = this.value;
+    // 切换电路类型时套用该类电路的典型参数，保证波形有参考价值
+    var preset = {
+      rc:  { R: 1000, C: 10, L: 10 },
+      rl:  { R: 100,  C: 10, L: 100 },
+      rlc: { R: 30,   C: 10, L: 10 }
+    }[t];
+    if(preset){
+      $("wR").value = preset.R;
+      $("wC").value = preset.C;
+      $("wL").value = preset.L;
+    }
+    $("wLwrap").style.display = (t === "rc") ? "none" : "grid";
+    $("wC").disabled = (t === "rl");
+    $("wC").style.opacity = (t === "rl") ? "0.45" : "1";
+    buildWave();
+  });
+
+  $("btnPhasor").addEventListener("click", runPhasor);
+  $("btnReso").addEventListener("click", function(){
+    var L = parseFloat($("pL").value) * 1e-3;
+    var C = parseFloat($("pC").value) * 1e-6;
+    if(!(L > 0) || !(C > 0)){ return; }
+    var f0 = 1 / (2 * Math.PI * Math.sqrt(L * C));
+    $("pF").value = parseFloat(f0.toPrecision(5));
+    runPhasor();
+  });
+
+  // 窗口尺寸变化时重绘
+  var timer = null;
+  window.addEventListener("resize", function(){
+    if(timer) clearTimeout(timer);
+    timer = setTimeout(function(){
+      if(state.fit) drawFit(state.fit);
+      if(state.wave) drawWave(state.wave);
+      if(state.phasor) drawPhasor(state.phasor);
+    }, 160);
+  });
+
+  /* ---------- 初始化 ---------- */
+  $("demoFit").click();
+  $("demoUnc").click();
+  $("demoDiff").click();
+  $("wLwrap").style.display = "none";
+  buildWave();
+  runPhasor();
+
+  // 支持 URL hash 直接定位标签，如 ee-toolbox.html#p-wave
+  var h = location.hash.replace("#", "");
+  if(h){
+    var btn = document.querySelector('.tab[data-panel="' + h + '"]');
+    if(btn) btn.click();
+  }
+
+})();
+</script>
+</body>
+</html>

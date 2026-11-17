@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>manuscript · 机械制图学习指南</title>
+<meta name="description" content="《机械制图》（同济·上交等编，第八版）第1/3/4/5章知识点通俗讲解，配交互3D模型">
+<script defer src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script defer src="content-ch1.js"></script>
+<script defer src="content-ch3.js"></script>
+<script defer src="content-ch4.js"></script>
+<script defer src="content-ch5.js"></script>
+<script defer src="scenes.js"></script>
+<script defer src="app.js"></script>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  :root{
+    --bg:#f6f7fa;
+    --paper:#ffffff;
+    --ink:#171b2c;
+    --ink2:#55607a;
+    --ink3:#8a92a8;
+    --line:#e2e6f0;
+    --accent:#2f5cd8;
+    --accent-soft:#edf2fe;
+    --blue:#2f5cd8;   /* 宽相等 */
+    --red:#d8404f;    /* 长对正 */
+    --green:#12966e;  /* 高平齐 */
+    --ok:#0f9d76;
+    --okbg:#e9f8f2;
+    --warn:#c2571f;
+    --warnbg:#fdf1e7;
+    --radius:14px;
+    --navw:264px;
+  }
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    font-size:15px;line-height:1.85;-webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:#d5e1fb}
+
+  /* ===== 顶栏 ===== */
+  .topbar{
+    position:fixed;top:0;left:0;right:0;height:56px;z-index:50;
+    background:rgba(255,255,255,.92);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+    display:flex;align-items:center;padding:0 16px;gap:12px;
+  }
+  .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;letter-spacing:-.2px}
+  .logo .cube{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#2f5cd8,#7b3fe4);
+    display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:800}
+  .logo em{font-style:normal;color:var(--ink3);font-weight:500;font-size:12.5px}
+  .burger{
+    margin-left:auto;width:38px;height:38px;border:1px solid var(--line);border-radius:10px;
+    background:#fff;cursor:pointer;display:none;align-items:center;justify-content:center;
+  }
+  .burger svg{width:18px;height:18px;stroke:var(--ink2);stroke-width:2;fill:none}
+  .progress{position:fixed;top:56px;left:0;height:2px;background:linear-gradient(90deg,#2f5cd8,#7b3fe4);
+    z-index:51;width:0%;transition:width .1s linear}
+
+  /* ===== 侧边导航 ===== */
+  nav.side{
+    position:fixed;top:56px;left:0;bottom:0;width:var(--navw);overflow-y:auto;
+    background:var(--paper);border-right:1px solid var(--line);padding:18px 14px 40px;z-index:40;
+  }
+  nav.side::-webkit-scrollbar{width:4px}
+  nav.side::-webkit-scrollbar-thumb{background:#d6dce9;border-radius:2px}
+  .navgrp{margin-bottom:6px}
+  .navgrp>a{
+    display:flex;align-items:baseline;gap:8px;text-decoration:none;color:var(--ink);
+    font-weight:700;font-size:13.5px;padding:9px 10px;border-radius:9px;
+  }
+  .navgrp>a .ch{font-size:11px;color:var(--ink3);font-weight:600}
+  .navsub{margin:0 0 10px 0;padding-left:10px;list-style:none}
+  .navsub li a{
+    display:block;text-decoration:none;color:var(--ink2);font-size:12.5px;
+    padding:6px 10px;border-left:2px solid var(--line);margin-left:8px;transition:.14s;
+  }
+  .navsub li a:hover{color:var(--accent);border-color:#b9c8f2}
+  .navsub li a.cur{color:var(--accent);border-color:var(--accent);background:var(--accent-soft);font-weight:600}
+
+  /* ===== 内容区 ===== */
+  main{margin-left:var(--navw);padding:84px 34px 90px;max-width:900px}
+  .chapter-head{margin-bottom:26px}
+  .chapter-head .chno{
+    font-size:12px;font-weight:800;letter-spacing:.14em;color:var(--accent);
+    background:var(--accent-soft);display:inline-block;padding:4px 12px;border-radius:999px;
+  }
+  .chapter-head h1{font-size:26px;margin:12px 0 8px;letter-spacing:-.4px;line-height:1.35}
+  .chapter-head .lead{color:var(--ink2);font-size:14px;margin:0}
+
+  section.sec{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+    padding:26px 28px 22px;margin:18px 0;box-shadow:0 1px 2px rgba(23,27,44,.04)}
+  .sec-tag{font-size:11px;font-weight:800;color:var(--ink3);letter-spacing:.12em;margin-bottom:4px}
+  section.sec>h2{margin:0 0 14px;font-size:19px;letter-spacing:-.3px;line-height:1.4;
+    display:flex;align-items:center;gap:10px}
+  section.sec>h2 .no{
+    flex:none;width:26px;height:26px;border-radius:8px;background:var(--accent-soft);color:var(--accent);
+    display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:800;
+  }
+
+  .blk-p{margin:12px 0;color:var(--ink)}
+  .blk-p b{color:var(--accent)}
+  .blk-p .term{color:var(--accent);font-weight:700}
+  .blk-h3{margin:24px 0 8px;font-size:15.5px;font-weight:700;color:var(--ink);
+    padding-left:10px;border-left:3px solid var(--accent)}
+
+  .tip,.warn{border-radius:12px;padding:14px 16px 14px 46px;margin:16px 0;font-size:13.5px;position:relative;line-height:1.8}
+  .tip{background:var(--okbg);border:1px solid #c4ecdd}
+  .warn{background:var(--warnbg);border:1px solid #f3ddc9}
+  .tip::before,.warn::before{position:absolute;left:14px;top:13px;font-size:12px;font-weight:800;
+    padding:2px 8px;border-radius:6px;color:#fff}
+  .tip::before{content:"口诀";background:var(--ok)}
+  .warn::before{content:"易错";background:var(--warn)}
+
+  /* 图 */
+  figure.fig{margin:18px 0;background:#fbfcfe;border:1px solid var(--line);border-radius:12px;padding:14px;overflow:hidden;max-width:100%}
+  figure.fig .svgbox{background:#fff;border-radius:8px;padding:6px;overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch}
+  figure.fig svg{display:block;margin:0 auto;width:100%;max-width:720px;height:auto}
+  figure.fig figcaption{margin-top:10px;font-size:12.5px;color:var(--ink3);text-align:center;line-height:1.6}
+
+  /* 3D 场景 */
+  .scene{margin:18px 0;border:1px solid #d6def0;border-radius:14px;overflow:hidden;background:#1d2436}
+  .scene .stage{position:relative;height:340px}
+  .scene canvas{width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+  .scene canvas:active{cursor:grabbing}
+  .scene .hint3d{
+    position:absolute;top:10px;left:12px;color:#aeb9d8;font-size:11px;font-weight:600;
+    background:rgba(13,18,32,.55);padding:4px 10px;border-radius:999px;pointer-events:none;
+  }
+  .scene .ctrl{background:#141a2b;padding:12px 16px;display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center}
+  .scene .ctrl label{color:#9fb0d6;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px}
+  .scene input[type=range]{accent-color:#5c83f7;width:150px}
+  .scene .btns{display:flex;gap:8px;flex-wrap:wrap}
+  .scene .btns button{
+    border:1px solid #2c3752;background:#1d2842;color:#aab8dd;font-size:12px;font-weight:600;
+    padding:6px 13px;border-radius:8px;cursor:pointer;font-family:inherit;transition:.15s;
+  }
+  .scene .btns button:hover{background:#253354;color:#fff}
+  .scene .btns button.on{background:#2f5cd8;color:#fff;border-color:#2f5cd8}
+  .scene .readout{color:#8fa2cc;font-size:12px;font-variant-numeric:tabular-nums;margin-left:auto}
+  .scene .shapebox{margin-left:auto}
+  .scene .fallback{padding:10px;color:#e8746b;font-size:12px;background:#141a2b}
+  .scene figcap{padding:9px 16px;background:#0f1524;color:#7f8fb4;font-size:12px;line-height:1.7}
+
+  /* 表格 */
+  .tbl{margin:16px 0;overflow-x:auto;border-radius:12px;border:1px solid var(--line)}
+  .tbl table{border-collapse:collapse;width:100%;font-size:13px;background:#fff}
+  .tbl th{background:#f2f5fb;color:var(--ink2);font-weight:700;text-align:left;padding:10px 14px;
+    border-bottom:1px solid var(--line);white-space:nowrap}
+  .tbl td{padding:10px 14px;border-bottom:1px solid #eef1f7;vertical-align:top;line-height:1.7}
+  .tbl tr:last-child td{border-bottom:none}
+  .tbl td .k{font-weight:700;color:var(--accent)}
+
+  /* 上/下一章 */
+  .pager{display:flex;gap:12px;margin-top:30px;flex-wrap:wrap}
+  .pager a{
+    flex:1;min-width:200px;text-decoration:none;background:var(--paper);border:1px solid var(--line);
+    border-radius:12px;padding:14px 18px;transition:.15s;display:block;
+  }
+  .pager a:hover{border-color:#b9c8f2;box-shadow:0 3px 14px rgba(47,92,216,.12);transform:translateY(-2px)}
+  .pager .dir{font-size:11px;color:var(--ink3);font-weight:700;letter-spacing:.1em}
+  .pager .t{font-size:14.5px;font-weight:700;color:var(--ink);margin-top:3px}
+
+  /* 首页 */
+  .home-hero{background:linear-gradient(135deg,#1d2b56,#2f5cd8 55%,#7b3fe4);border-radius:20px;
+    color:#fff;padding:40px 34px;margin-bottom:26px;position:relative;overflow:hidden}
+  .home-hero h1{margin:0 0 10px;font-size:28px;letter-spacing:-.5px;line-height:1.35}
+  .home-hero p{margin:0;color:#c9d6f5;font-size:14px;max-width:560px;line-height:1.9}
+  .home-hero .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+  .home-hero .tags span{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+    font-size:12px;padding:4px 12px;border-radius:999px;font-weight:600}
+  .chgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+  .chcard{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:20px 22px;
+    text-decoration:none;color:var(--ink);display:block;transition:.16s;position:relative}
+  .chcard:hover{border-color:#b9c8f2;transform:translateY(-3px);box-shadow:0 8px 22px rgba(47,92,216,.13)}
+  .chcard .cno{font-size:11px;font-weight:800;color:var(--accent);letter-spacing:.12em}
+  .chcard h3{margin:6px 0 8px;font-size:16.5px;letter-spacing:-.2px}
+  .chcard p{margin:0;color:var(--ink2);font-size:13px;line-height:1.75}
+  .chcard .topics{margin-top:12px;display:flex;flex-wrap:wrap;gap:6px}
+  .chcard .topics i{font-style:normal;font-size:11.5px;background:#f1f4fa;border:1px solid #e6eaf3;
+    color:var(--ink2);padding:2px 9px;border-radius:999px}
+  .chcard .arrow{position:absolute;right:18px;top:20px;color:#c3cbde;font-weight:700}
+
+  footer.pg{margin-top:40px;color:var(--ink3);font-size:12px;text-align:center;line-height:2}
+  .overlay{display:none;position:fixed;inset:0;background:rgba(13,18,32,.4);z-index:35}
+
+  /* ===== 手机适配 ===== */
+  @media (max-width:880px){
+    .burger{display:flex}
+    nav.side{
+      transform:translateX(-105%);transition:transform .25s ease;
+      box-shadow:0 0 40px rgba(13,18,32,.18);width:min(78vw,300px);top:0;padding-top:70px;
+    }
+    nav.side.open{transform:none}
+    .overlay.show{display:block}
+    main{margin-left:0;padding:76px 16px 60px;overflow-x:hidden}
+    section.sec{padding:20px 18px 16px;border-radius:12px}
+    .chapter-head h1{font-size:21px}
+    .home-hero{padding:28px 22px;border-radius:16px}
+    .home-hero h1{font-size:22px}
+    .scene .stage{height:300px}
+    /* 控件竖排，避免按钮挤出屏幕 */
+    .scene .ctrl{flex-direction:column;align-items:stretch;gap:10px}
+    .scene .ctrl label{justify-content:space-between}
+    .scene input[type=range]{width:auto;flex:1;max-width:180px}
+    .scene .btns{flex-wrap:wrap}
+    .scene .btns button{flex:1 1 auto;min-width:calc(50% - 4px);font-size:11.5px;padding:7px 8px}
+    .scene .readout{margin-left:0;width:100%;line-height:1.6}
+    .scene .shapebox{margin-left:0}
+    .blk-p,.tip,.warn{font-size:14px}
+    figure.fig{padding:8px}
+    /* 手机上图形保持最小可读宽度，可横向滑动查看细节 */
+    figure.fig svg{width:560px;max-width:none}
+    figure.fig::before{
+      content:"← 图形可左右滑动查看 →";display:block;text-align:center;
+      font-size:11px;color:#a4abbd;padding:0 0 6px;letter-spacing:.04em;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">
+    <span class="cube">M</span>
+    <span>manuscript</span>
+    <em>机械制图 · 学习指南</em>
+  </div>
+  <a href="../index.html" style="margin-left:auto;font-size:12.5px;color:#5c6478;text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:4px 11px;background:#fff;white-space:nowrap">← 博客</a>
+  <button class="burger" id="burger" aria-label="目录">
+    <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+  </button>
+</div>
+<div class="progress" id="progress"></div>
+
+<div class="overlay" id="overlay"></div>
+
+<nav class="side" id="side"><div id="navlist">加载中…</div></nav>
+
+<main id="main"><div style="color:#8a92a8">正在加载内容…</div></main>
+
+<footer class="pg" id="pgfoot"></footer>
+
+</body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#16306e">
+<title>Syboe 的电子笔记 — 川大电子信息学习博客</title>
+<style>
+  :root{
+    --ink:#1c2333; --sub:#5a6478; --faint:#8a94a8;
+    --line:#e3e8f2; --bg:#f4f6fb; --card:#ffffff;
+    --blue:#3563e9; --green:#12966e; --orange:#e0642f; --purple:#7c3aed;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased}
+  a{text-decoration:none;color:inherit}
+
+  /* ===== 顶栏 ===== */
+  header.top{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.92);
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .topin{max-width:1120px;margin:0 auto;padding:0 20px;height:58px;display:flex;align-items:center;gap:10px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px}
+  .brand .avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#3563e9,#7c3aed);
+    color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800}
+  .topnav{margin-left:auto;display:flex;gap:4px}
+  .topnav a{color:var(--sub);font-size:14px;padding:7px 12px;border-radius:8px}
+  .topnav a:hover{background:#eef2fb;color:var(--ink)}
+  .topnav a.cur{color:var(--blue);background:#eaf0ff;font-weight:700}
+
+  /* ===== 博客头 ===== */
+  .bloghead{background:linear-gradient(135deg,#16306e 0%,#2f5cd8 55%,#4a7bf0 100%);color:#fff;
+    position:relative;overflow:hidden}
+  .bloghead .in{max-width:1120px;margin:0 auto;padding:38px 20px 34px;position:relative;z-index:2}
+  .bloghead h1{margin:0;font-size:27px;letter-spacing:.5px}
+  .bloghead .sig{margin:8px 0 0;font-size:14px;opacity:.88}
+  .bloghead .stat{margin-top:14px;display:flex;gap:18px;font-size:12.5px;opacity:.85;flex-wrap:wrap}
+  .bloghead .stat b{font-size:15px;margin-right:3px}
+  .deco{position:absolute;right:26px;top:50%;transform:translateY(-50%);width:330px;opacity:.3;z-index:1}
+
+  /* ===== 主体两栏 ===== */
+  .wrap{max-width:1120px;margin:0 auto;padding:26px 20px 50px;display:grid;
+    grid-template-columns:minmax(0,1fr) 290px;gap:26px;align-items:start}
+
+  /* 文章流 */
+  .feedtitle{font-size:13px;font-weight:800;color:var(--faint);letter-spacing:2px;margin:4px 0 14px}
+  article.post{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:20px 22px 16px;margin-bottom:14px;display:block;position:relative;overflow:hidden;cursor:pointer;
+    transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+  article.post:hover{transform:translateY(-2px);border-color:#b9ccf5;
+    box-shadow:0 14px 34px -20px rgba(23,34,84,.35)}
+  article.post::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--blue)}
+  article.post.c-green::before{background:var(--green)}
+  article.post.c-orange::before{background:var(--orange)}
+  article.post.c-purple::before{background:var(--purple)}
+  .pmeta{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--faint);flex-wrap:wrap}
+  .pmeta .cat{font-weight:700;color:var(--blue)}
+  .c-green .pmeta .cat{color:var(--green)} .c-orange .pmeta .cat{color:var(--orange)} .c-purple .pmeta .cat{color:var(--purple)}
+  .pmeta .pin{background:#fdeaea;color:#c0392b;border-radius:4px;padding:0 6px;font-size:11px;font-weight:700}
+  article.post h2{margin:6px 0 6px;font-size:18px;line-height:1.45}
+  article.post .exc{font-size:13.5px;color:var(--sub);margin:0 0 10px}
+  .ptags{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .ptags span{font-size:11.5px;background:#eef2fb;color:#5a6478;border-radius:999px;padding:2px 10px}
+  .ptags .go{margin-left:auto;font-size:12.5px;color:var(--blue);font-weight:700}
+
+  /* 侧栏 */
+  aside .box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
+  aside .bt{font-size:12.5px;font-weight:800;color:var(--faint);letter-spacing:2px;margin-bottom:12px}
+  .profile{text-align:center}
+  .profile .pa{width:68px;height:68px;border-radius:50%;margin:2px auto 10px;
+    background:linear-gradient(135deg,#3563e9,#7c3aed);color:#fff;display:flex;align-items:center;
+    justify-content:center;font-size:24px;font-weight:800}
+  .profile .pn{font-weight:800;font-size:16px}
+  .profile .pd{font-size:12.5px;color:var(--sub);margin-top:5px;line-height:1.6}
+  .profile .pstats{display:flex;margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+  .profile .pstats div{flex:1}
+  .profile .pstats b{display:block;font-size:16px}
+  .profile .pstats span{font-size:11.5px;color:var(--faint)}
+  .tagscloud{display:flex;flex-wrap:wrap;gap:7px}
+  .tagscloud a{font-size:12.5px;background:#eef2fb;color:#46536e;border-radius:999px;padding:3px 11px}
+  .tagscloud a:hover{background:#dfe8fd;color:var(--blue)}
+  .arch a{display:flex;justify-content:space-between;font-size:13.5px;color:var(--sub);
+    padding:6px 4px;border-radius:7px}
+  .arch a:hover{background:#f2f5fc;color:var(--ink)}
+  .arch a i{font-style:normal;color:var(--faint);font-size:12px}
+  .quick a{display:block;font-size:13.5px;color:var(--sub);padding:6px 4px;border-radius:7px}
+  .quick a:hover{background:#f2f5fc;color:var(--blue)}
+
+  footer.site{max-width:1120px;margin:0 auto;padding:6px 20px 34px;color:var(--faint);
+    font-size:12.5px;text-align:center}
+
+  @media(max-width:900px){
+    .wrap{grid-template-columns:1fr}
+    aside{order:2}
+    .deco{display:none}
+    .bloghead h1{font-size:22px}
+    /* 顶栏：单行不换行，工具入口在手机上收起（文章卡片里可进） */
+    .topin{height:54px;padding:0 14px;gap:8px}
+    .brand{font-size:15px;white-space:nowrap;min-width:0}
+    .brand span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .brand .avatar{width:28px;height:28px;font-size:12px;flex:0 0 auto}
+    .topnav{flex-wrap:nowrap;gap:0}
+    .topnav a{white-space:nowrap;padding:6px 9px;font-size:13px}
+    .topnav a.n-opt{display:none}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="topin">
+    <a class="brand" href="index.html"><span class="avatar">S</span><span>Syboe 的电子笔记</span></a>
+    <nav class="topnav">
+      <a href="index.html" class="cur">文章</a>
+      <a href="baoyan.html">保研手册</a>
+      <a href="c-learner.html" class="n-opt">C 语言</a>
+      <a href="ee-toolbox.html" class="n-opt">工具箱</a>
+      <a href="manuscript/index.html" class="n-opt">机械制图</a>
+    </nav>
+  </div>
+</header>
+
+<div class="bloghead">
+  <svg class="deco" viewBox="0 0 330 200" fill="none" stroke="#fff" stroke-width="1.4">
+    <path d="M40 70 L100 40 L160 70 L100 100 Z"/><path d="M40 70 L40 125 L100 155 L100 100"/>
+    <path d="M100 100 L160 70 L160 125 L100 155"/>
+    <rect x="195" y="38" width="52" height="30"/><rect x="195" y="86" width="40" height="24"/><rect x="255" y="72" width="30" height="40"/>
+    <path d="M40 182 q22 -26 44 0 t44 0 t44 0 t44 0 t44 0"/>
+    <text x="288" y="180" font-size="20" fill="#fff" stroke="none" opacity=".9">&lt;/&gt;</text>
+  </svg>
+  <div class="in">
+    <h1>Syboe 的电子笔记</h1>
+    <p class="sig">四川大学 · 电子信息类 · 大一在读 —— 记录课程笔记、自制学习工具与保研进度。</p>
+    <div class="stat"><span><b>4</b>篇长文/工具</span><span><b>3</b>个交互项目</span><span><b>11</b>章 C 语言教程</span><span>最近更新 2026-11-17</span></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <main>
+    <div class="feedtitle">全部文章 · ARTICLES</div>
+
+    <article class="post c-purple" onclick="location.href='baoyan.html'">
+      <div class="pmeta"><span class="pin">置顶</span><span class="cat">资料整理</span><span>2026-11-17</span><span>·</span><span>约 6 分钟</span></div>
+      <h2>四川大学电子信息学院 · 保研推免资料手册</h2>
+      <p class="exc">把校教务处《推免实施办法》、学院推荐办法、夏令营与预推免通知全部读了一遍：综合成绩怎么算（60/35/5）、
+        哪些竞赛加分、从大一到大四上的完整时间线、申请材料清单，以及六个值得收藏的官方链接。</p>
+      <div class="ptags"><span>保研</span><span>推免政策</span><span>官方文件</span><span class="go">阅读全文 →</span></div>
+    </article>
+
+    <article class="post" onclick="location.href='c-learner.html'">
+      <div class="pmeta"><span class="cat">系列教程</span><span>2026-11-17</span><span>·</span><span>11 章 · 47 节</span></div>
+      <h2>零基础 C 语言 · 从入门到精通</h2>
+      <p class="exc">写给完全没碰过代码的人：11 章内容、36 个代码示例、16 道随堂测，指针和递归都配了能点的动画。
+        宽屏打开时右侧还有六级词汇每日翻卡，学代码顺便背单词。</p>
+      <div class="ptags"><span>C语言</span><span>编程入门</span><span>交互动画</span><span class="go">进入教程 →</span></div>
+    </article>
+
+    <article class="post c-green" onclick="location.href='ee-toolbox.html'">
+      <div class="pmeta"><span class="cat">自制工具</span><span>2026-11-17</span><span>·</span><span>实验报告刚需</span></div>
+      <h2>电路与实验工具箱</h2>
+      <p class="exc">大物实验数据处理（最小二乘拟合、不确定度 A/B 类合成、逐差法，图可直接导出贴报告），
+        加上 RC/RL/RLC 暂态波形、相量图和考前公式速查。</p>
+      <div class="ptags"><span>大物实验</span><span>电路分析</span><span>不确定度</span><span class="go">打开工具 →</span></div>
+    </article>
+
+    <article class="post c-orange" onclick="location.href='manuscript/index.html'">
+      <div class="pmeta"><span class="cat">课程笔记</span><span>2026-11-17</span><span>·</span><span>含 6 个 3D 模型</span></div>
+      <h2>机械制图（第八版）第 1 / 3 / 4 / 5 章图解</h2>
+      <p class="exc">同济、上交大等合编教材的重点整理：三视图三等规律、截交线、相贯线、组合体读图、正等测。
+        圆柱被斜切为什么是椭圆？拖动截平面自己看。</p>
+      <div class="ptags"><span>机械制图</span><span>3D 演示</span><span>截交线</span><span class="go">开始学习 →</span></div>
+    </article>
+  </main>
+
+  <aside>
+    <div class="box profile">
+      <div class="pa">S</div>
+      <div class="pn">Syboe</div>
+      <div class="pd">四川大学 电子信息类 大一<br>目标：保研 · 竞赛 · 把每门硬课学明白</div>
+      <div class="pstats">
+        <div><b>4</b><span>文章</span></div>
+        <div><b>100</b><span>六级词库</span></div>
+        <div><b>6</b><span>3D 模型</span></div>
+      </div>
+    </div>
+    <div class="box">
+      <div class="bt">标签 · TAGS</div>
+      <div class="tagscloud">
+        <a href="baoyan.html">保研</a><a href="c-learner.html">C语言</a><a href="ee-toolbox.html">电路</a>
+        <a href="ee-toolbox.html">大物实验</a><a href="manuscript/index.html">机械制图</a>
+        <a href="baoyan.html">竞赛</a><a href="c-learner.html">六级词汇</a>
+      </div>
+    </div>
+    <div class="box">
+      <div class="bt">归档 · ARCHIVE</div>
+      <div class="arch">
+        <a href="index.html">2026 年 11 月 <i>4 篇</i></a>
+      </div>
+    </div>
+    <div class="box">
+      <div class="bt">常用链接 · LINKS</div>
+      <div class="quick">
+        <a href="https://eie.scu.edu.cn/" target="_blank" rel="noopener">川大电子信息学院官网 ↗</a>
+        <a href="https://jwc.scu.edu.cn/" target="_blank" rel="noopener">川大教务处 ↗</a>
+        <a href="https://yz.scu.edu.cn/" target="_blank" rel="noopener">川大研招网 ↗</a>
+        <a href="https://yz.chsi.com.cn/tm" target="_blank" rel="noopener">教育部推免服务系统 ↗</a>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<footer class="site">Syboe 的电子笔记 · 用业余时间搭建 · 内容如有错漏以教材与官方通知为准</footer>
+
+</body>
+</html>

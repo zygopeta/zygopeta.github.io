@@ -1,0 +1,1932 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>C 语言从入门到精通 · c-learner</title>
+<style>
+  :root{
+    --bg:#f2f5fb; --card:#ffffff; --ink:#1c2333; --sub:#5a6478; --line:#dde4f0;
+    --brand:#3556e0; --brand2:#6a3df0; --ok:#0e9f6e; --bad:#e0442f; --gold:#c7860a;
+    --kw:#7c3aed; --str:#0e9f6e; --num:#c7860a; --fn:#2563cf; --com:#8a93a8; --pp:#d6336c;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:"PingFang SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.75;font-size:16px}
+  header.top{position:fixed;top:0;left:0;right:0;height:56px;z-index:50;display:flex;align-items:center;gap:12px;
+    padding:0 18px;background:linear-gradient(90deg,#20306b,#2c46b8 55%,#4a2fb8);color:#fff;box-shadow:0 2px 14px rgba(23,34,84,.25)}
+  header.top .logo{font-weight:800;font-size:17px;letter-spacing:.5px;white-space:nowrap}
+  header.top .logo small{font-weight:500;opacity:.75;font-size:12px;margin-left:8px}
+  header.top .backblog{margin-left:auto;font-size:13px;color:#fff;text-decoration:none;opacity:.85;
+    border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:4px 12px;white-space:nowrap}
+  header.top .backblog:hover{opacity:1;background:rgba(255,255,255,.14)}
+  .burger{display:none;width:40px;height:40px;border:0;border-radius:10px;background:rgba(255,255,255,.14);color:#fff;font-size:19px;cursor:pointer;margin-right:2px}
+  .overlay{position:fixed;inset:0;background:rgba(13,18,32,.45);z-index:40;display:none}
+  .overlay.show{display:block}
+  nav.side{position:fixed;top:0;left:0;bottom:0;width:262px;background:#101733;color:#c6d0ea;z-index:45;
+    padding:74px 12px 30px;overflow-y:auto;transition:transform .25s ease}
+  nav.side .grp{font-size:11px;letter-spacing:2px;color:#5f6c94;margin:16px 10px 6px}
+  nav.side a{display:flex;gap:9px;align-items:center;padding:8px 10px;margin:2px 0;border-radius:9px;color:#c6d0ea;text-decoration:none;font-size:14px}
+  nav.side a .no{width:26px;height:26px;border-radius:8px;background:#1d2949;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex:0 0 26px;color:#9db1e6}
+  nav.side a:hover{background:#1d2949}
+  nav.side a.on{background:linear-gradient(90deg,#2c46b8,#4a2fb8);color:#fff}
+  nav.side a.on .no{background:rgba(255,255,255,.18);color:#fff}
+  main{margin-left:262px;padding:78px 30px 80px;max-width:980px}
+  .chapter-head{background:linear-gradient(120deg,#20306b,#3b58d6);color:#fff;border-radius:18px;padding:30px 30px 26px;margin-bottom:24px;box-shadow:0 8px 30px rgba(35,53,128,.22)}
+  .chapter-head .kicker{font-size:12px;letter-spacing:3px;opacity:.75}
+  .chapter-head h1{margin:6px 0 8px;font-size:27px}
+  .chapter-head p{margin:0;font-size:14.5px;opacity:.88}
+  section.sec{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px 28px 20px;margin:0 0 22px;box-shadow:0 2px 10px rgba(28,35,51,.04)}
+  section.sec h2{margin:0 0 14px;font-size:20px;display:flex;align-items:center;gap:10px}
+  section.sec h2 .idx{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;flex:0 0 30px}
+  .blk-p{margin:10px 0;color:#2a3245}
+  .blk-p code,.tip code,.warn code,.quizx code{background:#eef1fa;border:1px solid #dfe5f3;border-radius:5px;padding:1px 6px;font-size:.88em;font-family:Consolas,"Courier New",monospace;color:#2b3ab5;white-space:nowrap}
+  .ana{background:linear-gradient(120deg,#f3f0ff,#eef4ff);border:1px solid #ddd6fa;border-left:5px solid #8b5cf6;border-radius:12px;padding:12px 16px;margin:14px 0;font-size:15px}
+  .ana b{color:#6d28d9}
+  .tip{background:#edfbf4;border:1px solid #bfe8d2;border-left:5px solid #0e9f6e;border-radius:12px;padding:12px 16px;margin:14px 0;font-size:15px}
+  .tip b{color:#0b7a55}
+  .warn{background:#fdf1ee;border:1px solid #f5cfc5;border-left:5px solid #e0442f;border-radius:12px;padding:12px 16px;margin:14px 0;font-size:15px}
+  .warn b{color:#b5301f}
+  figure.code{margin:16px 0;background:#141a2e;border-radius:13px;overflow:hidden;box-shadow:0 6px 18px rgba(15,20,40,.28)}
+  figure.code figcaption{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;font-size:12.5px;color:#8fa2cc;background:#0d1220;border-bottom:1px solid #232c48}
+  figure.code figcaption .dots{display:flex;gap:6px}
+  figure.code figcaption .dots i{width:10px;height:10px;border-radius:50%;display:block}
+  figure.code pre{margin:0;padding:14px 16px;overflow-x:auto;font-family:Consolas,"Cascadia Mono","Courier New",monospace;font-size:14px;line-height:1.65;color:#e8edf9;tab-size:4}
+  .c-kw{color:#c792ea;font-weight:600}.c-str{color:#8ce6b0}.c-num{color:#ffcb6b}.c-fn{color:#82aaff}.c-com{color:#5c6a8c;font-style:italic}.c-pp{color:#f07fa8}
+  figure.tabl{margin:16px 0;overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:#fff}
+  table.t{border-collapse:collapse;width:100%;font-size:14px;min-width:460px}
+  table.t th{background:#eef2fb;color:#33406b;text-align:left;padding:9px 12px;border-bottom:2px solid #d8e0f0;white-space:nowrap}
+  table.t td{padding:8px 12px;border-bottom:1px solid #ecf0f8;vertical-align:top}
+  table.t tr:last-child td{border-bottom:0}
+  table.t code{background:#eef1fa;border-radius:4px;padding:1px 6px;font-family:Consolas,monospace;font-size:.9em;color:#2b3ab5;white-space:nowrap}
+  .quizx{background:#fffaf0;border:1px solid #f0e0b8;border-radius:13px;padding:16px 18px 12px;margin:18px 0}
+  .quizx .q{font-weight:700;margin-bottom:10px}
+  .quizx .opt{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid #e4dcc2;border-radius:10px;padding:9px 14px;margin:7px 0;font-size:14.5px;cursor:pointer;font-family:inherit;line-height:1.5}
+  .quizx .opt:hover{border-color:var(--gold);background:#fffdf6}
+  .quizx .opt.right{border-color:var(--ok);background:#eafaf3;font-weight:600}
+  .quizx .opt.wrong{border-color:var(--bad);background:#fdf0ed;color:#a12b1c}
+  .quizx .opt:disabled{cursor:default;opacity:1}
+  .quizx .exp{display:none;margin-top:10px;padding-top:10px;border-top:1px dashed #e0d5ae;font-size:14px;color:#6b5d33}
+  .quizx .exp.show{display:block}
+  /* ===== 交互组件 ===== */
+  .wg{background:#0f1526;border-radius:15px;padding:16px;margin:18px 0;color:#dbe4f6;box-shadow:0 8px 22px rgba(12,17,34,.3)}
+  .wg .wg-title{font-size:13px;letter-spacing:1px;color:#8fa2cc;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .wg .wg-title::before{content:"";width:8px;height:8px;border-radius:50%;background:#f5a623}
+  .wg button{background:linear-gradient(135deg,#2c46b8,#4a2fb8);color:#fff;border:0;border-radius:9px;padding:8px 16px;font-size:13.5px;cursor:pointer;font-family:inherit;margin:4px 6px 4px 0}
+  .wg button:hover{filter:brightness(1.12)}
+  .wg button.ghost{background:#1d2949;color:#9db1e6}
+  .wg .wg-read{margin-top:10px;font-size:13.5px;color:#ffd57e;background:#1a2340;border-radius:9px;padding:9px 13px;min-height:40px;line-height:1.6}
+  .wg .wg-stage{min-height:60px}
+  /* 编译流水线 */
+  .pipe{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .pipe .node{border:1.5px solid #2c3752;background:#151d33;border-radius:11px;padding:9px 13px;font-size:13px;text-align:center;min-width:96px;line-height:1.45}
+  .pipe .node b{display:block;font-size:13.5px;color:#fff}
+  .pipe .node span{color:#8fa2cc;font-size:11.5px}
+  .pipe .arw{color:#5c6a8c;font-size:17px;font-weight:700}
+  .pipe .node.hot{border-color:#f5a623;box-shadow:0 0 0 3px rgba(245,166,35,.18);background:#241d0a}
+  .pipe .node.hot b{color:#ffd57e}
+  /* 内存格子 */
+  .memrow{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;justify-content:center}
+  .cell{width:74px;border:1.5px solid #2c3752;background:#151d33;border-radius:10px;text-align:center;padding:6px 4px 7px;position:relative;transition:all .25s}
+  .cell .addr{display:block;font-size:10px;color:#5c6a8c;font-family:Consolas,monospace}
+  .cell .name{display:block;font-size:12px;color:#9db1e6;font-family:Consolas,monospace;white-space:nowrap}
+  .cell .val{display:block;font-size:16px;font-weight:700;color:#e8edf9;font-family:Consolas,monospace;min-height:24px;white-space:nowrap}
+  .cell.hot{border-color:#f5a623;box-shadow:0 0 0 3px rgba(245,166,35,.2)}
+  .cell.hot .val{color:#ffd57e}
+  .cell.flash{animation:cellflash .5s ease 2}
+  @keyframes cellflash{50%{transform:translateY(-4px);border-color:#8ce6b0}}
+  .ptrbar{display:flex;justify-content:center;margin:2px 0 8px}
+  .ptrtag{font-family:Consolas,monospace;font-size:12.5px;background:#2a1d4d;border:1.5px solid #7c3aed;color:#d9c2ff;border-radius:9px;padding:6px 12px;position:relative}
+  .ptrtag::after{content:"";position:absolute;left:50%;bottom:-14px;width:2px;height:14px;background:#7c3aed}
+  .ptrtag i{font-style:normal;color:#8fa2cc}
+  /* 循环模拟表格 */
+  .looptab{width:100%;border-collapse:collapse;font-family:Consolas,monospace;font-size:13px;margin:10px 0}
+  .looptab th{color:#8fa2cc;text-align:left;padding:6px 10px;border-bottom:1px solid #2c3752;font-weight:600}
+  .looptab td{padding:6px 10px;border-bottom:1px solid #1d2949;color:#e8edf9}
+  .looptab td.hotrow{background:#241d0a;color:#ffd57e}
+  /* 数组越界 */
+  .arrcells{display:flex;gap:0;justify-content:center;margin:14px 0 4px;flex-wrap:wrap}
+  .acell{width:64px;height:64px;border:1.5px solid #2c3752;border-right:none;background:#151d33;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:Consolas,monospace}
+  .acell:first-child{border-radius:10px 0 0 10px}
+  .acell:last-child{border-right:1.5px solid #2c3752;border-radius:0 10px 10px 0}
+  .acell .idx{font-size:10.5px;color:#5c6a8c}
+  .acell .v{font-size:17px;font-weight:700;color:#e8edf9}
+  .acell.sel{background:#241d0a;border-color:#f5a623}
+  .acell.sel .v{color:#ffd57e}
+  .acell.ooo{border-color:#e0442f;background:#2d1410}
+  .acell.ooo .v{color:#ff9d8a}
+  .wg .wg-slider{display:flex;align-items:center;gap:12px;margin:8px 0;flex-wrap:wrap;font-family:Consolas,monospace;font-size:13px}
+  .wg input[type=range]{flex:1;min-width:130px;accent-color:#f5a623}
+  /* 递归栈 */
+  .stack{display:flex;flex-direction:column-reverse;gap:6px;margin:12px 0;min-height:60px}
+  .frame{background:#151d33;border:1.5px solid #2c3752;border-left:5px solid #2c46b8;border-radius:9px;padding:8px 14px;font-family:Consolas,monospace;font-size:13px;display:flex;justify-content:space-between;gap:10px;animation:frin .3s ease}
+  @keyframes frin{from{opacity:0;transform:translateY(-8px)}}
+  .frame .st{color:#8fa2cc;font-size:11.5px}
+  .frame .ret{color:#8ce6b0;font-weight:700}
+  .frame.top{border-left-color:#f5a623}
+  /* 排序动画 */
+  .bars{display:flex;align-items:flex-end;gap:6px;height:150px;padding:0 4px;margin:12px 0}
+  .bar{flex:1;background:linear-gradient(180deg,#4a6cf0,#2c46b8);border-radius:6px 6px 0 0;position:relative;transition:height .3s,background .3s;min-width:10px}
+  .bar .bv{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:11px;color:#8fa2cc;font-family:Consolas,monospace}
+  .bar.cmp{background:linear-gradient(180deg,#f5a623,#c7860a)}
+  .bar.sorted{background:linear-gradient(180deg,#17b878,#0e9f6e)}
+  /* swap 对比 */
+  .swapgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+  .swapbox{border:1.5px solid #2c3752;border-radius:12px;padding:10px 12px;background:#151d33}
+  .swapbox h4{margin:0 0 8px;font-size:13.5px;color:#9db1e6}
+  .swapbox .vs{display:flex;gap:8px;flex-wrap:wrap}
+  .swapbox .vbox{border:1.5px solid #2c3752;border-radius:9px;padding:6px 10px;font-family:Consolas,monospace;font-size:13px;min-width:74px}
+  .swapbox .vbox .vn{color:#5c6a8c;font-size:10.5px}
+  .swapbox .vbox .vv{font-size:16px;font-weight:700;color:#e8edf9}
+  .swapbox .vbox.changed{border-color:#17b878}
+  .swapbox .vbox.changed .vv{color:#8ce6b0}
+  .swapbox .vbox.mainv{background:#1d2949}
+  .wg .wg-code{background:#0a0e1c;border:1px solid #232c48;border-radius:9px;padding:9px 12px;font-family:Consolas,monospace;font-size:12.5px;line-height:1.6;overflow-x:auto;color:#c9d3ea;white-space:pre}
+  /* 增减演示 */
+  .incgrid{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+  .incbox{border:1.5px solid #2c3752;border-radius:12px;background:#151d33;padding:12px 16px;min-width:190px;text-align:center}
+  .incbox .code-line{font-family:Consolas,monospace;font-size:14px;color:#e8edf9;margin-bottom:8px}
+  .incbox .vals{font-family:Consolas,monospace;font-size:15px;color:#ffd57e}
+  .incbox .vals b{color:#8ce6b0}
+  /* 内存分区图 */
+  .zone{display:flex;flex-direction:column;gap:6px;margin:12px 0}
+  .zone .z{border-radius:10px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;border:1.5px solid}
+  .zone .z .zn{font-weight:700;font-size:14px}
+  .zone .z .zd{font-size:11.5px;color:#8fa2cc;text-align:right;line-height:1.5}
+  .z-code{border-color:#3d4f7a;background:#131c33}.z-code .zn{color:#82aaff}
+  .z-data{border-color:#3d6e57;background:#0f241c}.z-data .zn{color:#8ce6b0}
+  .z-heap{border-color:#8a6a1d;background:#2a2110}.z-heap .zn{color:#ffd57e}
+  .z-stack{border-color:#7a3d6a;background:#261322}.z-stack .zn{color:#f0a8d8}
+  /* 首页 */
+  .home-hero{background:linear-gradient(120deg,#20306b,#3b58d6 60%,#4a2fb8);border-radius:20px;color:#fff;padding:44px 40px;margin-bottom:26px;box-shadow:0 10px 36px rgba(35,53,128,.3)}
+  .home-hero h1{margin:0 0 10px;font-size:32px}
+  .home-hero p{margin:0;opacity:.9;font-size:15.5px;max-width:640px}
+  .home-hero .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .home-hero .chips span{background:rgba(255,255,255,.16);border-radius:99px;padding:5px 14px;font-size:12.5px}
+  .chgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;margin:10px 0 30px}
+  .chcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;text-decoration:none;color:var(--ink);display:block;transition:transform .18s,box-shadow .18s;box-shadow:0 2px 8px rgba(28,35,51,.05)}
+  .chcard:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(28,35,51,.12)}
+  .chcard .no{display:inline-flex;width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;align-items:center;justify-content:center;font-weight:800;font-size:14px;margin-bottom:10px}
+  .chcard h3{margin:0 0 6px;font-size:16.5px}
+  .chcard p{margin:0;font-size:13px;color:var(--sub);line-height:1.6}
+  .howto{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px 28px;margin:0 0 22px}
+  .howto h3{margin:0 0 10px}
+  .howto ol{margin:8px 0 0;padding-left:22px;color:#39415a}
+  .howto li{margin:7px 0}
+  footer{padding:24px 0 8px;text-align:center;color:#8a93a8;font-size:13px}
+  .sec-nav{display:flex;justify-content:space-between;gap:10px;margin-top:6px}
+  .sec-nav a{flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;text-decoration:none;color:var(--ink);font-size:14px}
+  .sec-nav a:hover{border-color:var(--brand)}
+  .sec-nav a small{display:block;color:var(--sub);font-size:11.5px}
+  .sec-nav a.next{text-align:right}
+  /* ===== 手机适配 ===== */
+  @media (max-width:880px){
+    .burger{display:flex;align-items:center;justify-content:center}
+    header.top{padding:0 13px;gap:8px}
+    header.top .logo{font-size:15px;overflow:hidden;text-overflow:ellipsis}
+    header.top .logo small{display:none}
+    header.top .backblog{font-size:12px;padding:4px 9px}
+    nav.side{transform:translateX(-105%);width:min(78vw,300px);top:0;padding-top:70px;box-shadow:0 0 40px rgba(13,18,32,.5)}
+    nav.side.open{transform:none}
+    .overlay.show{display:block}
+    main{margin-left:0;padding:74px 14px 60px}
+    section.sec{padding:20px 16px 16px;border-radius:13px}
+    .chapter-head{padding:22px 20px;border-radius:14px}
+    .chapter-head h1{font-size:21px}
+    .home-hero{padding:26px 20px;border-radius:16px}
+    .home-hero h1{font-size:23px}
+    .swapgrid{grid-template-columns:1fr}
+    figure.code pre{font-size:12.5px}
+    .cell{width:64px}
+    /* 手机上让表格自适应换行，避免横向滚动看不全 */
+    table.t{min-width:0;font-size:13px}
+    table.t th,table.t td{padding:7px 9px}
+    table.t code{white-space:normal}
+  }
+
+  /* ===== 六级词汇翻卡 ===== */
+  .cet{display:none}
+  .cet-inner-wrap{display:flex;flex-direction:column;height:100%}
+  .cet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+  .cet-title{font-size:13px;font-weight:800;letter-spacing:.04em;color:var(--ink);
+    display:flex;align-items:center;gap:6px}
+  .cet-title::before{content:"";width:3px;height:13px;border-radius:2px;background:linear-gradient(180deg,var(--brand),var(--brand2))}
+  .cet-date{font-size:11px;color:#8d97ac;font-variant-numeric:tabular-nums}
+  .cet-dots{display:flex;gap:4px;margin-bottom:11px}
+  .cet-dots i{flex:1;height:4px;border-radius:2px;background:#e2e8f4;transition:background .3s}
+  .cet-dots i.on{background:var(--ok)}
+  .cet-dots i.cur{background:var(--brand)}
+
+  .cet-stage{height:152px;perspective:900px;flex:0 0 152px}
+  .cet-flip{position:relative;width:100%;height:100%;transform-style:preserve-3d;
+    transition:transform .55s cubic-bezier(.2,.8,.3,1);cursor:pointer}
+  .cet-stage.flip .cet-flip{transform:rotateY(180deg)}
+  .cet-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+    border-radius:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:14px 12px;text-align:center}
+  .cet-front{background:linear-gradient(155deg,#eef2ff,#e6ebff);border:1px solid #d6dffb;
+    box-shadow:0 6px 18px -12px rgba(53,86,224,.5)}
+  .cet-back{background:linear-gradient(155deg,#f0fbf6,#e4f6ee);border:1px solid #c6e8d6;
+    transform:rotateY(180deg);box-shadow:0 6px 18px -12px rgba(14,159,110,.45)}
+  .cet-word{font-size:21px;font-weight:800;letter-spacing:-.3px;color:#25305c;line-height:1.3;word-break:break-word}
+  .cet-ph{font-size:11.5px;color:#7c88a8;margin-top:6px;font-family:Consolas,monospace}
+  .cet-pos{display:inline-block;font-size:10.5px;font-weight:700;color:#4a5fd0;background:#dfe5ff;
+    border-radius:4px;padding:0 5px;margin-left:5px;vertical-align:1px}
+  .cet-hint{font-size:10.5px;color:#9aa4bb;margin-top:11px;letter-spacing:.05em}
+  .cet-cn{font-size:14.5px;font-weight:700;color:#0b6b4a;line-height:1.55}
+  .cet-ex{font-size:11px;color:#4e6b60;margin-top:9px;line-height:1.6;font-style:italic}
+  .cet-exc{font-size:10.5px;color:#7b8f87;margin-top:3px;line-height:1.55}
+
+  .cet-actions{display:flex;gap:7px;margin-top:11px}
+  .cet-btn{flex:1;border:1px solid var(--line);background:#fff;color:var(--sub);
+    border-radius:9px;padding:7px 0;font-size:12.5px;font-weight:700;cursor:pointer;
+    font-family:inherit;transition:all .16s}
+  .cet-btn:hover{border-color:#c3cee6}
+  .cet-btn.main{background:linear-gradient(135deg,var(--brand),var(--brand2));border-color:transparent;color:#fff}
+  .cet-btn.main:hover{filter:brightness(1.07)}
+  .cet-btn.ghost:hover{background:#f6f8fe}
+  .cet-stat{display:flex;gap:6px;margin-top:11px;padding-top:10px;border-top:1px dashed #e2e8f5}
+  .cet-stat div{flex:1;text-align:center;min-width:0}
+  .cet-stat b{display:block;font-size:17px;font-weight:800;color:var(--ink);
+    font-variant-numeric:tabular-nums;line-height:1.25}
+  .cet-stat span{font-size:10px;color:#98a2b8;letter-spacing:.02em}
+  .cet-foot{display:flex;align-items:center;justify-content:space-between;margin-top:8px;
+    font-size:11px;color:#96a0b6;font-variant-numeric:tabular-nums}
+  .cet-mini{border:0;background:none;color:#96a0b6;font-size:11px;cursor:pointer;
+    font-family:inherit;text-decoration:underline;padding:0}
+  .cet-mini:hover{color:var(--brand)}
+  .cet-allin{display:flex;flex-direction:column;align-items:center;justify-content:center;
+    height:152px;border-radius:13px;border:1px dashed #cbd6ec;background:#fafbff;
+    color:#7b87a2;font-size:12.5px;text-align:center;padding:16px;line-height:1.8}
+  .cet-allin b{color:var(--ok);font-size:15px;display:block;margin-bottom:5px}
+
+  /* 宽屏：右侧固定栏（left 用固定值，不受滚动条宽度干扰） */
+  @media (min-width:1400px){
+    main{max-width:860px}
+    .cet{display:block;position:fixed;top:74px;width:236px;left:1142px;z-index:44;
+      background:var(--card);border:1px solid var(--line);border-radius:16px;
+      padding:16px 14px 13px;box-shadow:0 10px 34px -20px rgba(23,34,84,.4)}
+  }
+  /* 窄屏：右下浮动按钮 + 弹出面板 */
+  .cet-fab{display:none;position:fixed;right:15px;bottom:17px;z-index:48;
+    width:52px;height:52px;border-radius:50%;border:0;cursor:pointer;
+    background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;
+    font-size:15px;font-weight:800;font-family:inherit;
+    box-shadow:0 8px 24px -8px rgba(53,86,224,.6);
+    align-items:center;justify-content:center;flex-direction:column;line-height:1.1}
+  .cet-fab small{font-size:8.5px;font-weight:600;opacity:.85;letter-spacing:.5px}
+  @media (max-width:1399px){
+    .cet-fab{display:flex}
+    .cet.open{display:block;position:fixed;left:50%;transform:translateX(-50%);
+      bottom:80px;width:min(92vw,340px);z-index:49;
+      background:var(--card);border:1px solid var(--line);border-radius:16px;
+      padding:16px 15px 13px;box-shadow:0 18px 48px -14px rgba(23,34,84,.42)}
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <button class="burger" id="burger" aria-label="菜单">☰</button>
+  <div class="logo">C 语言从入门到精通<small>c-learner</small></div>
+  <a class="backblog" href="index.html">← 返回博客</a>
+</header>
+<div class="overlay" id="overlay"></div>
+<nav class="side" id="side"></nav>
+<main id="main"></main>
+
+<aside class="cet" id="cet" aria-label="六级词汇每日翻卡">
+  <div class="cet-head">
+    <span class="cet-title">今日六级</span>
+    <span class="cet-date" id="cetDate"></span>
+  </div>
+  <div class="cet-dots" id="cetDots"></div>
+  <div id="cetBody">
+    <div id="cetCard">
+    <div class="cet-stage" id="cetStage">
+      <div class="cet-flip" id="cetFlip">
+        <div class="cet-face cet-front">
+          <div class="cet-word" id="cetWord"></div>
+          <div class="cet-ph" id="cetPh"></div>
+          <div class="cet-hint">点一下看释义</div>
+        </div>
+        <div class="cet-face cet-back">
+          <div class="cet-cn" id="cetCn"></div>
+          <div class="cet-ex" id="cetEx"></div>
+          <div class="cet-exc" id="cetExc"></div>
+        </div>
+      </div>
+    </div>
+    <div class="cet-actions">
+      <button class="cet-btn ghost" id="cetAgain">不熟</button>
+      <button class="cet-btn main" id="cetKnow">记住了</button>
+    </div>
+    <div class="cet-stat">
+      <div><b id="cetStreak">0</b><span>连续天数</span></div>
+      <div><b id="cetTotal">0</b><span>累计掌握</span></div>
+    </div>
+    <div class="cet-foot">
+      <span id="cetCount"></span>
+      <button class="cet-mini" id="cetReset">重置</button>
+    </div>
+    </div>
+    <div id="cetDone" style="display:none"></div>
+  </div>
+</aside>
+<button class="cet-fab" id="cetFab" aria-label="六级单词">词<small>CET-6</small></button>
+<script>
+"use strict";
+
+/* ================= C 代码高亮 ================= */
+function hl(code){
+  var s = code.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  var stash = [];
+  /* 占位符只用『纯字母』编码，避免被后面的数字/关键字正则误伤 */
+  function enc(n){ var t = ""; do { t += String.fromCharCode(97 + n % 10); n = Math.floor(n / 10); } while(n > 0); return t; }
+  function dec(t){ var n = 0; for(var i = t.length - 1; i >= 0; i--) n = n * 10 + (t.charCodeAt(i) - 97); return n; }
+  function keep(html){ stash.push(html); return "\uE000" + enc(stash.length - 1) + "\uE001"; }
+  /* 预处理行 */
+  s = s.replace(/^[ \t]*#[^\n]*/gm, function(m){
+    return keep('<span class="c-pp">' + m + "</span>");
+  });
+  /* 注释 */
+  s = s.replace(/(\/\*[\s\S]*?\*\/|\/\/[^\n]*)/g, function(m){
+    return keep('<span class="c-com">' + m + "</span>");
+  });
+  /* 字符与字符串 */
+  s = s.replace(/("(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*')/g, function(m){
+    return keep('<span class="c-str">' + m + "</span>");
+  });
+  /* 关键字 / 数字 / 库函数 */
+  s = s.replace(/\b(int|char|float|double|void|long|short|unsigned|signed|const|struct|typedef|enum|union|static|extern|register|volatile|if|else|for|while|do|switch|case|default|break|continue|return|sizeof|goto)\b/g, '<span class="c-kw">$1</span>');
+  s = s.replace(/\b(0x[0-9a-fA-F]+|\d+\.?\d*[fLuU]*)\b/g, '<span class="c-num">$1</span>');
+  s = s.replace(/\b(printf|scanf|puts|putchar|getchar|gets|fgets|fputs|malloc|calloc|realloc|free|strcpy|strncpy|strcmp|strncmp|strlen|strcat|strchr|strstr|sprintf|snprintf|sscanf|fopen|fclose|fread|fwrite|fprintf|fscanf|memcpy|memset|exit|abs|sqrt|pow|NULL)\b(?=\s*\()/g, '<span class="c-fn">$1</span>');
+  /* 还原 */
+  s = s.replace(/\uE000([a-j]+)\uE001/g, function(m, p){ return stash[dec(p)]; });
+  return s;
+}
+
+/* ================= 交互组件注册表 ================= */
+var WIDGETS = {};
+
+WIDGETS.compile = {
+  title:"编译流水线 · 点『下一步』看源码怎么变成程序",
+  init:function(box){
+    var nodes = [
+      ["main.c","源代码"], ["预处理","展开 #include、替换 #define"], ["编译","翻译成汇编代码"],
+      ["汇编","变成机器码 .o 目标文件"], ["链接","拼上库函数"], ["a.exe","可执行程序"]
+    ];
+    var pipe = document.createElement("div");
+    pipe.className = "pipe";
+    var els = [];
+    nodes.forEach(function(n, i){
+      var d = document.createElement("div");
+      d.className = "node";
+      d.innerHTML = "<b>" + n[0] + "</b><span>" + n[1] + "</span>";
+      els.push(d); pipe.appendChild(d);
+      if(i < nodes.length-1){
+        var a = document.createElement("span");
+        a.className = "arw"; a.textContent = "→";
+        pipe.appendChild(a);
+      }
+    });
+    var read = document.createElement("div");
+    read.className = "wg-read";
+    read.textContent = "按『下一步』，跟着源码走一遍。";
+    var step = 0;
+    var texts = [
+      "这是你写的源代码：纯文本，人能看懂，机器看不懂。",
+      "预处理器把 stdio.h 的内容原样复制粘贴进来，#define 的宏也全部替换。得到的还是 C 代码。",
+      "编译器检查语法（少分号、拼错变量名都在这里报错），然后翻译成汇编代码。",
+      "汇编器把汇编代码翻译成二进制机器码，得到 main.o —— 里面 printf 只有地址没有实现。",
+      "链接器把 main.o 和标准库（printf 的真正实现在里面）拼在一起，补齐所有地址。",
+      "完成！双击 a.exe 就能运行。这就是为什么报错分『编译错误』和『链接错误』两种。"
+    ];
+    function draw(){
+      els.forEach(function(e, i){ e.classList.toggle("hot", i <= step && step > 0); });
+      if(step === 0) els.forEach(function(e){ e.classList.remove("hot"); });
+      read.textContent = texts[step];
+    }
+    mkBtn(box, "下一步", function(){
+      step = step + 1 > 5 ? 5 : step + 1; draw();
+    });
+    mkBtn(box, "重置", function(){ step = 0; draw(); }, true);
+    box.appendChild(pipe); box.appendChild(read);
+  }
+};
+
+WIDGETS.incdec = {
+  title:"i++ 与 ++i · 对比着看就再也不会混",
+  init:function(box){
+    var g = document.createElement("div");
+    g.className = "incgrid";
+    g.innerHTML =
+      '<div class="incbox"><div class="code-line">b = <b style="color:#ffd57e">a++</b>;</div>' +
+      '<div class="vals">a = 5, b = <b>5</b></div>' +
+      '<div style="font-size:12px;color:#8fa2cc;margin-top:6px">后置：先把 a 的值给 b，<br>a 再自己 +1</div></div>' +
+      '<div class="incbox"><div class="code-line">b = <b style="color:#ffd57e">++a</b>;</div>' +
+      '<div class="vals">a = 5, b = <b>6</b></div>' +
+      '<div style="font-size:12px;color:#8fa2cc;margin-top:6px">前置：a 先 +1，<br>再把新值给 b</div></div>';
+    box.appendChild(g);
+    var read = document.createElement("div");
+    read.className = "wg-read";
+    read.textContent = "口诀：++ 在前，先加后用；++ 在后，先用后加。单独一行写 a++ 或 ++a 时两者完全等价（没人接收它的值），循环里 for(;;i++) 想写哪个都行。";
+    box.appendChild(read);
+  }
+};
+
+WIDGETS.loop = {
+  title:"for 循环执行模拟器 · 一步一步看循环怎么转",
+  init:function(box){
+    var code = document.createElement("div");
+    code.className = "wg-code";
+    code.innerHTML = hl("int i, sum = 0;\nfor (i = 1; i <= 5; i++) {\n    sum = sum + i;   /* 累加 */\n}");
+    box.appendChild(code);
+    var tab = document.createElement("table");
+    tab.className = "looptab";
+    tab.innerHTML = "<tr><th>步骤</th><th>判断 i<=5</th><th>动作</th><th>i</th><th>sum</th></tr>";
+    var tbody = tab;
+    var read = document.createElement("div");
+    read.className = "wg-read";
+    read.textContent = "按『单步』走：初始化只在进循环前做一次，之后是 判断→执行→自增→再判断 的圈。";
+    var rows = [];
+    function state(){ return {i:1, sum:0, phase:0, done:false}; }
+    var st = state();
+    function addRow(a, b, c){
+      var tr = document.createElement("tr");
+      tr.innerHTML = "<td>" + a + "</td><td>" + b + "</td><td>" + c + "</td><td>" + st.i + "</td><td>" + st.sum + "</td>";
+      rows.push(tr); tbody.appendChild(tr);
+      rows.forEach(function(r){ r.classList.remove("hotrow"); });
+      tr.classList.add("hotrow");
+      if(rows.length > 7){ var old = rows.shift(); tbody.removeChild(old); }
+    }
+    function step(){
+      if(st.done){ return; }
+      if(st.phase === 0){ addRow("初始化", "—", "i = 1（只做一次）"); st.phase = 1; }
+      else if(st.phase === 1){
+        if(st.i <= 5){ addRow("判断", st.i + " <= 5 ✔", "条件成立，进入循环体"); st.phase = 2; }
+        else { addRow("判断", st.i + " <= 5 ✘", "条件不成立，退出循环"); st.done = true;
+          read.textContent = "循环结束：sum = " + st.sum + "（1+2+3+4+5）。再按一次单步可重置。"; return; }
+      }
+      else if(st.phase === 2){ st.sum += st.i; addRow("循环体", "—", "sum += " + st.i); st.phase = 3; }
+      else { st.i++; addRow("自增", "—", "i++ 变成 " + st.i); st.phase = 1; }
+      read.textContent = "当前 i = " + st.i + "，sum = " + st.sum + (st.phase === 1 ? "，即将判断条件" : st.phase === 2 ? "，即将执行循环体" : "，即将 i++");
+    }
+    mkBtn(box, "单步", step);
+    mkBtn(box, "自动跑完", function(){ while(!st.done) step(); });
+    mkBtn(box, "重置", function(){ st = state(); rows.forEach(function(r){ tbody.removeChild(r); }); rows = [];
+      read.textContent = "已重置。"; }, true);
+    box.appendChild(tab); box.appendChild(read);
+    /* 初始就把第一行摆出来，避免表格看起来是空的 */
+    addRow("初始化", "—", "i = 1（只做一次）");
+    st.phase = 1;
+    read.textContent = "已执行初始化 i = 1, sum = 0。按『单步』继续：判断 i<=5 → 执行循环体 → i++ → 再判断。";
+  }
+};
+
+WIDGETS.bubble = {
+  title:"冒泡排序动画 · 双重循环的典型应用",
+  init:function(box){
+    var arr = [5, 2, 8, 1, 6, 3, 7, 4];
+    var bars = document.createElement("div");
+    bars.className = "bars";
+    var bEls = [];
+    arr.forEach(function(v){
+      var b = document.createElement("div");
+      b.className = "bar";
+      b.innerHTML = '<span class="bv">' + v + "</span>";
+      bEls.push(b); bars.appendChild(b);
+    });
+    function draw(hi1, hi2, sortedUpto){
+      bEls.forEach(function(b, k){
+        b.style.height = (arr[k] * 18 + 8) + "px";
+        b.classList.remove("cmp", "sorted");
+        b.querySelector(".bv").textContent = arr[k];
+        if(k === hi1 || k === hi2) b.classList.add("cmp");
+        if(k >= sortedUpto) b.classList.add("sorted");
+      });
+    }
+    draw(-1, -1, arr.length);
+    var read = document.createElement("div");
+    read.className = "wg-read";
+    read.textContent = "每一轮内层循环把最大的数『冒泡』到最右端（橙色是比较中的两个数，绿色是已就位的）。按『单步』看每一次比较。";
+    var i = 0, j = 0, n = arr.length;
+    function single(){
+      if(i >= n-1){
+        read.textContent = "排序完成！数组已变成 1~8 有序排列。这就是双重 for 循环：外层控制轮数，内层控制每轮比较。";
+        draw(-1, -1, 0); return;
+      }
+      if(j >= n-1-i){
+        i++; j = 0;
+        read.textContent = "第 " + i + " 轮结束，最大的数已冒到右侧。";
+        draw(-1, -1, n-i); return;
+      }
+      if(arr[j] > arr[j+1]){
+        var t = arr[j]; arr[j] = arr[j+1]; arr[j+1] = t;
+        read.textContent = "比较 a[" + j + "] 和 a[" + (j+1) + "]：前者大，交换！";
+      } else {
+        read.textContent = "比较 a[" + j + "] 和 a[" + (j+1) + "]：顺序对，不动。";
+      }
+      draw(j, j+1, n-i);
+      j++;
+    }
+    mkBtn(box, "单步比较", single);
+    mkBtn(box, "自动播放", function(){
+      var timer = setInterval(function(){
+        single();
+        if(i >= n-1) clearInterval(timer);
+      }, 380);
+    });
+    mkBtn(box, "重置", function(){
+      arr = [5, 2, 8, 1, 6, 3, 7, 4]; i = 0; j = 0; draw(-1, -1, arr.length);
+      read.textContent = "已重置，再来一遍。";
+    }, true);
+    box.appendChild(bars); box.appendChild(read);
+  }
+};
+
+WIDGETS.array = {
+  title:"数组内存布局与越界 · 拖动滑块当回危险操作",
+  init:function(box){
+    var data = [23, 7, 96, 45, 12, 60];
+    var cells = document.createElement("div");
+    cells.className = "arrcells";
+    var cEls = [];
+    data.forEach(function(v, i){
+      var d = document.createElement("div");
+      d.className = "acell";
+      d.innerHTML = '<span class="idx">a[' + i + ']</span><span class="v">' + v + "</span>";
+      cEls.push(d); cells.appendChild(d);
+    });
+    /* 越界幽灵格：下标跑出范围时出现，直观显示『你在动别人的地盘』 */
+    var ghost = document.createElement("div");
+    ghost.className = "acell ooo";
+    ghost.style.display = "none";
+    ghost.innerHTML = '<span class="idx">越界</span><span class="v">???</span>';
+    cells.appendChild(ghost);
+    var sliderRow = document.createElement("div");
+    sliderRow.className = "wg-slider";
+    sliderRow.innerHTML = '<span>下标 i =</span><span id-x style="color:#ffd57e;font-weight:700">0</span>';
+    var disp = document.createElement("span");
+    disp.style.cssText = "color:#ffd57e;font-weight:700;min-width:24px";
+    sliderRow.replaceChild(disp, sliderRow.querySelector("[id-x]"));
+    var range = document.createElement("input");
+    range.type = "range"; range.min = -2; range.max = 7; range.value = 0;
+    sliderRow.appendChild(range);
+    var addr = document.createElement("div");
+    addr.style.cssText = "text-align:center;font-family:Consolas,monospace;font-size:11.5px;color:#5c6a8c";
+    var read = document.createElement("div");
+    read.className = "wg-read";
+    function upd(){
+      var i = +range.value;
+      disp.textContent = i;
+      cEls.forEach(function(c, k){
+        c.classList.remove("sel", "ooo");
+        if(k === i) c.classList.add("sel");
+      });
+      if(i >= 0 && i < data.length){
+        ghost.style.display = "none";
+        addr.textContent = "地址 = " + (0x2000 + i*4) + "（相邻元素差 4 字节 = sizeof(int)）";
+        read.textContent = "a[" + i + "] = " + data[i] + " ✓ 正常访问。注意地址：数组在内存里是连续排列的一排格子。";
+      } else {
+        ghost.style.display = "flex";
+        ghost.querySelector(".idx").textContent = "a[" + i + "]";
+        if(i < 0 && ghost.nextSibling !== cells.firstChild) cells.insertBefore(ghost, cells.firstChild);
+        else if(i >= 0) cells.appendChild(ghost);
+        addr.textContent = i < 0 ? "地址 = 越界（跑到数组前面去了）" : "地址 = " + (0x2000 + i*4) + "（已越过数组尾部）";
+        read.textContent = "⚠️ 越界！a[" + i + "] 不属于这个数组。C 语言不检查下标——它照样按地址去读写，读到的是别人（别的变量）的地盘，轻则数值乱跳，重则程序崩溃。编译器不报错，这是 C 最著名的陷阱。";
+      }
+    }
+    range.addEventListener("input", upd);
+    mkBtn(box, "回到安全区", function(){ range.value = 2; upd(); }, true);
+    box.appendChild(cells); box.appendChild(addr); box.appendChild(sliderRow); box.appendChild(read);
+    upd();
+  }
+};
+
+WIDGETS.recur = {
+  title:"递归调用栈 · 眼见为实地看 fact(4) 怎么算",
+  init:function(box){
+    var code = document.createElement("div");
+    code.className = "wg-code";
+    code.innerHTML = hl("int fact(int n) {\n    if (n == 1) return 1;        /* 出口 */\n    return n * fact(n - 1);      /* 自己调用自己 */\n}");
+    box.appendChild(code);
+    var stack = document.createElement("div");
+    stack.className = "stack";
+    var read = document.createElement("div");
+    read.className = "wg-read";
+    read.textContent = "每调用一次函数，就在『栈』上摞一块新砖（新的一份 n）。按『单步』看砖怎么摞上去、再怎么拿结果撤下来。";
+    var frames = [];   /* {n, state} state: waiting|ret, val */
+    var phase = 0;     /* 0=下沉 1=上浮 */
+    function draw(){
+      stack.innerHTML = "";
+      frames.forEach(function(f, idx){
+        var d = document.createElement("div");
+        d.className = "frame" + (idx === frames.length-1 ? " top" : "");
+        var stTxt = f.ret !== undefined ? "返回 " + f.ret
+          : (f.n === 1 ? "到达出口：n == 1，即将返回 1" : "等待 fact(" + (f.n-1) + ") 的结果…");
+        d.innerHTML = "<span>fact(" + f.n + ")</span><span class='st'>" + stTxt + "</span>" + (f.ret !== undefined ? "<span class='ret'>✓</span>" : "");
+        stack.appendChild(d);
+      });
+      if(frames.length === 0) stack.innerHTML = '<div style="color:#5c6a8c;font-size:12.5px;text-align:center;padding:14px 0">（栈空，还没有函数被调用）</div>';
+    }
+    function step(){
+      if(phase === 0){
+        if(frames.length === 0){ frames.push({n:4}); read.textContent = "main 调用 fact(4)：栈上摞起第一块砖，n = 4。"; }
+        else {
+          var top = frames[frames.length-1];
+          if(top.n === 1){ top.ret = 1; phase = 1;
+            read.textContent = "到达出口！n == 1，fact(1) 直接返回 1，不再继续往下钻 —— 递归必须有出口，否则栈被撑爆（栈溢出）。";
+          } else {
+            frames.push({n: top.n - 1});
+            read.textContent = "fact(" + top.n + ") 需要 fact(" + (top.n-1) + ") 的结果，于是继续调用，栈又摞一块砖。";
+          }
+        }
+      } else {
+        if(frames.length === 0){ read.textContent = "全部完成！main 拿到最终结果 24。再按可重置。"; return; }
+        var t = frames[frames.length-1];
+        if(t.ret !== undefined){
+          frames.pop();
+          if(frames.length){
+            var p = frames[frames.length-1];
+            p.ret = p.n * t.ret;
+            read.textContent = "fact(" + t.n + ") 返回 " + t.ret + "，上层 fact(" + p.n + ") 算出 " + p.n + " × " + t.ret + " = " + p.ret + "，栈撤掉一块砖。";
+          } else {
+            read.textContent = "fact(4) 返回最终结果 24（= 4×3×2×1）。栈已清空。";
+          }
+        }
+      }
+      draw();
+    }
+    mkBtn(box, "单步", step);
+    mkBtn(box, "自动播放", function(){
+      var timer = setInterval(function(){
+        step();
+        if(frames.length === 0 && phase === 1) clearInterval(timer);
+      }, 620);
+    });
+    mkBtn(box, "重置", function(){ frames = []; phase = 0; draw();
+      read.textContent = "已重置。"; }, true);
+    box.appendChild(stack); box.appendChild(read);
+    draw();
+  }
+};
+
+WIDGETS.mem = {
+  title:"内存与指针 · 一步一步把 &、* 看明白",
+  init:function(box){
+    var row = document.createElement("div");
+    row.className = "memrow";
+    row.innerHTML =
+      '<div class="cell" id-none><span class="addr">0x2000</span><span class="name">a (int)</span><span class="val">—</span></div>' +
+      '<div class="cell" id-none><span class="addr">0x2004</span><span class="name">b (int)</span><span class="val">—</span></div>' +
+      '<div class="cell" id-none><span class="addr">0x2008</span><span class="name">p (int*)</span><span class="val">—</span></div>';
+    var cells = row.querySelectorAll(".cell");
+    var ptrwrap = document.createElement("div");
+    ptrwrap.className = "ptrbar";
+    ptrwrap.style.display = "none";
+    ptrwrap.innerHTML = '<div class="ptrtag">p <i>—&gt; 指向 a (0x2000)</i></div>';
+    var read = document.createElement("div");
+    read.className = "wg-read";
+    read.textContent = "按『单步』执行三条语句，盯着格子看。";
+    var step = 0;
+    var steps = [
+      function(){
+        cells[0].querySelector(".val").textContent = "10";
+        flash(cells[0]);
+        read.textContent = "① int a = 10; —— 内存 0x2000 处划出 4 个字节，贴上标签 a，放进值 10。";
+      },
+      function(){
+        cells[1].querySelector(".val").textContent = "20";
+        flash(cells[1]);
+        read.textContent = "② int b = 20; —— 旁边 0x2004 再划 4 字节给 b。";
+      },
+      function(){
+        cells[2].querySelector(".val").textContent = "0x2000";
+        flash(cells[2]);
+        ptrwrap.style.display = "flex";
+        cells[0].classList.add("hot");
+        read.textContent = "③ int *p = &a; —— & 是『取地址』：取出 a 的门牌号 0x2000，存进指针变量 p。从此 p 知道 a 住哪。";
+      },
+      function(){
+        cells[0].querySelector(".val").textContent = "99";
+        flash(cells[0]);
+        read.textContent = "④ *p = 99; —— * 在等号左边是『顺着地址改值』：p 指向 0x2000，于是 a 被改成 99。看，没写 a 这个名字，a 的值却变了！这就是指针的威力。";
+      },
+      function(){
+        read.textContent = "⑤ printf(\"%d\", *p); —— * 在表达式中是『顺着地址取值』，打印 99。总结：& 取地址，* 按地址找变量。一进一出，正好互逆。";
+      }
+    ];
+    function flash(c){ c.classList.remove("flash"); void c.offsetWidth; c.classList.add("flash"); }
+    function next(){
+      if(step < steps.length){ steps[step](); step++; }
+      else read.textContent = "演示结束。核心就两句：&a 得到地址；*p 顺着地址访问变量。";
+    }
+    mkBtn(box, "单步执行", next);
+    mkBtn(box, "重置", function(){
+      step = 0; ptrwrap.style.display = "none";
+      cells.forEach(function(c){ c.classList.remove("hot"); c.querySelector(".val").textContent = "—"; });
+      read.textContent = "已重置，按『单步执行』再来一遍。";
+    }, true);
+    box.appendChild(row); box.appendChild(ptrwrap); box.appendChild(read);
+  }
+};
+
+WIDGETS.swap = {
+  title:"传值 vs 传地址 · swap 函数为什么必须用指针",
+  init:function(box){
+    var grid = document.createElement("div");
+    grid.className = "swapgrid";
+    function boxHTML(title, code, mx, my, fa, fb){
+      return '<div class="swapbox"><h4>' + title + '</h4>' +
+        '<div class="wg-code" style="margin-bottom:8px">' + hl(code) + "</div>" +
+        '<div class="vs">' +
+        '<div class="vbox mainv"><span class="vn">main: x</span><br><span class="vv">' + mx + "</span></div>" +
+        '<div class="vbox mainv"><span class="vn">main: y</span><br><span class="vv">' + my + "</span></div>" +
+        '<div class="vbox"><span class="vn">形参 a</span><br><span class="vv">' + fa + "</span></div>" +
+        '<div class="vbox"><span class="vn">形参 b</span><br><span class="vv">' + fb + "</span></div>" +
+        "</div></div>";
+    }
+    grid.innerHTML =
+      boxHTML("✘ 传值（交换失败）", "void swap(int a, int b) {\n    int t = a; a = b; b = t;\n}", 3, 8, "—", "—") +
+      boxHTML("✔ 传地址（交换成功）", "void swap(int *a, int *b) {\n    int t = *a; *a = *b; *b = t;\n}", 3, 8, "—", "—");
+    var boxes = grid.querySelectorAll(".swapbox");
+    var read = document.createElement("div");
+    read.className = "wg-read";
+    read.textContent = "两边 main 里都是 int x = 3, y = 8; 然后调用 swap。按『单步』看差别在哪。";
+    var step = 0;
+    function setV(boxIdx, sel, val, changed){
+      var b = boxes[boxIdx];
+      var v = b.querySelectorAll(".vv")[sel];
+      v.textContent = val;
+      if(changed) v.parentElement.classList.add("changed"); else v.parentElement.classList.remove("changed");
+    }
+    function run(){
+      step = (step + 1) % 4;
+      if(step === 1){
+        setV(0, 2, 3); setV(0, 3, 8); setV(1, 2, "&x"); setV(1, 3, "&y");
+        read.textContent = "① 发生调用：左边把 x、y 的值 3 和 8 复制一份给形参 a、b —— 注意 main 里的 x、y 没动。右边传的是 x、y 的地址，形参 a、b 里存的是地址。";
+      } else if(step === 2){
+        setV(0, 2, 8); setV(0, 3, 3, true); setV(1, 2, 8); setV(1, 3, 3, true);
+        read.textContent = "② 函数内部执行交换：两边都成功交换了自己的 a、b。左边换的是『复印件』，右边顺着地址改的是 x、y 本尊。";
+      } else if(step === 3){
+        read.textContent = "③ 函数返回，形参 a、b 销毁：左边 main 里 x=3, y=8 纹丝不动（换的是复印件）；右边 x、y 已经真的换了（绿色高亮）。";
+        setV(1, 0, 8, true); setV(1, 1, 3, true);
+      } else {
+        boxes.forEach(function(b, bi){
+          b.querySelectorAll(".vv").forEach(function(v, i){ v.textContent = ["3","8","—","—"][i]; v.parentElement.classList.remove("changed"); });
+        });
+        read.textContent = "已重置。结论：C 函数默认传值（复印一份）；想让函数改动外面的变量，就传地址、用指针。";
+      }
+    }
+    mkBtn(box, "单步执行", run);
+    mkBtn(box, "重置", function(){
+      step = 0;
+      boxes.forEach(function(b){
+        b.querySelectorAll(".vv").forEach(function(v, i){ v.textContent = ["3","8","—","—"][i]; v.parentElement.classList.remove("changed"); });
+      });
+      read.textContent = "已重置。";
+    }, true);
+    box.appendChild(grid); box.appendChild(read);
+  }
+};
+
+WIDGETS.zone = {
+  title:"程序内存分区 · malloc 的东西和普通变量住得不一样",
+  init:function(box){
+    var z = document.createElement("div");
+    z.className = "zone";
+    z.innerHTML =
+      '<div class="z z-code"><span class="zn">代码区（只读）</span><span class="zd">你的指令本身，机器码，防篡改</span></div>' +
+      '<div class="z z-code"><span class="zn">常量区</span><span class="zd">"hello" 这类字符串字面量，改它会崩</span></div>' +
+      '<div class="z z-data"><span class="zn">全局区 / 静态区</span><span class="zd">函数外定义的变量、static 变量，活到程序结束</span></div>' +
+      '<div class="z z-heap"><span class="zn">堆 heap（向下长）</span><span class="zd">malloc 的地盘，要手动 free，不用了不还 = 内存泄漏</span></div>' +
+      '<div class="z z-stack"><span class="zn">栈 stack（向上长）</span><span class="zd">函数形参、局部变量，函数一返回就自动清空</span></div>';
+    var read = document.createElement("div");
+    read.className = "wg-read";
+    read.textContent = "关键区别：栈像酒店自动退房（函数返回即回收），堆像自己租房（必须手动退）。指针最常见的崩溃 = 返回了指向栈上局部变量的地址——房已经退了还拿钥匙开门。";
+    box.appendChild(z); box.appendChild(read);
+  }
+};
+
+function mkBtn(box, label, fn, ghost){
+  var b = document.createElement("button");
+  if(ghost) b.className = "ghost";
+  b.textContent = label;
+  b.addEventListener("click", fn);
+  box.appendChild(b);
+  return b;
+}
+
+/* ================= 内容数据 ================= */
+var CH = [];
+
+/* ---------- 第 1 章 入门准备 ---------- */
+CH.push({
+  id:"ch1", title:"入门准备：程序是什么，怎么跑起来", desc:"零基础起步：理解源码→程序的旅程，装好工具，跑通第一个 Hello World。",
+  secs:[
+    { id:"c1s1", title:"程序到底是什么", blocks:[
+      { t:"ana", h:"计算机是一台<b>极度听话但完全不懂人话</b>的机器。你用菜谱告诉它先做什么后做什么，它就一丝不苟地执行——这份『菜谱』就是程序。" },
+      { t:"p", h:"C 语言就是你写菜谱用的一种语言：给变量起名字、做算术、条件判断、循环重复、把一大坨步骤打包成函数。1972 年诞生，至今仍是操作系统、单片机、数据库的根基语言。" },
+      { t:"p", h:"为什么值得先学 C：<b>它离机器近</b>。学 C 时你会顺带理解内存、地址、编译这些底层概念——以后学 Python、Java 任何语言都是降维打击；将来玩单片机、嵌入式，C 就是唯一官方语言。" },
+      { t:"tip", h:"别被『C 很难』吓住。难的其实只有<b>指针</b>和<b>内存</b>两块，而这个网站用了 3 个动画专门拆它们。其余部分和其他语言一样平易近人。" }
+    ]},
+    { id:"c1s2", title:"从源码到程序：编译的旅程", blocks:[
+      { t:"p", h:"你写下的 <code>.c</code> 文件只是普通文本，机器根本看不懂。中间要经过一条流水线，把它变成真正的可执行程序。走一遍：" },
+      { t:"wg", name:"compile" },
+      { t:"tip", h:"记住这条流水线，报错时你就知道去哪找问题：<b>编译错误</b>（少分号、拼错名字）在编译阶段；<b>链接错误</b>（undefined reference）在最后拼装阶段；程序能跑但闪退是<b>运行时错误</b>，编译器帮不了你。" }
+    ]},
+    { id:"c1s3", title:"装一个顺手的工具", blocks:[
+      { t:"p", h:"大一课程作业够用的组合，按省事程度排序：" },
+      { t:"table", head:["方案","配置","适合"], rows:[
+        ["在线编译器","打开即用，搜『OnlineGDB』或『C语言在线编译』，选 C 语言粘贴运行","5 分钟体验、手机上临时跑代码"],
+        ["Dev-C++ / Code::Blocks","安装包一路下一步，自带 gcc，按 F11 编译运行","纯新手，最省心"],
+        ["VS Code + MinGW","装 VS Code、装 gcc、加 C/C++ 扩展，配置 tasks.json","想长期用顺手装备的（推荐）"],
+        ["Visual Studio","社区版免费，新建 C++ 空项目，源文件后缀用 .c","课程要求 / 喜欢全家桶"]
+      ]},
+      { t:"tip", h:"无论用哪个，<b>新建的源文件后缀必须是 .c</b>（比如 main.c）。写成 .txt 或 .cpp 都会带来麻烦。" }
+    ]},
+    { id:"c1s4", title:"第一个程序：逐行解剖", blocks:[
+      { t:"code", cap:"hello.c", c:`#include <stdio.h>          /* 1: 引入标准输入输出工具箱 */
+
+int main(void)               /* 2: 程序的大门，从这里开始执行 */
+{
+    printf("Hello, World!\\n");  /* 3: 在屏幕打印一行字 */
+    return 0;                /* 4: 告诉系统：正常运行，圆满结束 */
+}`, note:"把这 6 行亲手敲进去（别复制粘贴！），编译运行，看到黑窗口蹦出 Hello, World! 就算正式入门。" },
+      { t:"p", h:"逐行解释：" },
+      { t:"table", head:["行","作用","细节"], rows:[
+        ["#include &lt;stdio.h&gt;","把『标准输入输出』的说明书复制进来","printf 就住在这个工具箱里，不引它就用不了"],
+        ["int main(void)","主函数——程序的唯一入口","每个 C 程序有且只有一个 main；int 表示它最后会返回一个整数"],
+        ["printf(...)","打印函数","双引号里的内容原样输出"],
+        ["\\n","换行符","不写它，下次打印会接在同一行"],
+        ["return 0;","返回 0 = 一切正常","非 0 通常表示出错（以后写脚本会用到）"],
+        ["; 分号","每条语句的句号","C 里最常忘的东西，没有之一"]
+      ]},
+      { t:"warn", h:"新手三大高频翻车：① 用了中文标点 <code>；（）“”</code>（输入法切全角了）；② 漏分号；③ printf 拼成 printF。报错时优先检查这三样。" },
+      { t:"quiz", q:"printf 输出后想让下一次输出换到新的一行，需要什么？", opts:["在 printf 后加一个空格","字符串末尾加 \\n","再写一个 printf 就自动换行","按回车键"], ans:1, exp:"\\n 是转义字符，代表『换行』这一动作。printf 不会自动换行，按回车更是不影响输出内容——程序里的换行必须由 \\n 完成。" }
+    ]}
+  ]
+});
+
+/* ---------- 第 2 章 数据与变量 ---------- */
+CH.push({
+  id:"ch2", title:"数据与变量：给内存贴标签", desc:"类型、变量、printf/scanf 格式化输入输出，以及整数除法等第一批陷阱。",
+  secs:[
+    { id:"c2s1", title:"变量 = 贴了标签的盒子", blocks:[
+      { t:"ana", h:"内存是一排超长的储物柜。定义变量 = 向管理员申请几个柜子，并贴上名字标签。柜子大小由<b>类型</b>决定：int 要 4 个柜，char 只要 1 个。" },
+      { t:"code", cap:"变量的定义与赋值", c:`int age;            /* 申请 4 字节，贴标签 age（此刻值是随机的垃圾值！） */
+age = 18;           /* 往盒子里放 18 */
+int score = 95;     /* 定义的同时初始化 —— 推荐写法 */
+score = score + 5;  /* 取出 95，加 5，放回去 → 100 */
+
+float pi = 3.14f;   /* 单精度小数，结尾加 f */
+double e  = 2.718;  /* 双精度小数，默认的整数外类型 */
+char grade = 'A';   /* 单个字符，用单引号` },
+      { t:"warn", h:"定义了没初始化的变量，值是上一任住户留下的<b>随机垃圾</b>。<code>int x; printf(\"%d\", x);</code> 可能打印任何数。习惯：<b>定义时顺手给初值</b>。" },
+      { t:"quiz", q:"int x; printf(\"%d\", x); 会打印出什么？", opts:["0","随机值（垃圾值）","编译报错","会提示未定义"], ans:1, exp:"局部变量不初始化时，值就是那块内存里残留的数据，不可预测。编译器一般不报错（最多警告），这是经典坑——记住：定义即初始化。" }
+    ]},
+    { id:"c2s2", title:"基本类型一张表", blocks:[
+      { t:"table", head:["类型","常见大小","装什么","printf 占位符"], rows:[
+        ["<code>int</code>","4 字节","整数（约 ±21 亿）","<code>%d</code>"],
+        ["<code>long long</code>","8 字节","大整数（约 ±922 亿亿）","<code>%lld</code>"],
+        ["<code>float</code>","4 字节","小数（约 7 位有效数字）","<code>%f</code>"],
+        ["<code>double</code>","8 字节","小数（约 15 位有效数字）","<code>%lf</code>"],
+        ["<code>char</code>","1 字节","单个字符 / 小整数（-128~127）","<code>%c</code>"],
+        ["<code>unsigned int</code>","4 字节","非负整数（范围翻倍）","<code>%u</code>"]
+      ]},
+      { t:"tip", h:"记法：%d = decimal 整数、%f = float 小数、%c = character 字符、%lf = long float。double 打印也可以用 %f。" },
+      { t:"code", cap:"sizeof：亲眼看看各类型占几字节", c:`#include <stdio.h>
+int main(void)
+{
+    printf("int:    %zu 字节\\n", sizeof(int));
+    printf("double: %zu 字节\\n", sizeof(double));
+    printf("char:   %zu 字节\\n", sizeof(char));
+    return 0;
+}`, note:"sizeof 是『量盒子尺寸』的运算符。同一类型在不同机器上可能不同，写代码别硬猜，用 sizeof 量。" }
+    ]},
+    { id:"c2s3", title:"printf：格式化打印", blocks:[
+      { t:"ana", h:"printf 像填空题：字符串里挖好坑（占位符），后面的参数按顺序往坑里填。" },
+      { t:"code", cap:"占位符与转义", c:`int apples = 5;
+double price = 12.5;
+
+printf("我有 %d 个苹果\\n", apples);        /* 我有 5 个苹果 */
+printf("单价 %.2f 元，共 %.2f 元\\n", price, price * apples);
+/* %.2f 保留 2 位小数：单价 12.50 元，共 62.50 元 */
+printf("[%10d]\\n", 123);   /* [       123] 宽度10，右对齐 */
+printf("[%-10d]\\n", 123);  /* [123       ] 负号 = 左对齐 */
+printf("\\t 制表符\\n");      /* \\t 相当于按一次Tab */` },
+      { t:"warn", h:"占位符和参数必须<b>类型配对</b>：用 %d 打印 double、或用 %f 打印 int，输出全是乱码且不报错——编译器只在警告里提醒，很多人关了警告就翻车。打印 double 记得 <code>%f</code>，打印 long long 记得 <code>%lld</code>。" }
+    ]},
+    { id:"c2s4", title:"scanf：键盘输入", blocks:[
+      { t:"code", cap:"读入一个整数和一个小数", c:`int age;
+double height;
+
+printf("输入年龄和身高：");
+scanf("%d", &age);        /* 注意 age 前面的 & ！ */
+scanf("%lf", &height);    /* double 输入用 %lf */
+
+printf("年龄 %d，身高 %.1f\\n", age, height);` },
+      { t:"ana", h:"& 是『取地址』。scanf 要把键盘敲的值<b>放进你家的柜子</b>，所以必须告诉它柜子的门牌号。忘了 & 是新手第一大崩溃源（程序直接闪退）。" },
+      { t:"warn", h:"scanf 里 double 用 <code>%lf</code>（输入和打印不一样！）；<code>char c; scanf(\"%c\", &c);</code> 会在上次回车残留的换行符处直接『吃掉回车』——先用 getchar() 清一下或避免混用。" },
+      { t:"quiz", q:"scanf(\"%d\", age); 忘了写 &，会发生什么？", opts:["编译直接报错","程序可能闪退或写坏内存","完全没问题","自动补上"], ans:1, exp:"编译器只给警告不报错。age 的值被当成了地址，scanf 往那个地址写数据——要么崩，要么悄悄破坏别的变量。养成肌肉记忆：scanf 的变量前面必须加 &（数组名除外，后面讲）。" }
+    ]},
+    { id:"c2s5", title:"类型转换：整数除法的坑", blocks:[
+      { t:"code", cap:"整数运算的小数去哪了", c:`int a = 7, b = 2;
+printf("%d\\n", a / b);          /* 3，不是 3.5！ */
+printf("%d\\n", a % b);          /* 1，% 是取余数 */
+
+printf("%f\\n", a / 2.0);        /* 3.5 —— 有一个 double 参与，整条式子升级 */
+printf("%.2f\\n", (double)a / b); /* 3.50 —— 强制转换 (double)a */` },
+      { t:"ana", h:"同类型运算结果还是同类型：int ÷ int = int，小数部分直接<b>砍掉</b>（不是四舍五入）。想得到小数，式子里至少要有一个小数参与者，或提前强制转换。" },
+      { t:"warn", h:"求平均数 <code>avg = sum / n;</code> 是重灾区：sum 和 n 都是 int 时结果永远是整数。写成 <code>sum / (double)n</code>。" },
+      { t:"quiz", q:"printf(\"%f\", 3/2); 输出什么？", opts:["1.5","1.000000","1","0"], ans:1, exp:"3/2 先按整数算出 1，再转成 double 传给 %f，所以打印 1.000000。想得到 1.5 要写 3/2.0 或 3.0/2。" }
+    ]}
+  ]
+});
+
+/* ---------- 第 3 章 运算符 ---------- */
+CH.push({
+  id:"ch3", title:"运算符与表达式", desc:"算术、自增自减、关系逻辑、优先级，以及嵌入式绕不开的位运算。",
+  secs:[
+    { id:"c3s1", title:"算术运算全家福", blocks:[
+      { t:"table", head:["运算符","含义","例子","结果"], rows:[
+        ["+ - *","加减乘","<code>3 * 4 + 2</code>","14"],
+        ["/","除（整数会砍小数）","<code>7 / 2</code>","3"],
+        ["%","取余（只用于整数）","<code>7 % 2</code>","1"],
+        ["=","赋值（不是数学的等号！）","<code>x = 5</code>","把 5 放进 x"],
+        ["+= -= *= /=","复合赋值","<code>x += 3</code> 等价 <code>x = x + 3</code>","简写"]
+      ]},
+      { t:"ana", h:"C 里的 <b>= 是动作不是判断</b>：『把右边的值搬进左边』。判断相等用的是两个等号 <code>==</code>。这俩写混是 C 语言史上翻车最多的 bug。" },
+      { t:"tip", h:"% 的妙用：<code>n % 2 == 0</code> 判断偶数；<code>n % 10</code> 取个位数；<code>n / 10</code> 去掉个位数。数位拆解全靠它。" }
+    ]},
+    { id:"c3s2", title:"i++ 与 ++i", blocks:[
+      { t:"wg", name:"incdec" },
+      { t:"quiz", q:"int a = 5; int b = a++; 执行后 a 和 b 分别是？", opts:["a=6, b=5","a=5, b=6","a=6, b=6","a=5, b=5"], ans:0, exp:"后置 ++：先把 a 的旧值 5 赋给 b，然后 a 才自增成 6。口诀『先用后加』。" }
+    ]},
+    { id:"c3s3", title:"比较与逻辑：条件的积木", blocks:[
+      { t:"table", head:["运算符","含义","真值规律"], rows:[
+        ["<code>== !=</code>","相等 / 不等","成立得 1，不成立得 0"],
+        ["<code>&gt; &lt; &gt;= &lt;=</code>","大小比较","同上"],
+        ["<code>&amp;&amp;</code>","并且（都真才真）","<code>1 &amp;&amp; 0</code> → 0"],
+        ["<code>||</code>","或者（有真就真）","<code>1 || 0</code> → 1"],
+        ["<code>!</code>","取反","<code>!0</code> → 1；任何非 0 都算『真』"]
+      ]},
+      { t:"ana", h:"C 没有『是/否』类型，就用数字代表：0 = 假，<b>任何非 0 = 真</b>。所以 <code>if(5)</code> 恒成立，<code>if(x = 0)</code> 永远不成立——因为它是赋值，x 变 0，0 是假！" },
+      { t:"code", cap:"短路求值：&& 左边假就不看右边", c:`int x = 0;
+if (x != 0 && 10 / x > 1) {   /* 左边 x!=0 为假 → 右边 10/x 根本不算，躲过了除零 */
+    printf("ok\\n");
+}
+if (x == 0 || 10 / x > 1) {   /* 左边为真 → 右边短路 */
+    printf("safe\\n");         /* 打印这个 */
+}` },
+      { t:"warn", h:"区间的数学写法 <code>0 &lt; x &lt; 10</code> 在 C 里是<b>合法但错误</b>的：先算 <code>0&lt;x</code> 得 0 或 1，再拿它和 10 比，恒为真。必须写成 <code>x &gt; 0 &amp;&amp; x &lt; 10</code>。" }
+    ]},
+    { id:"c3s4", title:"优先级：一张生存卡", blocks:[
+      { t:"table", head:["优先级（高→低）","运算符","记忆点"], rows:[
+        ["1","<code>()</code> 括号","不确定就加括号，永不亏"],
+        ["2","<code>! ++ -- -(负号)</code> 单目","一个操作数的最亲"],
+        ["3","<code>* / %</code>","先乘除"],
+        ["4","<code>+ -</code>","后加减"],
+        ["5","<code>&lt; &gt; &lt;= &gt;=</code>","比较低于算术"],
+        ["6","<code>== !=</code>","相等比较更低"],
+        ["7","<code>&amp;&amp;</code>",""],
+        ["8","<code>||</code>",""],
+        ["9","<code>= +=</code> 等赋值","最低！所以 x = 3+4 先算右边"]
+      ]},
+      { t:"tip", h:"实战策略：背不全没关系，<b>可疑的地方加括号</b>。括号零成本，还让读代码的人（包括三个月后的你）秒懂。" }
+    ]},
+    { id:"c3s5", title:"位运算：嵌入式看家本领", blocks:[
+      { t:"ana", h:"把数字看成 32 个 0/1 的灯泡，位运算就是成排地拨灯泡。单片机点灯、寄存器配置全靠它。" },
+      { t:"table", head:["运算符","含义","例子（8位示意）"], rows:[
+        ["<code>&amp;</code>","按位与：都 1 才 1","<code>0b1100 &amp; 0b1010 = 0b1000</code> —— 常用于取出某一位"],
+        ["<code>|</code>","按位或：有 1 就 1","<code>0b1100 | 0b1010 = 0b1110</code> —— 常用于点亮某一位"],
+        ["<code>^</code>","异或：不同才 1","<code>0b1100 ^ 0b1010 = 0b0110</code> —— 翻转某位 / 交换两数"],
+        ["<code>~</code>","按位取反","<code>~0 = -1</code>"],
+        ["<code>&lt;&lt;</code>","左移 = 乘 2ⁿ","<code>1 &lt;&lt; 3 = 8</code>"],
+        ["<code>&gt;&gt;</code>","右移 = 除 2ⁿ","<code>8 &gt;&gt; 2 = 2</code>"]
+      ]},
+      { t:"code", cap:"点灯三板斧（单片机天天用）", c:`reg = reg | (1 << 5);    /* 把第5位 置1（点亮），别的位不动 */
+reg = reg & ~(1 << 5);   /* 把第5位 清0（熄灭） */
+flag = (reg >> 3) & 1;   /* 读出第3位是0还是1 */` },
+      { t:"quiz", q:"表达式 1 << 4 的值是？", opts:["5","8","16","10000"], ans:2, exp:"左移 4 位 = 乘 2⁴ = 16。写成二进制：1 后面跟 4 个 0，即 10000₂。位运算快速心算：左移几位就是乘几个 2。" }
+    ]}
+  ]
+});
+
+/* ---------- 第 4 章 流程控制 ---------- */
+CH.push({
+  id:"ch4", title:"流程控制：让程序学会拐弯和转圈", desc:"if/switch 分支、三大循环、break/continue，附循环模拟器和冒泡排序动画。",
+  secs:[
+    { id:"c4s1", title:"if / else：岔路口", blocks:[
+      { t:"code", cap:"if-else if-else 阶梯", c:`int score;
+scanf("%d", &score);
+
+if (score >= 90) {
+    printf("优秀\\n");
+} else if (score >= 60) {
+    printf("及格\\n");       /* else if = 另一个岔路口 */
+} else {
+    printf("不及格\\n");     /* 所有路都不通时的兜底 */
+}` },
+      { t:"warn", h:"三个经典坑：① <code>if (x = 5)</code> 写成一个等号——赋值恒真，条件判断完全失效（养成写 <code>if (5 == x)</code> 的习惯，写错编译器会报错）；② <code>if (a > b);</code> 条件后手滑多打分号，if 直接空转；③ 大括号：哪怕只有一行也建议写上，日后加行不出事。" },
+      { t:"p", h:"悬置 else：else 总是和<b>最近的、还没配对的</b> if 结合。嵌套 if 时用大括号明确归属，别让编译器猜。" }
+    ]},
+    { id:"c4s2", title:"switch：多路分岔", blocks:[
+      { t:"code", cap:"switch 与穿透", c:`int day;
+scanf("%d", &day);
+
+switch (day) {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+        printf("工作日\\n");
+        break;                /* 不写 break 会一路往下穿透！ */
+    case 6:
+        printf("星期六\\n");   /* 故意穿透 case 6 → case 7 */
+    case 7:
+        printf("周末\\n");
+        break;
+    default:
+        printf("输入不合法\\n");
+}` },
+      { t:"ana", h:"switch 像<b>贴了编号的储物柜走廊</b>：按编号进柜，然后<b>从那里一直往前走</b>，直到撞上 break 这堵墙才出门。case 1~5 故意不装墙，走进 1 号就会一路走到 5 号的 printf。" },
+      { t:"tip", h:"括号里只能是整数或字符（不能是 double、不能是字符串）；每个分支记得 break；default 兜住非法输入，防崩溃。" },
+      { t:"quiz", q:"删掉上例中 case 5 后的 break，输入 3 会打印什么？", opts:["工作日","工作日 周末","周末","不合法"], ans:1, exp:"从 case 3 进入，打印『工作日』后没有 break，继续穿透到 case 6 打印『周末』，在 case 7 的 break 处出口。穿透是坑也是特性——按需使用。" }
+    ]},
+    { id:"c4s3", title:"三大循环", blocks:[
+      { t:"code", cap:"同一个任务的三种写法：求 1+2+…+100", c:`/* 写法1：while —— 先检查再干活 */
+int i = 1, sum = 0;
+while (i <= 100) {
+    sum += i;
+    i++;
+}
+
+/* 写法2：for —— 计数型循环首选，初始化/条件/自增一行全写 */
+int sum2 = 0;
+for (int i = 1; i <= 100; i++) {
+    sum2 += i;
+}
+
+/* 写法3：do-while —— 先斩后奏，至少执行一次 */
+int j = 1, sum3 = 0;
+do {
+    sum3 += j;
+    j++;
+} while (j <= 100);   /* 注意这行有分号！ */` },
+      { t:"tip", h:"选择口诀：知道循环几次 → for；条件满足才干活 → while；至少要干一次（如菜单、重输密码）→ do-while。" },
+      { t:"wg", name:"loop" }
+    ]},
+    { id:"c4s4", title:"break 与 continue", blocks:[
+      { t:"code", cap:"break 跳出整个循环；continue 只跳过这一圈", c:`for (int i = 1; i <= 10; i++) {
+    if (i == 3) continue;   /* 3 这一圈直接跳过，回到 i++ */
+    if (i == 7) break;      /* 直接退出整个循环 */
+    printf("%d ", i);
+}
+/* 输出：1 2 4 5 6 */` },
+      { t:"ana", h:"continue 是『这趟不干了，直接下一趟』；break 是『我辞职，整个循环结束』。注意 break 只能跳出一层循环，双层循环里跳出全部得用标志变量或 goto。" }
+    ]},
+    { id:"c4s5", title:"嵌套循环：循环套循环", blocks:[
+      { t:"code", cap:"九九乘法表：外层管行，内层管列", c:`for (int i = 1; i <= 9; i++) {          /* 第 i 行 */
+    for (int j = 1; j <= i; j++) {      /* 第 i 行打 i 个式子 */
+        printf("%d×%d=%-4d", j, i, i * j);
+    }
+    printf("\\n");                       /* 打完一行换行 */
+}` },
+      { t:"ana", h:"嵌套循环像<b>钟表</b>：内层的分针转一整圈（j 从头到尾），外层的时针才走一格（i++）。外层每走一步，内层完整转一圈。" },
+      { t:"p", h:"嵌套循环最重要的应用之一是排序。下面这个动画就是双重循环的经典——冒泡排序，亲手点几下看每一轮怎么把最大值冒到右边：" },
+      { t:"wg", name:"bubble" },
+      { t:"quiz", q:"while (1) { ... } 是什么循环？", opts:["语法错误","死循环，必须在体内用 break 跳出","只执行一次","条件永远为假"], ans:1, exp:"1 非 0 即真，条件永成立，是无限循环。菜单程序经常这样写：while(1) 转着，用户选『退出』时 break 出去。忘了写退出条件 = 程序卡死。" }
+    ]}
+  ]
+});
+
+/* ---------- 第 5 章 数组 ---------- */
+CH.push({
+  id:"ch5", title:"数组：一排连续的柜子", desc:"批量数据的存放方式，内存连续性、越界陷阱、二维数组。",
+  secs:[
+    { id:"c5s1", title:"为什么需要数组", blocks:[
+      { t:"ana", h:"存 100 个学生的成绩，难道写 score1、score2 … score100？数组让你<b>一次性申请一排柜子，用编号（下标）访问</b>，配合循环批量处理——从此变量数量不再是瓶颈。" },
+      { t:"code", cap:"数组的定义与使用", c:`int a[5] = {23, 7, 96, 45, 12};   /* 一排 5 个 int 柜子，装好初值 */
+/*   下标:  0    1   2    3   4        ← 从 0 开始数！ */
+
+printf("%d\\n", a[0]);    /* 23，第一个 */
+printf("%d\\n", a[4]);    /* 12，最后一个 */
+
+int b[10];                 /* 没初始化 → 10 个垃圾值 */
+int c[10] = {0};           /* 技巧：全部清零 */
+int d[] = {1, 2, 3};       /* 不写长度，自动算出 3 */
+
+int n = 5;
+int e[n];                  /* C99 允许变量长度，老教材可能不提 */` },
+      { t:"warn", h:"数组长度是 5，合法下标是 <b>0~4</b>，不是 1~5！『从 0 开始数』是程序员的世界观，越早适应越好。数到 a[5] 就是越界。" }
+    ]},
+    { id:"c5s2", title:"数组在内存里的真实样子", blocks:[
+      { t:"p", h:"数组不是 5 个零散的盒子，而是<b>内存里连成一排的 20 个字节</b>，彼此紧挨。下面的演示把每个格子的地址都标了出来——把下标拖出 0~5 的范围，看看会发生什么：" },
+      { t:"wg", name:"array" },
+      { t:"tip", h:"正因为连续，<code>a[i]</code> 的地址一步就能算出：首地址 + i × 4。这是数组遍历飞快的根本原因，也是第 7 章指针与数组关系的基础。" }
+    ]},
+    { id:"c5s3", title:"遍历：循环 + 数组是黄金搭档", blocks:[
+      { t:"code", cap:"求最大值、平均值、倒序", c:`int a[8] = {5, 12, 3, 88, 21, 7, 45, 9};
+int max = a[0];                      /* 先假设第一个最大 */
+int sum = 0;
+
+for (int i = 0; i < 8; i++) {        /* i 从 0 到 7，严丝合缝 */
+    if (a[i] > max) max = a[i];      /* 遇到更大的就更新 */
+    sum += a[i];
+}
+printf("最大 %d，平均 %.2f\\n", max, sum / 8.0);
+
+for (int i = 7; i >= 0; i--) {       /* 倒着走：7,6,...,0 */
+    printf("%d ", a[i]);
+}` },
+      { t:"warn", h:"循环边界和数组长度必须配准：<code>i &lt; 8</code> 对长度 8 的数组正好 0~7。写成 <code>i &lt;= 8</code> 就越界。习惯把长度写成 <code>sizeof(a)/sizeof(a[0])</code>，改数组不用改循环。" },
+      { t:"quiz", q:"int a[10]; 数组中最后一个元素是？", opts:["a[10]","a[9]","a[0]","a[11]"], ans:1, exp:"长度 10 → 下标 0~9。a[10] 是越界访问（第 11 个格子），编译不报错但运行有风险。" }
+    ]},
+    { id:"c5s4", title:"二维数组：表格", blocks:[
+      { t:"ana", h:"一维数组是一排柜子，二维数组是一张<b>柜子墙</b>：行 × 列，像 Excel 表格。" },
+      { t:"code", cap:"3 名学生 × 4 门课", c:`int score[3][4] = {
+    {85, 92, 78, 90},     /* 0号学生 */
+    {72, 88, 95, 61},     /* 1号学生 */
+    {90, 70, 82, 86}      /* 2号学生 */
+};
+
+printf("%d\\n", score[1][2]);   /* 95：第1行第2列（都是从0数） */
+
+/* 双层循环遍历：外层行、内层列 */
+for (int i = 0; i < 3; i++) {
+    int s = 0;
+    for (int j = 0; j < 4; j++) s += score[i][j];
+    printf("学生%d 平均 %.1f\\n", i + 1, s / 4.0);
+}` },
+      { t:"tip", h:"内存里它其实还是一条直线（按行排好），『二维』只是你看待它的方式。初始化时行数可省（<code>int s[][4]</code>），但<b>列数不能省</b>。" }
+    ]}
+  ]
+});
+
+/* ---------- 第 6 章 函数 ---------- */
+CH.push({
+  id:"ch6", title:"函数：把一坨代码打包成零件", desc:"定义、参数、返回值、作用域，以及递归的调用栈可视化。",
+  secs:[
+    { id:"c6s1", title:"为什么需要函数", blocks:[
+      { t:"ana", h:"做一道菜反复用到『打鸡蛋』：每次都把步骤重写一遍？聪明的做法是<b>写一次菜谱，之后喊一句『打鸡蛋』就行</b>。函数 = 可复用的代码零件。" },
+      { t:"p", h:"好处三个：① 不重复（写一次处处用）；② 好维护（改一处全局生效）；③ 好读（main 里只剩高层流程，像目录一样清爽）。你已经天天在用了——printf、scanf 都是别人写好的函数。" }
+    ]},
+    { id:"c6s2", title:"函数的定义与调用", blocks:[
+      { t:"code", cap:"一个完整的函数", c:`/* 返回类型  函数名(参数列表) */
+int add(int a, int b)          /* 定义：a、b 是形参（占位的格子） */
+{
+    return a + b;              /* return：算出结果并送回去 */
+}
+
+int main(void)
+{
+    int s = add(3, 5);         /* 调用：3、5 是实参（真值） */
+    printf("%d\\n", s);         /* 8 */
+    return 0;
+}` },
+      { t:"table", head:["部件","作用","注意"], rows:[
+        ["返回类型","函数算完吐出什么类型","不要东西就 <code>void</code>"],
+        ["形参","函数内部的占位变量","类型和名字都要写：int a"],
+        ["实参","调用时传进来的真值","数量、顺序、类型要对齐"],
+        ["return","交货 + 退出函数","void 函数里可单独 return; 提前退出"]
+      ]},
+      { t:"warn", h:"C 编译器<b>从上往下</b>读文件：main 之前没见过 add 就会报错。两种解决：① 把函数定义放 main 前面；② 在前面写一行<b>函数声明</b>（原型）：<code>int add(int a, int b);</code> 告诉编译器『有这货，长这样』。多文件项目全靠声明（头文件就是声明的集合）。" }
+    ]},
+    { id:"c6s3", title:"形参与实参：复印的哲学", blocks:[
+      { t:"ana", h:"传参像<b>发文件复印件</b>：函数拿到的是副本，随便涂改，原件不受影响。想让函数改你的原件（比如 swap 两个变量）？下一章的指针专门解决这个。" },
+      { t:"code", cap:"数组传参：传的是地址（例外！）", c:`/* 数组做参数时，传的不是复印件而是地址 —— 所以函数里改，外面真的变了 */
+void double_all(int arr[], int n)    /* 长度要单独传，函数里量不出 */
+{
+    for (int i = 0; i < n; i++)
+        arr[i] *= 2;
+}
+
+int main(void)
+{
+    int a[3] = {1, 2, 3};
+    double_all(a, 3);      /* 数组名 a 就是首地址 */
+    printf("%d %d %d\\n", a[0], a[1], a[2]);   /* 2 4 6 */
+    return 0;
+}` },
+      { t:"tip", h:"数组传参不复制内容（复制大数组太贵），传的是『从哪开始』的地址——这是数组与普通变量传参行为不同的根本原因，第 7 章会彻底讲透。" }
+    ]},
+    { id:"c6s4", title:"作用域：变量管辖范围", blocks:[
+      { t:"table", head:["变量","出生地","活动范围","寿命"], rows:[
+        ["局部变量","函数内部 / 大括号里","所在大括号内","函数返回即销毁"],
+        ["全局变量","所有函数之外","整个文件（都能访问）","程序开始到结束"],
+        ["static 局部","函数内加 static","仍是本函数","活到程序结束（值在多次调用间保留）"]
+      ]},
+      { t:"warn", h:"全局变量方便但危险：谁都能改，出了 bug 无从查起。原则：<b>能用局部就局部</b>，函数之间靠参数和返回值交流，不靠共享变量。" },
+      { t:"code", cap:"static 局部变量：函数的记性", c:`int count(void)
+{
+    static int n = 0;   /* 只在第一次调用时初始化 */
+    n++;                /* 之后每次调用都在上次的基础上 +1 */
+    return n;
+}
+/* 连续调用 3 次：返回 1、2、3 —— 函数记住了历史 */` }
+    ]},
+    { id:"c6s5", title:"递归：函数调用自己", blocks:[
+      { t:"ana", h:"递归是『把大问题缩小成同类小问题』的思考法：4! = 4 × 3!，而 3! = 3 × 2!……直到 1! = 1 到底。每层调用都把问题规模缩小，到底后一层层把答案送回来。" },
+      { t:"code", cap:"阶乘", c:`int fact(int n)
+{
+    if (n == 1) return 1;      /* ① 出口：到底了就返回 */
+    return n * fact(n - 1);    /* ② 缩小：n! = n × (n-1)! */
+}` },
+      { t:"p", h:"光看代码容易懵，下面这个动画把每一步压栈、弹栈都摆到你眼前——<b>点单步，看 fact(4) 怎么先展开再收拢</b>：" },
+      { t:"wg", name:"recur" },
+      { t:"warn", h:"递归两大铁律：① <b>必须有出口</b>（没有 = 无限调用，栈被撑爆，程序崩溃『栈溢出』）；② 每次调用必须<b>朝出口逼近</b>（n 递减）。忘了写出口是新手递归第一杀手。" },
+      { t:"quiz", q:"递归函数缺少出口（终止条件）会发生什么？", opts:["编译报错","运行到 n=0 自动停止","无限递归 → 栈溢出崩溃","自动返回 0"], ans:2, exp:"编译器不管逻辑死活。运行时每次调用都压栈，内存有限的栈很快耗尽，程序崩溃（stack overflow）。写递归先写出口，是铁律。" }
+    ]}
+  ]
+});
+
+/* ---------- 第 7 章 指针 ---------- */
+CH.push({
+  id:"ch7", title:"指针：C 语言的灵魂（也是分水岭）", desc:"地址与解引用、指针与数组、函数传址——配内存动画，一次看懂。",
+  secs:[
+    { id:"c7s1", title:"内存、地址：指针的地基", blocks:[
+      { t:"ana", h:"把内存想成一条街，每家每户都有<b>门牌号（地址）</b>。变量是住户，指针就是<b>抄下某家门牌号的小抄</b>。有了小抄，你就算不知道住户叫什么，也能找到他家、改他家的东西。" },
+      { t:"p", h:"两个核心符号，一进一出正好互逆：" },
+      { t:"table", head:["符号","名字","方向"], rows:[
+        ["<code>&amp;x</code>","取地址符","变量 → 地址（去人家抄门牌）"],
+        ["<code>*p</code>","解引用（间接访问）","地址 → 变量（按小抄找上门）"]
+      ]},
+      { t:"p", h:"抽象？正常。下面这个演示把 5 条语句一条条执行给你看，盯着格子变化——<b>这是全站最重要的一个动画</b>：" },
+      { t:"wg", name:"mem" },
+      { t:"quiz", q:"int a = 10; int *p = &a; 此时 *p 的值是？", opts:["a 的地址","10","不确定","p 的地址"], ans:1, exp:"p 里存的是 a 的地址（比如 0x2000），*p 表示『顺着 p 里的地址找上门，取出那家的值』——正是 a 的 10。p = 地址，*p = 间接得到的值。" }
+    ]},
+    { id:"c7s2", title:"指针的语法与类型", blocks:[
+      { t:"code", cap:"定义、解引用、改值", c:`int a = 10;
+int *p = &a;       /* p 的类型是 int*：『指向 int 的指针』 */
+
+printf("%p\\n", p);    /* 打印 p 里存的地址（十六进制一串） */
+printf("%d\\n", *p);   /* 10：顺着地址取值 */
+
+*p = 99;               /* 顺着地址改值：a 变成 99 */
+printf("%d\\n", a);     /* 99 —— 没写 a，a 却变了 */
+
+int *q = p;            /* 指针也能赋给指针：q 也指向 a */
+printf("%d\\n", *q);    /* 99 */` },
+      { t:"warn", h:"类型要对口：<code>int *p</code> 只能指向 int；<code>double *d</code> 只能指向 double。指针存的都是地址，但类型决定了它把那块内存『看成什么』——读几个字节、怎么解读。" },
+      { t:"tip", h:"读法定式：看到 <code>int *p</code> 读作『p 是一个指向 int 的指针』；看到 <code>*p = 5</code> 读作『把 5 放进 p 指向的地方』。别再纠结 * 到底跟 int 还是跟 p——<code>int* p</code>、<code>int *p</code>、<code>int * p</code> 完全等价。" },
+      { t:"warn", h:"三大凶案现场：① <b>野指针</b>：指针没初始化就解引用——<code>int *p; *p = 5;</code>（往随机地址写东西，随时崩）；② <b>空指针解引用</b>：p 是 NULL 还 *p；③ 解引用已失效的地址（函数返回后栈变量没了）。规范：指针拿不到合法地址就先置 <code>NULL</code>，用之前判 <code>if (p != NULL)</code>。" }
+    ]},
+    { id:"c7s3", title:"指针与数组：天生一对", blocks:[
+      { t:"p", h:"一条贯穿 C 语言的铁律：<b>数组名在表达式里会退化成首元素地址</b>。也就是说 <code>a</code> 和 <code>&amp;a[0]</code> 是一回事。所以：" },
+      { t:"code", cap:"a[i] 的真面目", c:`int a[5] = {10, 20, 30, 40, 50};
+int *p = a;          /* 等价 int *p = &a[0]; */
+
+printf("%d\\n", *p);     /* 10：第0个 */
+printf("%d\\n", *(p+1)); /* 20：地址+1格 → 下一个元素 */
+printf("%d\\n", p[2]);   /* 30：指针也能用[] */
+
+/* 编译器内部：a[i] 一律翻译成 *(a + i)
+   p+1 不是地址+1字节，而是+sizeof(int)=4字节 —— 指针加法自动带单位 */` },
+      { t:"ana", h:"数组是一排柜子，指针是<b>一根可以滑动的手指</b>。p 指在谁身上，<code>*p</code> 就是谁；<code>p++</code> 手指滑到下一格。遍历数组 = 手指从头滑到尾。" },
+      { t:"code", cap:"两种遍历完全等价", c:`for (int i = 0; i < 5; i++) printf("%d ", a[i]);
+printf("\\n");
+
+for (int *p = a; p < a + 5; p++) printf("%d ", *p);   /* 指针滑行版 */
+printf("\\n");` },
+      { t:"tip", h:"区别只有一个：数组名是<b>常量地址</b>（不能 a++，柜子钉死了），指针变量随便挪。函数参数里的 <code>int arr[]</code> 本质就是 <code>int *</code>——所以函数里量不出数组长度，得额外传 n。" }
+    ]},
+    { id:"c7s4", title:"指针做参数：让函数动外面的世界", blocks:[
+      { t:"p", h:"第 6 章留下的问题：函数默认只拿到复印件，改不动 main 里的 x、y。解决办法——<b>传地址</b>。两种 swap 对比着看，一眼分晓：" },
+      { t:"wg", name:"swap" },
+      { t:"code", cap:"能改外面变量的函数模板", c:`void addTen(int *x)     /* 收地址 */
+{
+    *x = *x + 10;      /* 顺着地址改本体 */
+}
+
+int main(void)
+{
+    int n = 5;
+    addTen(&n);        /* 传 n 的地址 */
+    printf("%d\\n", n); /* 15 —— 函数真的改了它 */
+    return 0;
+}` },
+      { t:"tip", h:"想『带出』一个结果可以靠 return；想一次带出<b>多个</b>结果，或修改大块数据（数组、结构体）时，传地址是唯一解。scanf 一定要 &，就是同一个道理。" }
+    ]},
+    { id:"c7s5", title:"再进一层：二级指针速览", blocks:[
+      { t:"ana", h:"小抄上抄的是<b>另一张小抄的位置</b>——指针的指针。不神秘，只是套娃一层。" },
+      { t:"code", cap:"int **：指向指针的指针", c:`int a = 10;
+int *p = &a;      /* p 指向 a */
+int **pp = &p;    /* pp 指向 p */
+
+printf("%d\\n", **pp);   /* 顺着两层找：→p→a = 10 */
+
+*pp = NULL;       /* 通过 pp 改了 p 本身：p 现在是 NULL */` },
+      { t:"tip", h:"现阶段知道它存在、能看懂即可。它的主战场是『函数里要修改一个指针变量本身』（如链表头插法）和 main 的参数 <code>char *argv[]</code>。别急着深钻。" },
+      { t:"quiz", q:"int a=5, *p=&a; 执行 *p = *p + 2; 后 a 是？", opts:["5","7","编译错误","p 变成 7"], ans:1, exp:"*p 就是 a 的别名：*p + 2 算出 7，顺着 p 的地址放回去，a 变成 7。p 本身（存的地址）没变。" }
+    ]}
+  ]
+});
+
+/* ---------- 第 8 章 字符串 ---------- */
+CH.push({
+  id:"ch8", title:"字符串：以 \\0 收尾的字符数组", desc:"字符数组与字符串的区别、string.h 工具箱、输入的安全姿势。",
+  secs:[
+    { id:"c8s1", title:"C 的字符串：一个约定", blocks:[
+      { t:"ana", h:"C 没有专门的字符串类型！所谓字符串就是<b>字符数组 + 约定的结束暗号 \\0</b>。就像文章末尾画个句号，函数读到这里就知道『到头了，别再读了』。" },
+      { t:"code", cap:"\\0 才是字符串的一部分", c:`char s[6] = {'H', 'e', 'l', 'l', 'o', '\\0'};   /* 手工版 */
+char t[]  = "Hello";     /* 常规版：自动补 \\0，长度 6（5个字母+1个暗号） */
+
+printf("%s\\n", t);      /* %s 打印到 \\0 为止 */
+printf("%zu\\n", sizeof(t));  /* 6：真实占用 */
+printf("%zu\\n", strlen(t));  /* 5：有效字符数（不算暗号） */` },
+      { t:"warn", h:"数组开小了放不下 <code>\\0</code> 是高频 bug：<code>char s[5] = \"Hello\";</code> 5 个格子装 6 样东西，暗号写到界外。装 5 个字母的字符串，格子至少开 6。" },
+      { t:"quiz", q:"strlen(\"abc\\0def\") 的返回值是？", opts:["7","3","4","6"], ans:1, exp:"strlen 从头数到第一个 \\0 就停：a、b、c 共 3 个。后面还有什么它不关心。同理 printf %s 也只输出 abc。" }
+    ]},
+    { id:"c8s2", title:"两种定义方式的暗坑", blocks:[
+      { t:"code", cap:"数组 vs 常量指针：可改性不同", c:`char a[] = "Hello";   /* 数组：内容拷进自己的格子，可以改 */
+a[0] = 'J';           /* 合法：变 "Jello" */
+
+char *p = "Hello";    /* 指向常量区的字符串字面量 */
+/* p[0] = 'J';        ← 危险！常量区只读，程序可能直接崩溃 */
+p = "World";          /* 但让 p 改指别的字符串，合法 */
+
+const char *q = "abc";  /* 推荐写法：const 明说『不许改内容』 */` },
+      { t:"tip", h:"口诀：<b>要修改用数组定义，只读用 const char*</b>。考试和面试都爱考这俩的区别。" }
+    ]},
+    { id:"c8s3", title:"string.h 工具箱", blocks:[
+      { t:"table", head:["函数","作用","注意"], rows:[
+        ["<code>strlen(s)</code>","数有效字符数","返回 size_t 无符号数，<code>strlen(s) - 1</code> 为 0 时会变成天文数字（大坑）"],
+        ["<code>strcpy(dst, src)</code>","复制字符串","dst 格子必须够大，否则越界写崩"],
+        ["<code>strcat(dst, src)</code>","接到 dst 尾部","同样要求 dst 够大"],
+        ["<code>strcmp(a, b)</code>","比较大小","返回 0 表示相等（不是 1！）"],
+        ["<code>strchr(s, c)</code>","找字符首次出现","返回地址（指针），没找到返回 NULL"]
+      ]},
+      { t:"code", cap:"strcmp 的正确用法", c:`if (strcmp(pass, "admin") == 0)   /* 返回0 = 内容相同 */
+    printf("登录成功\\n");
+/* 千万别写 if (pass == "admin") —— 那是在比两个地址！ */` },
+      { t:"warn", h:"字符串比较用 == 是 C 的经典错误：<code>==</code> 比较的是两个数组的首地址，几乎永远不相等。必须用 strcmp。" }
+    ]},
+    { id:"c8s4", title:"读字符串：安全姿势", blocks:[
+      { t:"code", cap:"三种输入方式", c:`char name[32];
+
+scanf("%31s", name);        /* ① 不加&（数组名本来就是地址）；
+                               %31s 限长31，超长部分留在输入里
+                               缺点：遇到空格就断 */
+
+fgets(name, 32, stdin);     /* ② 推荐：整行读，含空格，
+                               自动防止写越界（最多读31字符） */
+
+/* gets(name);              ③ 已被废弃：无长度限制，黑客最爱 */` },
+      { t:"tip", h:"fgets 会把回车也收进来，需要时去掉：<code>name[strcspn(name, \"\\n\")] = '\\0';</code>。记住这套，写课设读输入就稳了。" }
+    ]}
+  ]
+});
+
+/* ---------- 第 9 章 结构体 ---------- */
+CH.push({
+  id:"ch9", title:"结构体：把一组数据打成包", desc:"自定义类型、成员访问、结构体指针与 ->、动态内存的雏形。",
+  secs:[
+    { id:"c9s1", title:"为什么需要结构体", blocks:[
+      { t:"ana", h:"描述一个学生：姓名、学号、三门成绩。用 5 个散变量？存 100 个学生就要 500 个变量，而且谁和谁是一伙的全靠人脑记。结构体 = <b>把相关数据打包成一种新类型</b>，像设计一张表格的『表头』。" },
+      { t:"code", cap:"定义与使用", c:`struct Student {           /* 造图纸：定义一种新类型 */
+    char  name[20];
+    int   id;
+    double score[3];
+};
+
+struct Student stu1 = {"张三", 2026001, {92, 85, 78}};   /* 按图纸造一个 */
+
+printf("%s 学号 %d\\n", stu1.name, stu1.id);
+stu1.score[0] = 95;        /* 点号访问成员 */
+
+struct Student all[100];   /* 结构体数组：100 个学生，批量管理 */
+all[0] = stu1;             /* 整体赋值，成员全拷贝 */` },
+      { t:"tip", h:"用 typedef 起个短名，代码更清爽：<code>typedef struct { … } Student;</code> 之后直接写 <code>Student stu1;</code>，不用再带 struct 前缀。" }
+    ]},
+    { id:"c9s2", title:"结构体指针与 ->", blocks:[
+      { t:"code", cap:"函数处理结构体：传指针避免大拷贝", c:`void printStu(const Student *s)   /* 传地址：只传4/8字节，不整包复印 */
+{
+    printf("%s: %.1f\\n", s->name, s->score[0]);
+    /* s->name 完全等价 (*s).name，箭头是简写 */
+}
+
+int main(void)
+{
+    Student stu = {"李四", 2026002, {88, 91, 76}};
+    printStu(&stu);
+    return 0;
+}` },
+      { t:"ana", h:"记忆：<b>变量用点，指针用箭头</b>。s 是指针 → 用 <code>s-&gt;name</code>；s 是本体 → 用 <code>s.name</code>。见到 -&gt; 就知道左边是指针。" },
+      { t:"warn", h:"最常见崩溃：指针还没指向有效结构体就 <code>s-&gt;name</code>。老规矩：指针使用前必须已初始化到合法地址。" }
+    ]},
+    { id:"c9s3", title:"链表：结构体最经典的应用", blocks:[
+      { t:"ana", h:"数组是一排钉死的柜子（插队要整体搬家）；链表是<b>一串人手拉手</b>：每个节点装数据 + 记住下一个人的联系方式（指针）。插人、删人只需改两只手。" },
+      { t:"code", cap:"链表节点：结构体里藏一个指向自己的指针", c:`typedef struct Node {
+    int data;               /* 存数据 */
+    struct Node *next;      /* 指向下一个节点；尾节点 next = NULL */
+} Node;
+
+/* 手工串三个节点：1 → 2 → 3 → NULL */
+Node a = {1, NULL}, b = {2, NULL}, c = {3, NULL};
+Node *head = &a;
+a.next = &b;
+b.next = &c;
+
+/* 遍历：顺着 next 走到 NULL 为止 */
+for (Node *p = head; p != NULL; p = p->next)
+    printf("%d ", p->data);      /* 1 2 3 */` },
+      { t:"tip", h:"链表是大二数据结构课的绝对主角（配合第 11 章的 malloc 动态造节点）。现在看懂这个 20 行的小例子，到时候就是复习而不是新课。" },
+      { t:"quiz", q:"Node *p 指向某节点，访问它的 data 成员写成？", opts:["p.data","p->data 或 (*p).data","*p.data","p::data"], ans:1, exp:"p 是指针，用箭头 p->data；等价写法是先解引用再点号 (*p).data。直接 p.data 是给本体用的写法，指针这么写编译直接报错。" }
+    ]}
+  ]
+});
+
+/* ---------- 第 10 章 文件 ---------- */
+CH.push({
+  id:"ch10", title:"文件操作：让数据活过关机", desc:"fopen 的模式表、读写与关闭——课设存档的最后一块拼图。",
+  secs:[
+    { id:"c10s1", title:"三板斧：打开 → 读写 → 关闭", blocks:[
+      { t:"ana", h:"变量里的数据是<b>酒店住客</b>：程序一关全部退房。想留住成绩、存档进度？把数据写进文件——从酒店搬进<b>自己的房子</b>。" },
+      { t:"code", cap:"写入文件的标准流程", c:`#include <stdio.h>
+
+int main(void)
+{
+    FILE *fp = fopen("score.txt", "w");  /* ① 打开（模式 w = 写） */
+    if (fp == NULL) {                    /* 打开失败必须检查！ */
+        printf("文件打不开\\n");
+        return 1;
+    }
+
+    fprintf(fp, "张三 %d\\n", 92);        /* ② 用法同 printf，多了个 fp */
+    fprintf(fp, "李四 %d\\n", 85);
+
+    fclose(fp);                          /* ③ 关闭：刷盘落袋为安 */
+    return 0;
+}` },
+      { t:"table", head:["模式","含义","细节"], rows:[
+        ["<code>\"r\"</code>","只读","文件不存在 → 返回 NULL"],
+        ["<code>\"w\"</code>","只写","文件不存在就<b>新建</b>；存在则<b>清空重写</b>（覆盖警告！）"],
+        ["<code>\"a\"</code>","追加","接着文件末尾写，原内容保留"],
+        ["<code>\"r+\"</code>","读写","文件必须已存在"],
+        ["<code>\"w+\"</code>","读写","不存在新建 / 存在清空"]
+      ]},
+      { t:"warn", h:"两大纪律：① fopen 返回 NULL 必须检查（文件被占用、路径错、磁盘满都走这条分支）；② <b>fclose 不能忘</b>——不关闭，缓冲区里最后的数据可能没真正落盘，数据就丢了。" }
+    ]},
+    { id:"c10s2", title:"读取文件：逐行处理", blocks:[
+      { t:"code", cap:"fgets 一行行读，直到读完", c:`char line[128];
+FILE *fp = fopen("score.txt", "r");
+if (fp == NULL) return 1;
+
+while (fgets(line, sizeof(line), fp) != NULL) {   /* 读到文件尾返回NULL */
+    printf("%s", line);    /* fgets 保留换行符，这里不用再加\\n */
+}
+fclose(fp);` },
+      { t:"tip", h:"fprintf / fscanf 就是 printf / scanf 加了个文件参数；fgets 是最稳的整行读取。读写二进制（图片等）用 fread/fwrite，需要时查表即可。" }
+    ]}
+  ]
+});
+
+/* ---------- 第 11 章 内存与进阶 ---------- */
+CH.push({
+  id:"ch11", title:"内存四区、动态内存与进阶心法", desc:"malloc/free、程序内存地图、预处理、调试方法——从会写代码到写好代码。",
+  secs:[
+    { id:"c11s1", title:"程序内存地图", blocks:[
+      { t:"p", h:"写到这里，你已经用过好几种『来源』不同的变量了。程序运行时，内存分成几块不同的行政区，谁住哪、寿命多长全不一样：" },
+      { t:"wg", name:"zone" },
+      { t:"quiz", q:"函数返回后，它内部局部变量所在的内存会？", opts:["永久保留","立即回收（栈区自动清理）","变成 NULL","转到堆区"], ans:1, exp:"局部变量住在栈上，函数一返回整块栈帧回收。所以返回指向局部变量的指针 = 返回一间已退房的房间钥匙——再用必崩。" }
+    ]},
+    { id:"c11s2", title:"malloc：按需申请，用完归还", blocks:[
+      { t:"ana", h:"数组在定义时就得写死长度，像<b>建房时定死房间数</b>。malloc 让你<b>入住时再按人头租房</b>——要几间租几间，退房（free）还给系统。住堆区。" },
+      { t:"code", cap:"动态数组的完整生命周期", c:`#include <stdio.h>
+#include <stdlib.h>     /* malloc、free 的家 */
+
+int main(void)
+{
+    int n;
+    scanf("%d", &n);
+
+    int *a = malloc(n * sizeof(int));   /* 申请 n 个 int 的连续空间 */
+    if (a == NULL) return 1;            /* 申请失败（内存不足）要检查 */
+
+    for (int i = 0; i < n; i++) a[i] = i * i;   /* 当普通数组用 */
+    printf("%d\\n", a[n - 1]);
+
+    free(a);        /* 归还！不还 = 内存泄漏（长期运行的程序被慢慢拖死） */
+    a = NULL;       /* 良好习惯：free 后置空，防止后续误用悬垂指针 */
+    return 0;
+}` },
+      { t:"warn", h:"铁律四条：① free 恰好一次（free 两次 = 崩溃）；② 丢了 malloc 返回的地址就没法 free（泄漏）；③ free 之后指针悬垂，别再解引用，置 NULL 保平安；④ 用了多少心里要有数——越界写堆内存是诡异 bug 的头号来源。" }
+    ]},
+    { id:"c11s3", title:"预处理：#define 与 #include 的真相", blocks:[
+      { t:"code", cap:"宏只是文本替换", c:`#define PI 3.14159
+#define SQUARE(x) ((x) * (x))   /* 带参宏：整个替换 */
+
+double r = SQUARE(3);      /* 替换成 ((3) * (3)) = 9 */` },
+      { t:"warn", h:"带参宏的括号战争：<code>#define SQ(x) x*x</code>，则 <code>SQ(1+2)</code> 替换成 <code>1+2*1+2</code> = 5 而不是 9！宏没有类型、不求职、纯粹贴字——参数和整体都要套足括号，或干脆用函数。" },
+      { t:"p", h:"头文件的真相：<code>#include &lt;stdio.h&gt;</code> 只是把一份『声明清单』文本原样复制进来，让编译器知道 printf 长什么样。自己写多文件项目：把函数声明放进 <code>xxx.h</code>，实现放进 <code>xxx.c</code>，使用者只需 include 头文件——这就是 C 工程的组织方式。" }
+    ]},
+    { id:"c11s4", title:"调试心法：程序崩了怎么排查", blocks:[
+      { t:"p", h:"程序能编译 ≠ 正确。崩溃或输出诡异时，按这个顺序排查：" },
+      { t:"table", head:["症状","高概率原因","检查动作"], rows:[
+        ["程序闪退（无提示）","野指针 / 空指针解引用 / scanf 忘 &","在可疑位置插 printf 定位到崩溃前一行"],
+        ["输出一串乱码大数","未初始化变量 / 越界读","检查定义时有无初值；检查下标边界"],
+        ["数值莫名变化","数组越界<b>写</b>踩了邻居变量","循环边界 i&lt;n 还是 i&lt;=n"],
+        ["结果差一点点","整数除法 / 精度 / = 写成 ==","算式里补 .0 或 (double)"],
+        ["段错误 Segmentation fault","访问了不属于你的地址","优先查所有指针是否初始化、越界"]
+      ]},
+      { t:"tip", h:"printf 调试法永不过时：在可疑区域打印变量值和标记（<code>printf(\"到这 A %d\\n\", x)</code>），跑一遍就知道死在哪两行之间。熟练后再加上断点调试器（gdb / VS 调试 F5），双剑合璧。" }
+    ]},
+    { id:"c11s5", title:"毕业路线图", blocks:[
+      { t:"p", h:"把前面 10 章真正消化（代码都敲过、测验都答对），你已经超过大多数同龄人了。接下来按目标选路线：" },
+      { t:"table", head:["目标","下一步学什么"], rows:[
+        ["打牢专业课","数据结构（链表/栈/队列/树——结构体+指针+malloc 的合体技）"],
+        ["玩单片机/嵌入式","51 或 STM32：C 的位运算、寄存器操作就是日常"],
+        ["算法竞赛","刷 OJ 题（洛谷/蓝桥杯），把循环、数组、字符串练成肌肉记忆"],
+        ["做课设","几百行的小项目：学生管理系统（结构体+文件+链表）是完美毕业考"]
+      ]},
+      { t:"tip", h:"最后一条建议，也是最值钱的一条：<b>每天写代码，哪怕只有 20 分钟</b>。编程是手艺，不是知识——看会了不算会，敲对了才算会。祝入门顺利 🎉" },
+      { t:"quiz", q:"以下哪项不是内存泄漏的表现？", opts:["free 之后继续使用指针","忘了 free 申请的内存","申请的地址弄丢了","程序占的内存持续增长"], ans:0, exp:"free 后继续用是『悬垂指针』（随时崩溃）；内存泄漏指忘了 free 或丢了地址没法 free，导致内存持续被占、不释放。两者都是堆区管理事故，但表现不同。" }
+    ]}
+  ]
+});
+
+/* ================= 渲染引擎 ================= */
+function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function renderBlock(b){
+  switch(b.t){
+    case "p": return '<div class="blk-p">' + b.h + "</div>";
+    case "ana": return '<div class="ana">类比 · <span>' + b.h + "</span></div>";
+    case "tip": return '<div class="tip"><b>要点</b> · ' + b.h + "</div>";
+    case "warn": return '<div class="warn"><b>易错</b> · ' + b.h + "</div>";
+    case "code":
+      return '<figure class="code"><figcaption><span>' + (b.cap || "C 代码") + '</span><span class="dots"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></span></figcaption><pre>' + hl(b.c) + "</pre>" + (b.note ? '<div style="padding:9px 16px;font-size:12.5px;color:#8fa2cc;border-top:1px solid #232c48;background:#0d1220">' + b.note + "</div>" : "") + "</figure>";
+    case "table":
+      return '<figure class="tabl"><table class="t"><tr>' + b.head.map(function(x){ return "<th>" + x + "</th>"; }).join("") + "</tr>" +
+        b.rows.map(function(r){ return "<tr>" + r.map(function(x){ return "<td>" + x + "</td>"; }).join("") + "</tr>"; }).join("") + "</table></figure>";
+    case "wg":
+      return '<div class="wg" data-wg="' + b.name + '"></div>';
+    case "quiz":
+      return '<div class="quizx" data-ans="' + b.ans + '"><div class="q">随堂测 · ' + b.q + "</div>" +
+        b.opts.map(function(o){ return '<button class="opt">' + o + "</button>"; }).join("") +
+        '<div class="exp">' + b.exp + "</div></div>";
+  }
+  return "";
+}
+
+function initWidgets(root){
+  root.querySelectorAll(".wg").forEach(function(el){
+    var w = WIDGETS[el.getAttribute("data-wg")];
+    if(!w) return;
+    var title = document.createElement("div");
+    title.className = "wg-title";
+    title.textContent = w.title || "";
+    el.appendChild(title);
+    try{ w.init(el); }
+    catch(e){
+      el.innerHTML = '<div style="color:#ff9d8a;font-size:13px">组件加载失败：' + e.message + "</div>";
+    }
+  });
+  root.querySelectorAll(".quizx").forEach(function(q){
+    var ans = +q.getAttribute("data-ans");
+    var opts = q.querySelectorAll(".opt");
+    var exp = q.querySelector(".exp");
+    opts.forEach(function(o, i){
+      o.addEventListener("click", function(){
+        opts.forEach(function(x){ x.disabled = true; });
+        if(i === ans){ o.classList.add("right"); }
+        else { o.classList.add("wrong"); opts[ans].classList.add("right"); }
+        exp.classList.add("show");
+      });
+    });
+  });
+}
+
+function buildSide(){
+  var side = document.getElementById("side");
+  var html = '<div class="grp">开始</div><a href="#/" data-r="/">🏠 总览</a><div class="grp">基础篇</div>';
+  CH.forEach(function(c, i){
+    html += '<a href="#/' + c.id + '" data-r="' + c.id + '"><span class="no">' + (i+1) + "</span>" + c.title + "</a>";
+    if(i === 4) html += '<div class="grp">进阶篇</div>';
+  });
+  side.innerHTML = html;
+}
+
+function homeView(){
+  var cards = CH.map(function(c, i){
+    return '<a class="chcard" href="#/' + c.id + '"><span class="no">' + (i+1) + "</span><h3>" + c.title + "</h3><p>" + c.desc + "</p></a>";
+  }).join("");
+  return '<div class="home-hero"><h1>零基础 C 语言 · 从入门到精通</h1>' +
+    "<p>写给完全没写过代码的你：每一步都有类比、有图、有能玩的演示，还有随堂小测。学完能独立写出几百行的程序，并为数据结构、单片机打好地基。</p>" +
+    '<div class="chips"><span>11 章 · 36 个代码示例</span><span>9 个交互动画</span><span>16 道随堂测</span><span>手机可学</span></div></div>' +
+    '<div class="howto"><h3>怎么用这个网站</h3><ol>' +
+    "<li>按顺序学，每章 20~40 分钟；跳级容易在指针处翻车。</li>" +
+    "<li>所有代码必须<b>亲手敲一遍再运行</b>——看懂和会写是两回事。</li>" +
+    "<li>橙色『随堂测』答错没关系，看解析，回头翻。</li>" +
+    "<li>碰到交互组件（深色卡片）就大胆点按钮、拖滑块，玩坏不了。</li>" +
+    "<li>学完第 11 章，回头把每章随堂测再刷一遍——全对就算入门完成。</li></ol></div>" +
+    '<div class="chgrid">' + cards + "</div>";
+}
+
+function chapterView(ci){
+  var c = CH[ci];
+  var html = '<div class="chapter-head"><div class="kicker">CHAPTER ' + (ci+1) + "</div><h1>" + c.title + "</h1><p>" + c.desc + "</p></div>";
+  c.secs.forEach(function(s, i){
+    html += '<section class="sec" id="' + s.id + '"><h2><span class="idx">' + (ci+1) + "." + (i+1) + "</span>" + s.title + "</h2>";
+    s.blocks.forEach(function(b){ html += renderBlock(b); });
+    html += "</section>";
+  });
+  var prev = ci > 0 ? CH[ci-1] : null;
+  var next = ci < CH.length-1 ? CH[ci+1] : null;
+  html += '<div class="sec-nav">' +
+    (prev ? '<a href="#/' + prev.id + '"><small>上一章</small>' + prev.title + "</a>" : "<a></a>") +
+    (next ? '<a class="next" href="#/' + next.id + '"><small>下一章</small>' + next.title + "</a>" : '<a class="next" href="#/"><small>完成 🎉</small>回到总览</a>') +
+    "</div>";
+  return html;
+}
+
+function route(){
+  var hash = location.hash.replace(/^#\/?/, "") || "home";
+  var main = document.getElementById("main");
+  var target = hash.split("/")[0];
+  var secId = hash.split("/")[1] || null;
+  var ci = -1;
+  CH.forEach(function(c, i){ if(c.id === target) ci = i; });
+  if(ci === -1){ main.innerHTML = homeView(); }
+  else { main.innerHTML = chapterView(ci); initWidgets(main); }
+  document.querySelectorAll("nav.side a").forEach(function(a){
+    a.classList.toggle("on", a.getAttribute("data-r") === target || (target === "home" && a.getAttribute("data-r") === "/"));
+  });
+  document.getElementById("side").classList.remove("open");
+  document.getElementById("overlay").classList.remove("show");
+  if(secId){
+    setTimeout(function(){
+      var el = document.getElementById(secId);
+      if(el){
+        var y = el.getBoundingClientRect().top + window.pageYOffset - 68;
+        try{ window.scrollTo({top:y, left:0, behavior:"instant"}); }
+        catch(e){ window.scrollTo(0, y); }
+      }
+    }, 30);
+  } else window.scrollTo(0, 0);
+}
+
+document.getElementById("burger").addEventListener("click", function(){
+  document.getElementById("side").classList.toggle("open");
+  document.getElementById("overlay").classList.toggle("show");
+});
+document.getElementById("overlay").addEventListener("click", function(){
+  document.getElementById("side").classList.remove("open");
+  document.getElementById("overlay").classList.remove("show");
+});
+window.addEventListener("hashchange", route);
+
+buildSide();
+route();
+</script>
+<script>
+/* ===== 六级词汇每日翻卡 ===== */
+var CET6 = [
+{w:"abandon",p:"əˈbændən",t:"v.",c:"放弃；抛弃",e:"They abandoned the plan at the last minute.",ec:"他们最后一刻放弃了这个计划。"},
+{w:"abstract",p:"ˈæbstrækt",t:"adj.",c:"抽象的；深奥的",e:"Beauty is an abstract concept.",ec:"美是一个抽象的概念。"},
+{w:"accumulate",p:"əˈkjuːmjəleɪt",t:"v.",c:"积累；积聚",e:"Dust accumulated on the shelves.",ec:"灰尘在架子上积了起来。"},
+{w:"acquire",p:"əˈkwaɪə",t:"v.",c:"获得；习得",e:"Children acquire language very quickly.",ec:"儿童习得语言非常快。"},
+{w:"adapt",p:"əˈdæpt",t:"v.",c:"适应；改编",e:"She adapted quickly to the new job.",ec:"她很快适应了新工作。"},
+{w:"adequate",p:"ˈædɪkwət",t:"adj.",c:"足够的；适当的",e:"The room has adequate light for reading.",ec:"这房间光线够读书。"},
+{w:"advocate",p:"ˈædvəkeɪt",t:"v.",c:"提倡；主张",e:"He advocates a simple lifestyle.",ec:"他提倡简单的生活方式。"},
+{w:"aggregate",p:"ˈæɡrɪɡət",t:"n.",c:"总计；集合体",e:"The aggregate of the data is impressive.",ec:"这些数据的总和很可观。"},
+{w:"allocate",p:"ˈæləkeɪt",t:"v.",c:"分配；拨给",e:"We must allocate more funds to research.",ec:"我们必须给研究多拨经费。"},
+{w:"ambiguous",p:"æmˈbɪɡjuəs",t:"adj.",c:"模糊的；有歧义的",e:"His answer was deliberately ambiguous.",ec:"他的回答故意含糊。"},
+{w:"anticipate",p:"ænˈtɪsɪpeɪt",t:"v.",c:"预料；期待",e:"We anticipate a rise in prices.",ec:"我们预计价格会上涨。"},
+{w:"arbitrary",p:"ˈɑːbɪtrəri",t:"adj.",c:"任意的；专断的",e:"The choice seemed completely arbitrary.",ec:"这个选择看起来完全是随意的。"},
+{w:"assemble",p:"əˈsembl",t:"v.",c:"组装；集合",e:"Workers assemble the parts by hand.",ec:"工人手工组装这些零件。"},
+{w:"assess",p:"əˈses",t:"v.",c:"评估；评定",e:"It takes time to assess the damage.",ec:"评估损失需要时间。"},
+{w:"assume",p:"əˈsjuːm",t:"v.",c:"假定；承担",e:"I assume you have read the report.",ec:"我假定你已经读过报告了。"},
+{w:"attain",p:"əˈteɪn",t:"v.",c:"达到；获得",e:"She attained her goal at last.",ec:"她终于达到了目标。"},
+{w:"attribute",p:"əˈtrɪbjuːt",t:"v.",c:"把……归因于",e:"He attributes his success to hard work.",ec:"他把成功归因于努力。"},
+{w:"authentic",p:"ɔːˈθentɪk",t:"adj.",c:"真正的；可靠的",e:"Experts say the painting is authentic.",ec:"专家说这幅画是真迹。"},
+{w:"bulk",p:"bʌlk",t:"n.",c:"大批；大部分",e:"The bulk of the work is already done.",ec:"大部分工作已经完成。"},
+{w:"capacity",p:"kəˈpæsəti",t:"n.",c:"容量；能力",e:"The theatre has a capacity of 800.",ec:"这个剧院能容纳八百人。"},
+{w:"cease",p:"siːs",t:"v.",c:"停止；终止",e:"The rain finally ceased at noon.",ec:"雨在中午终于停了。"},
+{w:"coherent",p:"kəʊˈhɪərənt",t:"adj.",c:"连贯的；有条理的",e:"Give a coherent account of what happened.",ec:"有条理地叙述发生了什么。"},
+{w:"collapse",p:"kəˈlæps",t:"v.",c:"倒塌；崩溃",e:"The old bridge collapsed in the flood.",ec:"那座旧桥在洪水中塌了。"},
+{w:"commence",p:"kəˈmens",t:"v.",c:"开始；着手",e:"The ceremony will commence at nine.",ec:"仪式将在九点开始。"},
+{w:"compatible",p:"kəmˈpætəbl",t:"adj.",c:"兼容的；相容的",e:"This printer is compatible with most computers.",ec:"这台打印机兼容大多数电脑。"},
+{w:"compensate",p:"ˈkɒmpenseɪt",t:"v.",c:"补偿；弥补",e:"Nothing can compensate for that loss.",ec:"什么都无法弥补那个损失。"},
+{w:"compile",p:"kəmˈpaɪl",t:"v.",c:"编译；汇编；编纂",e:"The compiler turns source code into machine code.",ec:"编译器把源码翻译成机器码。"},
+{w:"complement",p:"ˈkɒmplɪment",t:"v.",c:"补充；与……相配",e:"The wine complements the meal perfectly.",ec:"这酒与这顿饭搭配得极好。"},
+{w:"comply",p:"kəmˈplaɪ",t:"v.",c:"遵守；服从",e:"All staff must comply with the safety rules.",ec:"所有员工必须遵守安全规定。"},
+{w:"comprehensive",p:"ˌkɒmprɪˈhensɪv",t:"adj.",c:"全面的；综合的",e:"The report gives a comprehensive survey.",ec:"这份报告作了全面的考察。"},
+{w:"comprise",p:"kəmˈpraɪz",t:"v.",c:"包含；由……组成",e:"The course comprises ten modules.",ec:"这门课由十个模块组成。"},
+{w:"conceive",p:"kənˈsiːv",t:"v.",c:"构想；设想",e:"It is hard to conceive of such a world.",ec:"很难想象这样一个世界。"},
+{w:"concise",p:"kənˈsaɪs",t:"adj.",c:"简洁的；简明的",e:"Keep your answer as concise as possible.",ec:"回答尽可能简洁。"},
+{w:"condense",p:"kənˈdens",t:"v.",c:"浓缩；压缩",e:"He condensed the report into one page.",ec:"他把报告压缩成了一页。"},
+{w:"confine",p:"kənˈfaɪn",t:"v.",c:"限制；局限于",e:"Please confine your remarks to the topic.",ec:"请把发言限制在主题之内。"},
+{w:"conform",p:"kənˈfɔːm",t:"v.",c:"符合；遵从",e:"The product must conform to national standards.",ec:"产品必须符合国家标准。"},
+{w:"consecutive",p:"kənˈsekjətɪv",t:"adj.",c:"连续的；连贯的",e:"It rained for five consecutive days.",ec:"连续下了五天雨。"},
+{w:"considerable",p:"kənˈsɪdərəbl",t:"adj.",c:"相当大的；可观的",e:"He spent a considerable amount of time on it.",ec:"他在那上面花了相当多时间。"},
+{w:"constitute",p:"ˈkɒnstɪtjuːt",t:"v.",c:"构成；组成",e:"Women constitute half of the workforce.",ec:"女性占劳动力的一半。"},
+{w:"constrain",p:"kənˈstreɪn",t:"v.",c:"约束；限制",e:"Limited funds constrain our plans.",ec:"有限的资金限制了我们的计划。"},
+{w:"consult",p:"kənˈsʌlt",t:"v.",c:"咨询；查阅",e:"Consult a doctor if symptoms persist.",ec:"症状持续的话请咨询医生。"},
+{w:"consume",p:"kənˈsjuːm",t:"v.",c:"消耗；消费",e:"This engine consumes very little fuel.",ec:"这台发动机耗油很少。"},
+{w:"contemporary",p:"kənˈtemprəri",t:"adj.",c:"当代的；同时代的",e:"She studies contemporary Chinese art.",ec:"她研究中国当代艺术。"},
+{w:"contradict",p:"ˌkɒntrəˈdɪkt",t:"v.",c:"反驳；与……矛盾",e:"The results contradict his theory.",ec:"结果与他的理论相矛盾。"},
+{w:"convert",p:"kənˈvɜːt",t:"v.",c:"转换；改变",e:"Solar panels convert light into electricity.",ec:"太阳能板把光转化成电。"},
+{w:"convey",p:"kənˈveɪ",t:"v.",c:"传达；运送",e:"Words cannot convey my gratitude.",ec:"言语无法表达我的感谢。"},
+{w:"crucial",p:"ˈkruːʃl",t:"adj.",c:"关键的；决定性的",e:"Timing is crucial in this experiment.",ec:"在这个实验里时机至关重要。"},
+{w:"cumulative",p:"ˈkjuːmjələtɪv",t:"adj.",c:"累积的；累计的",e:"The cumulative effect is enormous.",ec:"累积起来的效应是巨大的。"},
+{w:"decay",p:"dɪˈkeɪ",t:"v.",c:"腐烂；衰减",e:"The signal decays quickly over distance.",ec:"信号随距离迅速衰减。"},
+{w:"deduce",p:"dɪˈdjuːs",t:"v.",c:"推断；演绎",e:"We deduced the answer from the data.",ec:"我们从数据推断出了答案。"},
+{w:"deficient",p:"dɪˈfɪʃnt",t:"adj.",c:"缺乏的；不足的",e:"The soil here is deficient in nitrogen.",ec:"这里的土壤缺氮。"},
+{w:"deliberate",p:"dɪˈlɪbərət",t:"adj.",c:"故意的；审慎的",e:"It was a deliberate mistake, not an accident.",ec:"那是故意的错误，不是意外。"},
+{w:"denote",p:"dɪˈnəʊt",t:"v.",c:"表示；意指",e:"In this formula, I denotes current.",ec:"在这个公式里，I 表示电流。"},
+{w:"derive",p:"dɪˈraɪv",t:"v.",c:"得到；起源于",e:"The word derives from Latin.",ec:"这个词源自拉丁语。"},
+{w:"deteriorate",p:"dɪˈtɪəriəreɪt",t:"v.",c:"恶化；变坏",e:"His health deteriorated rapidly.",ec:"他的健康迅速恶化。"},
+{w:"deviate",p:"ˈdiːvieɪt",t:"v.",c:"偏离；背离",e:"Do not deviate from the original plan.",ec:"不要偏离原定计划。"},
+{w:"diminish",p:"dɪˈmɪnɪʃ",t:"v.",c:"减少；削弱",e:"The pain gradually diminished.",ec:"疼痛逐渐减轻了。"},
+{w:"discrete",p:"dɪˈskriːt",t:"adj.",c:"离散的；分立的",e:"The signal is discrete, not continuous.",ec:"这个信号是离散的，不是连续的。"},
+{w:"disperse",p:"dɪˈspɜːs",t:"v.",c:"驱散；散开",e:"The crowd dispersed after the show.",ec:"演出结束后人群散开了。"},
+{w:"displace",p:"dɪsˈpleɪs",t:"v.",c:"取代；使移位",e:"Machines have displaced many manual workers.",ec:"机器取代了许多体力工人。"},
+{w:"dispose",p:"dɪˈspəʊz",t:"v.",c:"处理；处置",e:"Dispose of the waste properly.",ec:"要妥善处理这些废物。"},
+{w:"distinct",p:"dɪˈstɪŋkt",t:"adj.",c:"明显的；截然不同的",e:"There are two distinct groups of users.",ec:"有两类明显不同的用户。"},
+{w:"distort",p:"dɪˈstɔːt",t:"v.",c:"扭曲；使失真",e:"High temperature distorts the image.",ec:"高温使图像失真。"},
+{w:"diverge",p:"daɪˈvɜːdʒ",t:"v.",c:"分叉；产生分歧",e:"Our opinions diverged sharply.",ec:"我们的意见产生了很大分歧。"},
+{w:"dominate",p:"ˈdɒmɪneɪt",t:"v.",c:"支配；占优势",e:"One company dominates the whole market.",ec:"一家公司主导了整个市场。"},
+{w:"drastic",p:"ˈdræstɪk",t:"adj.",c:"剧烈的；极端的",e:"The doctor took drastic measures.",ec:"医生采取了激烈的措施。"},
+{w:"elaborate",p:"ɪˈlæbərət",t:"adj.",c:"精心制作的；详尽的",e:"He made up an elaborate excuse.",ec:"他编了一个精心设计的借口。"},
+{w:"eligible",p:"ˈelɪdʒəbl",t:"adj.",c:"有资格的；合适的",e:"Only second-year students are eligible to apply.",ec:"只有二年级学生有资格申请。"},
+{w:"eliminate",p:"ɪˈlɪmɪneɪt",t:"v.",c:"消除；淘汰",e:"We must eliminate all possible errors.",ec:"我们必须消除所有可能的错误。"},
+{w:"emerge",p:"ɪˈmɜːdʒ",t:"v.",c:"出现；浮现",e:"New problems emerged during the test.",ec:"测试过程中出现了新问题。"},
+{w:"empirical",p:"ɪmˈpɪrɪkl",t:"adj.",c:"经验的；实证的",e:"The theory lacks empirical support.",ec:"这个理论缺乏实证支持。"},
+{w:"endure",p:"ɪnˈdjʊə",t:"v.",c:"忍受；持续",e:"She endured years of hardship.",ec:"她忍受了多年的艰辛。"},
+{w:"enhance",p:"ɪnˈhɑːns",t:"v.",c:"增强；提高",e:"Good lighting enhances the photograph.",ec:"好的光线提升了照片效果。"},
+{w:"entail",p:"ɪnˈteɪl",t:"v.",c:"需要；牵涉",e:"The job entails a lot of travelling.",ec:"这份工作需要经常出差。"},
+{w:"equivalent",p:"ɪˈkwɪvələnt",t:"adj.",c:"等价的；相当的",e:"One mile is equivalent to about 1.6 km.",ec:"一英里约等于一点六公里。"},
+{w:"establish",p:"ɪˈstæblɪʃ",t:"v.",c:"建立；确立",e:"They established a new research lab.",ec:"他们建立了一个新的研究实验室。"},
+{w:"evaluate",p:"ɪˈvæljueɪt",t:"v.",c:"评价；评估",e:"We need to evaluate the results carefully.",ec:"我们需要仔细评估结果。"},
+{w:"evolve",p:"ɪˈvɒlv",t:"v.",c:"演化；逐步发展",e:"The system evolved over many years.",ec:"这个系统经过多年逐步演化。"},
+{w:"exceed",p:"ɪkˈsiːd",t:"v.",c:"超过；超出",e:"Do not exceed the speed limit.",ec:"不要超过限速。"},
+{w:"explicit",p:"ɪkˈsplɪsɪt",t:"adj.",c:"明确的；清楚的",e:"She gave explicit instructions before leaving.",ec:"她走之前给了明确指示。"},
+{w:"exploit",p:"ɪkˈsplɔɪt",t:"v.",c:"利用；开发",e:"We should exploit this opportunity fully.",ec:"我们应该充分利用这个机会。"},
+{w:"extract",p:"ɪkˈstrækt",t:"v.",c:"提取；摘录",e:"Extract the key points from the text.",ec:"从文中提取要点。"},
+{w:"feasible",p:"ˈfiːzəbl",t:"adj.",c:"可行的；行得通的",e:"The plan is technically feasible.",ec:"这个计划在技术上可行。"},
+{w:"fluctuate",p:"ˈflʌktʃueɪt",t:"v.",c:"波动；起伏",e:"Prices fluctuate with demand.",ec:"价格随需求波动。"},
+{w:"formulate",p:"ˈfɔːmjuleɪt",t:"v.",c:"制定；系统表述",e:"They formulated a new policy last year.",ec:"他们去年制定了新政策。"},
+{w:"fundamental",p:"ˌfʌndəˈmentl",t:"adj.",c:"基本的；根本的",e:"This is a fundamental principle of physics.",ec:"这是物理学的一条基本原理。"},
+{w:"generate",p:"ˈdʒenəreɪt",t:"v.",c:"产生；发生",e:"The motor generates electricity when turned.",ec:"这个马达被转动时就能发电。"},
+{w:"genuine",p:"ˈdʒenjuɪn",t:"adj.",c:"真正的；真诚的",e:"She showed genuine interest in the topic.",ec:"她对这个话题表现出真正的兴趣。"},
+{w:"hierarchy",p:"ˈhaɪərɑːki",t:"n.",c:"层级；等级制度",e:"The company has a very flat hierarchy.",ec:"这家公司的层级非常扁平。"},
+{w:"identical",p:"aɪˈdentɪkl",t:"adj.",c:"完全相同的",e:"The two samples are almost identical.",ec:"这两个样品几乎完全相同。"},
+{w:"illuminate",p:"ɪˈluːmɪneɪt",t:"v.",c:"照亮；阐明",e:"The results illuminate the whole process.",ec:"这些结果阐明了整个过程。"},
+{w:"imply",p:"ɪmˈplaɪ",t:"v.",c:"暗示；意味着",e:"Silence does not imply consent.",ec:"沉默并不意味着同意。"},
+{w:"impose",p:"ɪmˈpəʊz",t:"v.",c:"强加；征收",e:"They imposed new taxes on imports.",ec:"他们对进口商品征收了新税。"},
+{w:"incorporate",p:"ɪnˈkɔːpəreɪt",t:"v.",c:"包含；纳入",e:"Incorporate these changes into the design.",ec:"把这些改动纳入设计之中。"},
+{w:"indicate",p:"ˈɪndɪkeɪt",t:"v.",c:"表明；指示",e:"The data indicate a clear upward trend.",ec:"数据表明了一个明显的上升趋势。"},
+{w:"induce",p:"ɪnˈdjuːs",t:"v.",c:"引起；诱导",e:"Long-term stress can induce illness.",ec:"长期压力会引起疾病。"},
+{w:"inevitable",p:"ɪnˈevɪtəbl",t:"adj.",c:"不可避免的",e:"Change is inevitable in any system.",ec:"任何系统里变化都不可避免。"},
+{w:"infer",p:"ɪnˈfɜː",t:"v.",c:"推断；推论",e:"We can infer the value from the graph.",ec:"我们可以从图中推断出数值。"},
+{w:"inherent",p:"ɪnˈhɪərənt",t:"adj.",c:"固有的；内在的",e:"There are inherent risks in this approach.",ec:"这种方法存在固有风险。"},
+{w:"inhibit",p:"ɪnˈhɪbɪt",t:"v.",c:"抑制；阻止",e:"Fear of failure can inhibit learning.",ec:"对失败的恐惧会抑制学习。"}
+];
+
+(function(){
+  var PER = 8, KEY = "cet6_v1";
+  function el(id){ return document.getElementById(id); }
+  function pad2(n){ return n < 10 ? "0" + n : "" + n; }
+  function dayKey(){
+    var d = new Date();
+    return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
+  }
+  function hash(s){
+    var h = 2166136261;
+    for (var i = 0; i < s.length; i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+    return h >>> 0;
+  }
+  /* 同一天永远是同一批词 */
+  function planOf(key){
+    var s = hash(key), seen = {}, idx = [], guard = 0;
+    while (idx.length < PER && guard < 800){
+      s = (Math.imul(s, 1103515245) + 12345) >>> 0;
+      var i = s % CET6.length;
+      if (!seen[i]){ seen[i] = 1; idx.push(i); }
+      guard++;
+    }
+    return idx;
+  }
+
+  var box = el("cet"), fab = el("cetFab");
+  if (!box || !CET6.length) return;
+
+  var today = dayKey(), plan = planOf(today);
+  var st = { date: today, known: [], cur: 0 };
+
+  try {
+    var raw = localStorage.getItem(KEY);
+    if (raw){
+      var o = JSON.parse(raw);
+      if (o && o.date === today && o.cur >= 0 && o.cur <= PER) st = o;
+    }
+  } catch (e) {}
+
+  function save(){
+    try {
+      localStorage.setItem(KEY, JSON.stringify(st));
+      /* 只在真正背过词时才记入打卡，单纯打开页面不算 */
+      if (st.known.length > 0){
+        var h = histLoad();
+        h[today] = st.known.length;
+        localStorage.setItem(HKEY, JSON.stringify(h));
+      }
+    } catch (e) {}
+  }
+
+  var HKEY = "cet6_hist";
+  function histLoad(){
+    try { return JSON.parse(localStorage.getItem(HKEY) || "{}") || {}; }
+    catch (e) { return {}; }
+  }
+  function keyOf(d){
+    return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
+  }
+  function paintStat(){
+    var h = histLoad(), streak = 0, total = 0, k;
+    for (k in h){ if (typeof h[k] === "number") total += h[k]; }
+    var d = new Date();
+    /* 今天还没开始背的话，从昨天往前数，避免打卡显示中断 */
+    if (!h[keyOf(d)]) d.setDate(d.getDate() - 1);
+    for (var i = 0; i < 400; i++){
+      if (h[keyOf(d)] > 0){ streak++; d.setDate(d.getDate() - 1); }
+      else break;
+    }
+    el("cetStreak").textContent = streak;
+    el("cetTotal").textContent = total;
+  }
+
+  el("cetDate").textContent = today.slice(5).replace("-", "/");
+
+  function paintDots(){
+    var dots = el("cetDots"), s = "";
+    for (var i = 0; i < PER; i++){
+      var cls = st.known.indexOf(i) >= 0 ? "on" : (i === st.cur ? "cur" : "");
+      s += '<i class="' + cls + '"></i>';
+    }
+    dots.innerHTML = s;
+  }
+
+  function show(i){
+    var w = CET6[plan[i]];
+    el("cetWord").innerHTML = w.w;
+    el("cetPh").innerHTML = "/" + w.p + "/ <span class='cet-pos'>" + w.t + "</span>";
+    el("cetCn").textContent = w.c;
+    el("cetEx").textContent = w.e;
+    el("cetExc").textContent = w.ec;
+    el("cetCount").textContent = (i + 1) + " / " + PER;
+  }
+
+  function render(){
+    var done = st.cur >= PER;
+    el("cetCard").style.display = done ? "none" : "block";
+    el("cetDone").style.display = done ? "block" : "none";
+    if (done){
+      el("cetDone").innerHTML = '<div class="cet-allin"><b>今日 8 个过完了 ✓</b>' +
+        '掌握 ' + st.known.length + ' 个。明天会自动换一批新词。<br>每天 8 个，一个月 240 个。</div>';
+      el("cetCount").textContent = PER + " / " + PER;
+    } else {
+      el("cetStage").classList.remove("flip");
+      show(st.cur);
+    }
+    paintDots();
+    save();
+    paintStat();
+  }
+
+  function next(mark){
+    if (st.cur >= PER) return;
+    if (mark && st.known.indexOf(st.cur) < 0) st.known.push(st.cur);
+    st.cur++;
+    render();
+  }
+
+  el("cetStage").addEventListener("click", function(){
+    if (st.cur >= PER) return;
+    this.classList.toggle("flip");
+  });
+  el("cetKnow").addEventListener("click", function(){ next(true); });
+  el("cetAgain").addEventListener("click", function(){ next(false); });
+  el("cetReset").addEventListener("click", function(){
+    st = { date: today, known: [], cur: 0 };
+    render();
+  });
+  fab.addEventListener("click", function(e){
+    e.stopPropagation();
+    box.classList.toggle("open");
+  });
+  /* 窄屏：点面板外部收起 */
+  document.addEventListener("click", function(e){
+    if (!box.classList.contains("open")) return;
+    if (!window.matchMedia("(max-width:1399px)").matches) return;
+    if (!box.contains(e.target)) box.classList.remove("open");
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
