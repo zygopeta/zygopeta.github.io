@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#16306e">
+<title>C题伴学 · C 语言 AI 讲题台 — MorGlory 的电子笔记</title>
+<meta name="description" content="粘贴 C 语言题目，AI 给思路提示、完整题解、逐行讲解与 Debug，题目和讲题记录云端保存。">
+<style>
+  :root{
+    --ink:#1c2333; --sub:#5a6478; --faint:#8a94a8;
+    --line:#e3e8f2; --bg:#f4f6fb; --card:#ffffff;
+    --blue:#3563e9; --green:#12966e; --orange:#e0642f; --purple:#7c3aed;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased}
+  a{text-decoration:none;color:inherit}
+
+  /* ===== 顶栏（与博客首页保持一致） ===== */
+  header.top{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.92);
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .topin{max-width:1120px;margin:0 auto;padding:0 20px;height:58px;display:flex;align-items:center;gap:10px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px}
+  .brand .avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#3563e9,#7c3aed);
+    color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800}
+  .topnav{margin-left:auto;display:flex;gap:4px}
+  .topnav a{color:var(--sub);font-size:14px;padding:7px 12px;border-radius:8px}
+  .topnav a:hover{background:#eef2fb;color:var(--ink)}
+  .topnav a.cur{color:var(--blue);background:#eaf0ff;font-weight:700}
+
+  /* ===== 头部 ===== */
+  .bloghead{background:linear-gradient(135deg,#16306e 0%,#2f5cd8 55%,#4a7bf0 100%);color:#fff;
+    position:relative;overflow:hidden}
+  .bloghead .in{max-width:1120px;margin:0 auto;padding:38px 20px 34px;position:relative;z-index:2}
+  .bloghead h1{margin:0;font-size:27px;letter-spacing:.5px}
+  .bloghead .sig{margin:8px 0 0;font-size:14px;opacity:.88}
+  .bloghead .stat{margin-top:14px;display:flex;gap:18px;font-size:12.5px;opacity:.85;flex-wrap:wrap}
+  .bloghead .stat b{font-size:15px;margin-right:3px}
+  .deco{position:absolute;right:26px;top:50%;transform:translateY(-50%);width:330px;opacity:.28;z-index:1}
+
+  /* ===== 主体 ===== */
+  .wrap{max-width:1120px;margin:0 auto;padding:26px 20px 50px;display:grid;
+    grid-template-columns:minmax(0,1fr) 290px;gap:26px;align-items:start}
+  .feedtitle{font-size:13px;font-weight:800;color:var(--faint);letter-spacing:2px;margin:4px 0 14px}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:22px 24px;margin-bottom:16px}
+  .panel h2{margin:0 0 10px;font-size:19px}
+  .panel h3{margin:22px 0 10px;font-size:15px}
+  .panel p{margin:8px 0;color:var(--sub);font-size:14px}
+  .lead{font-size:15px;color:var(--ink)!important}
+  code{font-family:Consolas,Menlo,monospace;background:#eef2fb;border-radius:4px;padding:1px 5px;font-size:13px}
+
+  .modes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0 4px}
+  .mode{border:1px solid var(--line);border-radius:11px;padding:12px 14px;background:#fbfcff}
+  .mode .mt{font-weight:700;font-size:14px;margin-bottom:3px}
+  .mode .md{font-size:12.8px;color:var(--sub);line-height:1.6}
+  .mode.m1{border-left:3px solid var(--blue)}
+  .mode.m2{border-left:3px solid var(--green)}
+  .mode.m3{border-left:3px solid var(--purple)}
+  .mode.m4{border-left:3px solid var(--orange)}
+
+  ol.steps{margin:10px 0 0;padding-left:22px;color:var(--sub);font-size:14px}
+  ol.steps li{margin:7px 0}
+  ol.steps b{color:var(--ink)}
+
+  .cta{display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+    margin-top:22px;padding:18px;border-radius:12px;
+    background:linear-gradient(135deg,#eef3ff,#f6f0ff);border:1px solid #d9e3ff}
+  .cta .ctatext{flex:1;min-width:200px}
+  .cta .ctatext b{display:block;font-size:15px}
+  .cta .ctatext span{font-size:12.5px;color:var(--sub)}
+  .go-btn{display:inline-flex;align-items:center;gap:8px;background:var(--blue);color:#fff;
+    font-size:15px;font-weight:700;padding:11px 22px;border-radius:10px;white-space:nowrap;
+    box-shadow:0 8px 20px -10px rgba(53,99,233,.7)}
+  .go-btn:hover{background:#2a52cc}
+
+  .notice{margin-top:16px;border:1px solid #f0dcbf;background:#fff9f0;border-left:4px solid var(--orange);
+    border-radius:9px;padding:12px 15px;font-size:13px;color:#7a5326;line-height:1.7}
+  .notice b{color:#5c3b16}
+
+  aside .box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
+  aside .bt{font-size:12.5px;font-weight:800;color:var(--faint);letter-spacing:2px;margin-bottom:12px}
+  .kv{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:7px 0;border-bottom:1px dashed var(--line)}
+  .kv:last-child{border-bottom:none}
+  .kv span:first-child{color:var(--faint)}
+  .kv span:last-child{color:var(--ink);text-align:right}
+  .sidelink{display:block;font-size:13.5px;color:var(--sub);padding:7px 4px;border-radius:7px}
+  .sidelink:hover{background:#f2f5fc;color:var(--blue)}
+  .badge{display:inline-block;background:#eaf0ff;color:var(--blue);border-radius:999px;
+    padding:2px 10px;font-size:11.5px;font-weight:700;margin-bottom:10px}
+
+  footer.site{max-width:1120px;margin:0 auto;padding:6px 20px 34px;color:var(--faint);
+    font-size:12.5px;text-align:center}
+
+  @media(max-width:900px){
+    .wrap{grid-template-columns:1fr}
+    aside{order:2}
+    .deco{display:none}
+    .bloghead h1{font-size:22px}
+    .modes{grid-template-columns:1fr}
+    .topin{height:54px;padding:0 14px;gap:8px}
+    .brand{font-size:15px;white-space:nowrap;min-width:0}
+    .brand span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .brand .avatar{width:28px;height:28px;font-size:12px;flex:0 0 auto}
+    .topnav{flex-wrap:nowrap;gap:0}
+    .topnav a{white-space:nowrap;padding:6px 9px;font-size:13px}
+    .topnav a.n-opt{display:none}
+    .panel{padding:18px 16px}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="topin">
+    <a class="brand" href="index.html"><span class="avatar">M</span><span>MorGlory 的电子笔记</span></a>
+    <nav class="topnav">
+      <a href="index.html">文章</a>
+      <a href="baoyan.html">保研手册</a>
+      <a href="c-learner.html" class="n-opt">C 语言</a>
+      <a href="c-tutor.html" class="cur n-opt">C题伴学</a>
+      <a href="ee-toolbox.html" class="n-opt">工具箱</a>
+      <a href="manuscript/index.html" class="n-opt">机械制图</a>
+    </nav>
+  </div>
+</header>
+
+<div class="bloghead">
+  <svg class="deco" viewBox="0 0 330 200" fill="none" stroke="#fff" stroke-width="1.4">
+    <rect x="24" y="42" width="120" height="116" rx="8"/>
+    <path d="M24 70 L144 70"/><circle cx="36" cy="56" r="3" fill="#fff"/><circle cx="46" cy="56" r="3" fill="#fff"/><circle cx="56" cy="56" r="3" fill="#fff"/>
+    <path d="M40 92 L56 92 M40 106 L88 106 M40 120 L72 120 M40 134 L104 134"/>
+    <text x="176" y="98" font-size="34" fill="#fff" stroke="none" opacity=".95">C</text>
+    <text x="216" y="98" font-size="18" fill="#fff" stroke="none" opacity=".8">+ AI</text>
+    <path d="M176 118 L290 118"/>
+  </svg>
+  <div class="in">
+    <h1>C题伴学 · C 语言 AI 讲题台</h1>
+    <p class="sig">把题目丢进来，AI 带你一步步想明白 —— 思路提示、完整题解、逐行讲解、帮我 Debug，题目和讲题记录都存在云端。</p>
+    <div class="stat"><span><b>5</b>种讲题模式</span><span><b>云端</b>跨设备同步</span><span><b>免密钥</b>AI 调用</span><span>上线 2026-11-22</span></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <main>
+    <a href="index.html" style="display:inline-block;font-size:13px;color:var(--sub);margin:0 0 10px">← 返回博客首页</a>
+    <div class="feedtitle">自制工具 · SELF-MADE TOOL</div>
+
+    <section class="panel">
+      <div class="badge">2026-11-22 · 新增</div>
+      <h2>卡在一道 C 语言题上？先别急着看答案</h2>
+      <p class="lead">这是给自己刷题做的一个小工具。把题干、输入输出格式、样例粘进去，选一个模式，AI 会按大一初学者的程度讲 —— 术语先用大白话解释，代码保证能直接 gcc 编译，还会顺手点出数组越界、<code>scanf</code> 忘写 <code>&amp;</code>、<code>=</code> 和 <code>==</code> 这些老坑。</p>
+      <p>和直接问 AI 不一样的地方：题目、你自己写的代码、每一次讲题记录都会按题归档存下来，可以标「待攻克 / 需复习 / 已掌握」，换台电脑登录还能接着看。复习周翻一遍「需复习」比重新搜题省事得多。</p>
+    </section>
+
+    <section class="panel">
+      <h2>五种讲题模式</h2>
+      <p>选模式就提问，也可以在下面继续追问，AI 记得这道题前面聊了什么。</p>
+      <div class="modes">
+        <div class="mode m1"><div class="mt">💡 思路提示</div><div class="md">不直接给完整代码，分 3~5 步引导思考，点出关键知识点和易错处。适合自己先想。</div></div>
+        <div class="mode m2"><div class="mt">📝 完整题解</div><div class="md">题意拆解 → 算法思路 → 可编译的 C 代码 → 复杂度 → 测试用例（含边界）。</div></div>
+        <div class="mode m3"><div class="mt">🔍 逐行讲解</div><div class="md">针对你写的代码逐行解释，说明变量在循环里怎么变、每句在干什么。</div></div>
+        <div class="mode m4"><div class="mt">🐛 帮我 Debug</div><div class="md">把报错信息或错误现象一起贴进来，定位原因、给出改好的完整代码和验证方法。</div></div>
+      </div>
+      <p style="margin-top:12px">另外还有<strong>自由追问</strong>：对任何一步没听懂，直接接着问，比如「为什么这里要用 <code>&amp;</code> 取地址」。</p>
+    </section>
+
+    <section class="panel">
+      <h2>怎么开始</h2>
+      <ol class="steps">
+        <li>点下面的按钮，在<strong>新标签页</strong>打开工具（会跳到工具自己的网址）。</li>
+        <li><b>用邮箱验证码登录</b>：填邮箱 → 获取验证码 → 登录，新邮箱会自动注册，不用记密码。</li>
+        <li><b>新建题目</b>：填标题和题干，可顺手贴上自己写的代码；点「保存题目」存到云端。</li>
+        <li><b>选一个模式</b>，AI 会流式输出讲解；代码块可一键复制，生成中随时能停。</li>
+      </ol>
+
+      <div class="cta">
+        <div class="ctatext">
+          <b>打开 C题伴学 →</b>
+          <span>https://c-problem-tutor.app.workbuddy.host</span>
+        </div>
+        <a class="go-btn" href="https://c-problem-tutor.app.workbuddy.host/?sharecode=XZMOORKVEG" target="_blank" rel="noopener">进入工具 ↗</a>
+      </div>
+
+      <div class="notice">
+        <b>为什么要跳出去？</b> 工具的登录、数据库和 AI 调用由 WorkBuddy 云服务提供，服务端按域名做精确校验，只认上面那个正式网址。所以博客里放的是入口，不是把工具页面搬过来 —— 直接从本地文件或不带分享码的地址打开会提示登录失败。另外 AI 调用会消耗应用额度，用完页面会明确提示。
+      </div>
+    </section>
+  </main>
+
+  <aside>
+    <div class="box">
+      <div class="bt">工具信息 · INFO</div>
+      <div class="kv"><span>类型</span><span>网页应用 / 静态前端</span></div>
+      <div class="kv"><span>后端</span><span>WorkBuddy 云服务</span></div>
+      <div class="kv"><span>登录</span><span>邮箱验证码 / WorkBuddy 账号</span></div>
+      <div class="kv"><span>数据</span><span>题目 + 讲题记录云端保存</span></div>
+      <div class="kv"><span>AI</span><span>内置模型，无需自备 API Key</span></div>
+      <div class="kv"><span>状态</span><span>已上线</span></div>
+    </div>
+    <div class="box">
+      <div class="bt">相关页面 · RELATED</div>
+      <a class="sidelink" href="c-learner.html">零基础 C 语言 · 11 章教程 →</a>
+      <a class="sidelink" href="ee-toolbox.html">电路与实验工具箱 →</a>
+      <a class="sidelink" href="index.html">← 返回博客首页</a>
+    </div>
+    <div class="box">
+      <div class="bt">小提示 · TIP</div>
+      <p style="font-size:13px;color:var(--sub);margin:0">「思路提示」默认不给完整答案。想先自己想一遍再对答案，用这个模式最合适；真卡住了再切「完整题解」。</p>
+    </div>
+  </aside>
+</div>
+
+<footer class="site">MorGlory 的电子笔记 · 用业余时间搭建 · 内容如有错漏以教材与官方通知为准</footer>
+
+</body>
+</html>
