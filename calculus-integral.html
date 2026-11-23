@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>不定积分 · 从听不懂到会套路</title>
+<style>
+  :root{
+    --ink:#1b2130;
+    --ink-2:#3d4658;
+    --ink-3:#6b7488;
+    --line:#e3e6ee;
+    --line-2:#eef0f6;
+    --bg:#fbfbfd;
+    --card:#ffffff;
+    --blue:#2b5cd9;
+    --blue-soft:#eef2fe;
+    --green:#0f7a5a;
+    --green-soft:#e9f7f1;
+    --orange:#c2410c;
+    --orange-soft:#fdf1e9;
+    --violet:#6d3fc4;
+    --violet-soft:#f3edfd;
+    --serif:"Noto Serif SC","Source Han Serif SC","Songti SC","SimSun",serif;
+    --sans:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    --mono:"JetBrains Mono","Cascadia Code",Consolas,"Courier New",monospace;
+    --shadow:0 1px 2px rgba(20,26,40,.04),0 8px 24px rgba(20,26,40,.06);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:var(--sans);font-size:16px;line-height:1.85;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--blue);text-decoration:none}
+  /* 顶部进度条 */
+  #bar{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,#2b5cd9,#6d3fc4);z-index:99;transition:width .1s linear}
+
+  /* 首屏 */
+  header.hero{
+    padding:64px 24px 44px;
+    background:
+      radial-gradient(1100px 320px at 12% -10%,#e9efff 0%,rgba(233,239,255,0) 60%),
+      radial-gradient(900px 300px at 92% 0%,#f6ecff 0%,rgba(246,236,255,0) 55%),
+      #fff;
+    border-bottom:1px solid var(--line);
+  }
+  .hero-inner{max-width:1040px;margin:0 auto}
+  .kicker{font-size:13px;letter-spacing:.14em;color:var(--blue);font-weight:600;text-transform:uppercase}
+  h1{
+    font-family:var(--serif);font-size:44px;line-height:1.25;margin:10px 0 10px;
+    letter-spacing:.01em;font-weight:700;
+  }
+  .lead{font-size:17px;color:var(--ink-2);max-width:660px;margin:0}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}
+  .chip{
+    font-size:13px;padding:5px 12px;border-radius:999px;
+    background:#fff;border:1px solid var(--line);color:var(--ink-2);
+  }
+  .chip b{color:var(--blue)}
+  .hint-line{margin-top:18px;font-size:13.5px;color:var(--ink-3)}
+  .hint-line code{font-family:var(--mono);font-size:12.5px;background:#f2f4fa;padding:2px 6px;border-radius:4px}
+
+  /* 主体布局 */
+  .wrap{max-width:1040px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:236px 1fr;gap:44px;align-items:start}
+  aside{position:sticky;top:26px;padding:34px 0 40px;font-size:13.5px}
+  aside .toc-title{font-size:11.5px;letter-spacing:.16em;color:var(--ink-3);font-weight:700;margin-bottom:12px}
+  aside nav a{
+    display:block;padding:7px 12px;border-radius:7px;color:var(--ink-2);
+    border-left:2px solid transparent;margin-bottom:1px;line-height:1.5;
+  }
+  aside nav a:hover{background:#f4f6fb;color:var(--ink)}
+  aside nav a.on{background:var(--blue-soft);color:var(--blue);border-left-color:var(--blue);font-weight:600}
+  aside .toc-num{display:inline-block;width:18px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+  aside a.on .toc-num{color:var(--blue)}
+  .aside-note{margin-top:20px;padding:12px;border-radius:8px;background:#fff;border:1px solid var(--line);color:var(--ink-3);font-size:12.5px;line-height:1.7}
+
+  main{padding:34px 0 80px;min-width:0}
+
+  /* 章节 */
+  section{margin-bottom:56px;scroll-margin-top:22px}
+  .sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px}
+  .sec-no{
+    font-family:var(--mono);font-size:12px;color:var(--blue);font-weight:700;
+    background:var(--blue-soft);padding:2px 8px;border-radius:5px;letter-spacing:.05em;
+  }
+  h2{font-family:var(--serif);font-size:27px;margin:0;font-weight:700;letter-spacing:.01em}
+  .sec-sub{color:var(--ink-3);font-size:14px;margin:2px 0 20px}
+  h3{font-family:var(--serif);font-size:19.5px;margin:30px 0 8px;font-weight:700}
+  h4{font-size:15.5px;margin:22px 0 6px;font-weight:700;color:var(--ink)}
+  p{margin:10px 0}
+  .muted{color:var(--ink-3)}
+  strong{font-weight:700}
+  em{font-style:normal;background:linear-gradient(transparent 62%,#ffe9a8 62%);padding:0 1px}
+
+  /* 卡片 */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px 24px;box-shadow:var(--shadow)}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+
+  /* 提示块 */
+  .box{border-radius:10px;padding:16px 18px;margin:16px 0;font-size:15.2px;border:1px solid}
+  .box .tag{
+    display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.08em;
+    padding:2px 8px;border-radius:4px;margin-bottom:6px;
+  }
+  .box.why{background:var(--blue-soft);border-color:#d6e0fb}
+  .box.why .tag{background:#dbe5fd;color:#22459f}
+  .box.warn{background:var(--orange-soft);border-color:#f6dccb}
+  .box.warn .tag{background:#fbe0cf;color:#9a3412}
+  .box.tip{background:var(--green-soft);border-color:#cfeee2}
+  .box.tip .tag{background:#d3efe4;color:#0b5f46}
+  .box.plain{background:#f8f9fc;border-color:var(--line)}
+  .box p:first-of-type{margin-top:4px}
+  .box p:last-child{margin-bottom:0}
+
+  /* 例题 */
+  .eg{background:#fff;border:1px solid var(--line);border-radius:10px;padding:0;overflow:hidden;margin:16px 0}
+  .eg-head{
+    padding:10px 18px;background:#f7f8fc;border-bottom:1px solid var(--line-2);
+    font-size:13px;color:var(--ink-2);font-weight:600;letter-spacing:.03em;
+  }
+  .eg-body{padding:14px 18px}
+  .step{display:flex;gap:10px;margin:7px 0;align-items:flex-start}
+  .step .n{
+    flex:0 0 auto;width:20px;height:20px;border-radius:50%;background:var(--blue-soft);
+    color:var(--blue);font-size:11.5px;font-weight:700;display:flex;align-items:center;
+    justify-content:center;margin-top:5px;font-family:var(--mono);
+  }
+  .step .t{flex:1;min-width:0}
+
+  /* 表格 */
+  .tbl-wrap{overflow-x:auto;margin:16px 0}
+  table{border-collapse:collapse;width:100%;font-size:14.6px;background:#fff}
+  th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line-2);vertical-align:middle}
+  thead th{background:#f7f8fc;font-weight:700;color:var(--ink-2);font-size:13.5px;border-bottom:1px solid var(--line)}
+  tbody tr:hover{background:#fafbff}
+  td.m{font-size:15px}
+  .group-row td{background:#fbfcfe;font-weight:700;color:var(--blue);font-size:13.5px;letter-spacing:.04em}
+  .hook{color:var(--ink-3);font-size:13.5px}
+
+  /* 决策流程 */
+  .flow{display:grid;gap:10px;margin:18px 0}
+  .flow-row{display:flex;gap:10px;align-items:stretch}
+  .flow-q{
+    flex:0 0 232px;background:#fff;border:1px solid var(--line);border-radius:8px;
+    padding:10px 12px;font-size:13.8px;line-height:1.6;display:flex;align-items:center;
+  }
+  .flow-a{
+    flex:1;border-radius:8px;padding:10px 14px;font-size:14.2px;
+    background:var(--blue-soft);border:1px solid #d6e0fb;display:flex;align-items:center;gap:8px;
+  }
+  .flow-a b{color:#22459f}
+
+  /* 习题 */
+  .ex{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:12px 0;transition:border-color .15s,box-shadow .15s}
+  .ex:hover{border-color:#cfd6e8;box-shadow:var(--shadow)}
+  .ex-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+  .ex-q{font-size:15.6px;flex:1;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+  .ex-no{font-family:var(--mono);font-size:12px;color:var(--ink-3);flex:0 0 auto;letter-spacing:.02em}
+  details{border-top:1px dashed var(--line);margin-top:10px;padding-top:8px}
+  details summary{
+    cursor:pointer;font-size:13.5px;color:var(--blue);font-weight:600;list-style:none;
+    display:inline-flex;align-items:center;gap:6px;user-select:none;
+  }
+  details summary::-webkit-details-marker{display:none}
+  details summary::before{content:"▸";font-size:11px;transition:transform .15s}
+  details[open] summary::before{transform:rotate(90deg)}
+  details .body{padding:6px 0 2px 2px;font-size:14.8px;color:var(--ink-2)}
+  .ans summary{color:var(--green)}
+  .chk{font-size:12.5px;color:var(--ink-3);display:inline-flex;align-items:center;gap:6px;cursor:pointer;user-select:none;white-space:nowrap;padding-top:3px}
+  .chk input{accent-color:var(--green);width:14px;height:14px;cursor:pointer}
+  .ex-head-bar{
+    display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;
+    margin:22px 0 8px;padding:12px 16px;border-radius:10px;background:#f7f8fc;border:1px solid var(--line-2);
+    font-size:13.5px;color:var(--ink-2);
+  }
+  .ex-head-bar .btns{display:flex;gap:8px}
+  button.mini{
+    font:inherit;font-size:12.8px;padding:5px 11px;border-radius:6px;cursor:pointer;
+    border:1px solid var(--line);background:#fff;color:var(--ink-2);transition:.15s;
+  }
+  button.mini:hover{border-color:#c3cce0;background:#fbfcff;color:var(--ink)}
+  .group-title{font-size:13px;font-weight:700;letter-spacing:.1em;color:var(--violet);background:var(--violet-soft);display:inline-block;padding:3px 10px;border-radius:5px;margin-top:26px}
+
+  /* 清单 */
+  .check-list{list-style:none;padding:0;margin:14px 0}
+  .check-list li{
+    display:flex;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:15.2px;align-items:flex-start;
+  }
+  .check-list li:last-child{border-bottom:none}
+  .check-list .mark{color:var(--green);font-weight:700;flex:0 0 auto}
+
+  footer{border-top:1px solid var(--line);padding:26px 24px 46px;color:var(--ink-3);font-size:13px;text-align:center}
+  footer b{color:var(--ink-2)}
+
+  @media (max-width:900px){
+    .wrap{grid-template-columns:1fr;gap:0;padding:0 18px}
+    aside{display:none}
+    h1{font-size:32px}
+    .hero-inner{padding:0}
+    header.hero{padding:44px 18px 34px}
+    .grid-2,.grid-3{grid-template-columns:1fr}
+    .flow-row{flex-direction:column}
+    .flow-q{flex:none}
+  }
+  @media print{
+    #bar,aside,.ex-head-bar,.chk,button{display:none!important}
+    body{background:#fff}
+    .wrap{display:block;max-width:none}
+    details{border:none}
+    details .body{display:block!important}
+    .card,.ex,.eg{box-shadow:none;break-inside:avoid}
+    h2{break-after:avoid}
+  }
+  mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%}
+  mjx-container[display="true"]{margin:12px 0!important}
+</style>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$','$'],['\\(','\\)']],
+      displayMath: [['$$','$$'],['\\[','\\]']],
+      processEscapes: true
+    },
+    svg: { fontCache: 'global' },
+    options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+  };
+</script>
+<script defer src="vendor/tex-svg.js"></script>
+</head>
+<body>
+<div id="bar"></div>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="kicker">高等数学 · 第三章 → 第四章</div>
+    <h1>不定积分 · 定积分：从"听不懂"到"会套路"</h1>
+    <p class="lead">不定积分不是一门需要背下来的学问，而是一套<em>识别信号的流程</em>。这份笔记先讲清楚它为什么让人晕，再给你四个方法、六道难关、三十三道分层习题（含 7 道压轴），最后加一栏定积分把两章接起来。</p>
+    <div class="chips">
+      <span class="chip">四大方法：<b>凑微分 · 三角代换 · 分部积分 · 有理函数</b></span>
+      <span class="chip">33 道习题<span style="color:var(--ink-3)">（含 7 道压轴 + 提示答案）</span></span>
+      <span class="chip"><b>新增第 10 节</b>：定积分学习与 9 道配套题</span>
+      <span class="chip">每题都可以<b>求导验回去</b></span>
+    </div>
+    <div class="hint-line">建议顺序：先读第 0、1 节理解"它在干什么"，再背第 2 节公式表，然后按 3→4→5→6 学方法，最后做习题（A→B→C→D 组）；学完不定积分再看第 10 节的定积分。<code>Ctrl/Cmd + P</code> 可直接打印成纸质笔记。</div>
+  </div>
+</header>
+
+<div class="wrap">
+  <aside>
+    <div class="toc-title">目录</div>
+    <nav id="toc">
+      <a href="#sec-0"><span class="toc-num">0</span>为什么你会听不懂</a>
+      <a href="#sec-1"><span class="toc-num">1</span>本质：求导的反向操作</a>
+      <a href="#sec-2"><span class="toc-num">2</span>基本公式表（21 条）</a>
+      <a href="#sec-3"><span class="toc-num">3</span>方法一：凑微分</a>
+      <a href="#sec-4"><span class="toc-num">4</span>方法二：三角代换</a>
+      <a href="#sec-5"><span class="toc-num">5</span>方法三：分部积分</a>
+      <a href="#sec-6"><span class="toc-num">6</span>方法四：有理函数</a>
+      <a href="#sec-7"><span class="toc-num">7</span>六个难点逐个破</a>
+      <a href="#sec-8"><span class="toc-num">8</span>分层习题（33 题）</a>
+      <a href="#sec-9"><span class="toc-num">9</span>考前检查清单</a>
+      <a href="#sec-10"><span class="toc-num">10</span>定积分：从面积到牛莱公式</a>
+    </nav>
+    <div class="aside-note">
+      <b>一句话原则</b><br>
+      积分做完，立刻求导验回去。<br>
+      导数等于原被积函数，你就对了 —— 这是唯一不会骗人的检查法。
+    </div>
+  </aside>
+
+  <main>
+
+    <!-- ============ 0 ============ -->
+    <section id="sec-0">
+      <div class="sec-head"><span class="sec-no">00</span><h2>为什么你会听不懂</h2></div>
+      <p class="sec-sub">不是你笨，是这门学问的表达方式和前面完全不同。</p>
+
+      <p>求导的时候，你手上有一套确定的规则：幂函数怎么导、乘积怎么导、复合怎么导，一步步往下算就行。那是一种<strong>"顺着推"</strong>的感觉。</p>
+      <p>到了不定积分，老师突然要求你"倒着推"。就像看一段录像倒着放——画面还是那些画面，但你得从结果猜出过程。绝大多数人卡住，是因为三个坎：</p>
+
+      <div class="grid-3" style="margin-top:18px">
+        <div class="card">
+          <div style="font-family:var(--mono);font-size:12px;color:var(--blue);font-weight:700">坎 1</div>
+          <h4 style="margin-top:4px">方向反了</h4>
+          <p style="font-size:14.4px;color:var(--ink-2);margin:4px 0 0">求导是"给你函数，算导数"；积分是"给你导数，猜原函数"。没有公式能直接套，只能<strong>猜一个再验证</strong>。</p>
+        </div>
+        <div class="card">
+          <div style="font-family:var(--mono);font-size:12px;color:var(--blue);font-weight:700">坎 2</div>
+          <h4 style="margin-top:4px">答案不唯一</h4>
+          <p style="font-size:14.4px;color:var(--ink-2);margin:4px 0 0">积分的结果<strong>不是一个函数，是一族函数</strong>，全部相差一个常数。那个 $+C$ 不是装饰。</p>
+        </div>
+        <div class="card">
+          <div style="font-family:var(--mono);font-size:12px;color:var(--blue);font-weight:700">坎 3</div>
+          <h4 style="margin-top:4px">没有万能算法</h4>
+          <p style="font-size:14.4px;color:var(--ink-2);margin:4px 0 0">同一个积分可能有四五种做法，也可能根本积不出来。所以积分题考的是<strong>认类型、选方法</strong>。</p>
+        </div>
+      </div>
+
+      <div class="box tip">
+        <span class="tag">心态</span>
+        <p>把不定积分当成<strong>做菜</strong>，不要当成<strong>做算术</strong>。你要先看食材（被积函数长什么样），再决定用哪口锅（哪个方法）。方法就那么四个，食材的"长相"也就那么几类 —— 认熟了，题就没有意外的。</p>
+      </div>
+    </section>
+
+    <!-- ============ 1 ============ -->
+    <section id="sec-1">
+      <div class="sec-head"><span class="sec-no">01</span><h2>本质：求导的反向操作</h2></div>
+      <p class="sec-sub">先把这个定义吃透，后面所有技巧才有落脚点。</p>
+
+      <div class="card">
+        <p style="margin-top:0"><strong>定义.</strong> 如果在一个区间上处处有</p>
+        <p style="text-align:center">$$F'(x)=f(x)$$</p>
+        <p>就称 $F(x)$ 是 $f(x)$ 的一个<strong>原函数</strong>，并把 $f(x)$ 的全体原函数记作</p>
+        <p style="text-align:center">$$\int f(x)\,\mathrm{d}x=F(x)+C$$</p>
+        <p style="margin-bottom:0">其中 $\int$ 是积分号，$f(x)$ 叫<strong>被积函数</strong>，$f(x)\mathrm{d}x$ 叫<strong>被积表达式</strong>，$x$ 叫<strong>积分变量</strong>，$C$ 叫<strong>积分常数</strong>。</p>
+      </div>
+
+      <h3>为什么要加 $C$：一个物理比喻</h3>
+      <p>假设你坐在一辆车里，只能看到速度表，看不到窗外的路标。速度表告诉你"此刻跑多快"——这就是 $f(x)$。你想知道"我走到哪儿了"——这就是 $F(x)$。</p>
+      <p>问题在于：<em>速度表记录只能算出"走了多远"，算不出"从哪儿出发"</em>。同样一段行程，从成都出发和从重庆出发，路程一样，位置却差一个常数。这个"起点未知"就是 $C$。</p>
+
+      <div class="box why">
+        <span class="tag">几何版解释</span>
+        <p>$y=x^3$、$y=x^3+1$、$y=x^3-5$ 这三条曲线形状完全一样，只是上下平移。它们在<strong>同一个 $x$ 处的切线斜率都相等</strong>（都是 $3x^2$）。</p>
+        <p style="margin-bottom:0">"斜率相同"这件事，无法区分这三条曲线 —— 所以积分只能给你"一整族曲线"，写作 $x^3+C$。</p>
+      </div>
+
+      <h3>求导与积分：一张对照表</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th style="width:50%">求导（顺向，有算法）</th><th>积分（逆向，靠识别）</th></tr></thead>
+          <tbody>
+            <tr><td class="m">$(x^3)'=3x^2$</td><td class="m">$\displaystyle\int 3x^2\,\mathrm{d}x=x^3+C$</td></tr>
+            <tr><td class="m">$(\sin x)'=\cos x$</td><td class="m">$\displaystyle\int \cos x\,\mathrm{d}x=\sin x+C$</td></tr>
+            <tr><td class="m">$(\arctan x)'=\dfrac{1}{1+x^2}$</td><td class="m">$\displaystyle\int \frac{\mathrm{d}x}{1+x^2}=\arctan x+C$</td></tr>
+            <tr><td class="m">$(\ln x)'=\dfrac{1}{x}$</td><td class="m">$\displaystyle\int \frac{\mathrm{d}x}{x}=\ln|x|+C$</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="box tip">
+        <span class="tag">最强检查法</span>
+        <p style="margin-bottom:0">算完一个不定积分，<strong>立刻对答案求导</strong>。如果导数正好等于原被积函数，答案就对了 —— 不用等老师批。这个动作能救回 90% 的低级错误，也能让你在考场上心里有底。</p>
+      </div>
+
+      <div class="box warn">
+        <span class="tag">易错</span>
+        <p style="margin-bottom:0">$\int f(x)\mathrm{d}x$ 里的 $\mathrm{d}x$ 不是摆设。它标明"对谁积分"。$\int t\,\mathrm{d}x$ 和 $\int t\,\mathrm{d}t$ 是完全不同的两件事：前者把 $t$ 当常数，结果是 $tx+C$。</p>
+      </div>
+    </section>
+
+    <!-- ============ 2 ============ -->
+    <section id="sec-2">
+      <div class="sec-head"><span class="sec-no">02</span><h2>基本公式表：21 条，分五组记</h2></div>
+      <p class="sec-sub">这是全部积分的"字母表"。不要死记，按"谁是谁的导数"成对记。</p>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th style="width:46%">被积函数</th><th style="width:34%">积分结果</th><th>记忆钩子</th></tr></thead>
+          <tbody>
+            <tr class="group-row"><td colspan="3">① 幂与倒数</td></tr>
+            <tr><td class="m">$\displaystyle\int k\,\mathrm{d}x$</td><td class="m">$kx+C$</td><td class="hook">常数的原函数是一次函数</td></tr>
+            <tr><td class="m">$\displaystyle\int x^{a}\,\mathrm{d}x\;(a\neq-1)$</td><td class="m">$\dfrac{x^{a+1}}{a+1}+C$</td><td class="hook">指数加一再除以加一（求导的逆动作）</td></tr>
+            <tr><td class="m">$\displaystyle\int \frac{\mathrm{d}x}{x}$</td><td class="m">$\ln|x|+C$</td><td class="hook">唯一例外，指数 $-1$ 时落在对数上</td></tr>
+            <tr class="group-row"><td colspan="3">② 指数</td></tr>
+            <tr><td class="m">$\displaystyle\int e^{x}\,\mathrm{d}x$</td><td class="m">$e^{x}+C$</td><td class="hook">$e^x$ 求导还是自己</td></tr>
+            <tr><td class="m">$\displaystyle\int a^{x}\,\mathrm{d}x$</td><td class="m">$\dfrac{a^{x}}{\ln a}+C$</td><td class="hook">多一个 $\ln a$ 分母</td></tr>
+            <tr class="group-row"><td colspan="3">③ 三角函数</td></tr>
+            <tr><td class="m">$\displaystyle\int \sin x\,\mathrm{d}x$</td><td class="m">$-\cos x+C$</td><td class="hook">带负号（$\cos$ 求导出负 $\sin$）</td></tr>
+            <tr><td class="m">$\displaystyle\int \cos x\,\mathrm{d}x$</td><td class="m">$\sin x+C$</td><td class="hook">正号，与上一行成对</td></tr>
+            <tr><td class="m">$\displaystyle\int \sec^2x\,\mathrm{d}x$</td><td class="m">$\tan x+C$</td><td class="hook">$(\tan x)'=\sec^2x$</td></tr>
+            <tr><td class="m">$\displaystyle\int \csc^2x\,\mathrm{d}x$</td><td class="m">$-\cot x+C$</td><td class="hook">$(\cot x)'=-\csc^2x$</td></tr>
+            <tr><td class="m">$\displaystyle\int \sec x\tan x\,\mathrm{d}x$</td><td class="m">$\sec x+C$</td><td class="hook">$(\sec x)'=\sec x\tan x$</td></tr>
+            <tr><td class="m">$\displaystyle\int \csc x\cot x\,\mathrm{d}x$</td><td class="m">$-\csc x+C$</td><td class="hook">带负号</td></tr>
+            <tr><td class="m">$\displaystyle\int \tan x\,\mathrm{d}x$</td><td class="m">$-\ln|\cos x|+C$</td><td class="hook">凑微分推出来，不用背（见第 3 节）</td></tr>
+            <tr><td class="m">$\displaystyle\int \cot x\,\mathrm{d}x$</td><td class="m">$\ln|\sin x|+C$</td><td class="hook">同上，符号相反</td></tr>
+            <tr><td class="m">$\displaystyle\int \sec x\,\mathrm{d}x$</td><td class="m">$\ln|\sec x+\tan x|+C$</td><td class="hook">形式特殊，直接背</td></tr>
+            <tr><td class="m">$\displaystyle\int \csc x\,\mathrm{d}x$</td><td class="m">$\ln|\csc x-\cot x|+C$</td><td class="hook">直接背</td></tr>
+            <tr class="group-row"><td colspan="3">④ 反三角型（含根号与平方和）</td></tr>
+            <tr><td class="m">$\displaystyle\int \frac{\mathrm{d}x}{1+x^2}$</td><td class="m">$\arctan x+C$</td><td class="hook">分母无根号 → 反正切</td></tr>
+            <tr><td class="m">$\displaystyle\int \frac{\mathrm{d}x}{\sqrt{1-x^2}}$</td><td class="m">$\arcsin x+C$</td><td class="hook">分母有根号 → 反正弦</td></tr>
+            <tr><td class="m">$\displaystyle\int \frac{\mathrm{d}x}{a^2+x^2}$</td><td class="m">$\dfrac{1}{a}\arctan\dfrac{x}{a}+C$</td><td class="hook">带 $a$ 就缩放：里面除以 $a$，外面乘 $\frac{1}{a}$</td></tr>
+            <tr><td class="m">$\displaystyle\int \frac{\mathrm{d}x}{\sqrt{a^2-x^2}}$</td><td class="m">$\arcsin\dfrac{x}{a}+C$</td><td class="hook">同上缩放</td></tr>
+            <tr class="group-row"><td colspan="3">⑤ 对数型（平方差）</td></tr>
+            <tr><td class="m">$\displaystyle\int \frac{\mathrm{d}x}{x^2-a^2}$</td><td class="m">$\dfrac{1}{2a}\ln\left|\dfrac{x-a}{x+a}\right|+C$</td><td class="hook">拆成两个单根，见第 6 节</td></tr>
+            <tr><td class="m">$\displaystyle\int \frac{\mathrm{d}x}{\sqrt{x^2\pm a^2}}$</td><td class="m">$\ln\left|x+\sqrt{x^2\pm a^2}\right|+C$</td><td class="hook">结果里还带根号，别怕</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="box tip">
+        <span class="tag">记忆策略</span>
+        <p><strong>三角那八条成对记：</strong>一行正、一行负。$\cos\to\sin$ 是正的，$\sin\to-\cos$ 是负的；$\tan\to\sec^2$ 正、$\cot\to-\csc^2$ 负。规律是"求导出来带负号的，积分就补负号"。</p>
+        <p style="margin-bottom:0"><strong>带 $a$ 的四条当"缩放规则"记：</strong>把基本公式里的 $x$ 全换成 $\frac{x}{a}$，整体再乘 $\frac{1}{a}$ 或不动（$\arcsin$ 那条不用乘）。这样只需记 4 条无 $a$ 的版本，其余现推。</p>
+      </div>
+    </section>
+
+    <!-- ============ 3 ============ -->
+    <section id="sec-3">
+      <div class="sec-head"><span class="sec-no">03</span><h2>方法一：凑微分（第一类换元）</h2></div>
+      <p class="sec-sub">使用频率最高的方法，一半以上的积分题靠它。</p>
+
+      <h3>核心思想一句话</h3>
+      <p>把被积式子<strong>看成 $f(u)\,\mathrm{d}u$</strong> 的样子，其中 $u$ 是"里面那层函数"。因为</p>
+      <p style="text-align:center">$$\mathrm{d}u=\varphi'(x)\,\mathrm{d}x\quad\Longleftrightarrow\quad \varphi'(x)\,\mathrm{d}x=\mathrm{d}\varphi(x)$$</p>
+      <p>所以<em>被积函数里如果"恰好"含有一个因子是另一个因子的导数，就可以把它挪进 $\mathrm{d}$ 后面</em>。</p>
+
+      <div class="box why">
+        <span class="tag">为什么可以这么干</span>
+        <p style="margin-bottom:0">因为复合函数求导是"外层导数 × 内层导数"。积分往回走，就是要把那个"内层导数"找出来、消掉。找不到？那这个方法就用不了，换别的。</p>
+      </div>
+
+      <h3>识别信号：看到这些就试凑微分</h3>
+      <div class="flow">
+        <div class="flow-row">
+          <div class="flow-q">式子里有"某函数 $\times$ 它的导数"，如 $x\,e^{x^2}$、$\dfrac{x}{1+x^2}$、$\sin^2x\cos x$</div>
+          <div class="flow-a"><b>凑微分</b>：令 $u=$ 里面那层</div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-q">同时出现 $\dfrac{1}{x}$ 与 $\ln x$</div>
+          <div class="flow-a"><b>凑微分</b>：$\dfrac{\mathrm{d}x}{x}=\mathrm{d}(\ln x)$</div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-q">线性式 $ax+b$：$\dfrac{1}{2x+1}$、$e^{3x}$、$\sin 5x$</div>
+          <div class="flow-a"><b>凑微分</b>：$\mathrm{d}(ax+b)=a\,\mathrm{d}x$，外面补 $\frac{1}{a}$</div>
+        </div>
+      </div>
+
+      <div class="eg">
+        <div class="eg-head">例题 1　$\displaystyle\int 2x\,e^{x^2}\,\mathrm{d}x$</div>
+        <div class="eg-body">
+          <div class="step"><div class="n">1</div><div class="t">看结构：$e$ 的指数是 $x^2$，而外面正好有 $2x$ —— 它正是 $(x^2)'$。</div></div>
+          <div class="step"><div class="n">2</div><div class="t">凑：$2x\,\mathrm{d}x=\mathrm{d}(x^2)$，于是原式 $=\displaystyle\int e^{x^2}\,\mathrm{d}(x^2)$。</div></div>
+          <div class="step"><div class="n">3</div><div class="t">把 $x^2$ 看成整体 $u$：$\displaystyle\int e^{u}\,\mathrm{d}u=e^{u}+C$。</div></div>
+          <div class="step"><div class="n">4</div><div class="t">回代：$=e^{x^2}+C$。验算：$(e^{x^2})'=e^{x^2}\cdot 2x$ ✓</div></div>
+        </div>
+      </div>
+
+      <div class="eg">
+        <div class="eg-head">例题 2　$\displaystyle\int \frac{x}{1+x^2}\,\mathrm{d}x$</div>
+        <div class="eg-body">
+          <div class="step"><div class="n">1</div><div class="t">$(1+x^2)'=2x$，而分子只有 $x$，差一个 2。</div></div>
+          <div class="step"><div class="n">2</div><div class="t">配平：$x\,\mathrm{d}x=\dfrac{1}{2}\,\mathrm{d}(1+x^2)$，原式 $=\dfrac{1}{2}\displaystyle\int\frac{\mathrm{d}(1+x^2)}{1+x^2}$。</div></div>
+          <div class="step"><div class="n">3</div><div class="t">套 $\displaystyle\int\frac{\mathrm{d}u}{u}=\ln|u|$：$=\dfrac{1}{2}\ln(1+x^2)+C$。</div></div>
+        </div>
+      </div>
+
+      <div class="eg">
+        <div class="eg-head">例题 3　$\displaystyle\int \frac{\mathrm{d}x}{x\ln x}$</div>
+        <div class="eg-body">
+          <div class="step"><div class="n">1</div><div class="t">看见 $\frac{1}{x}$ 和 $\ln x$ 同时出现 —— 信号极强。</div></div>
+          <div class="step"><div class="n">2</div><div class="t">$\dfrac{\mathrm{d}x}{x}=\mathrm{d}(\ln x)$，原式 $=\displaystyle\int\frac{\mathrm{d}(\ln x)}{\ln x}$。</div></div>
+          <div class="step"><div class="n">3</div><div class="t">$=\ln|\ln x|+C$。（注意绝对值，因为 $\ln x$ 可以小于 1 而为负）</div></div>
+        </div>
+      </div>
+
+      <div class="eg">
+        <div class="eg-head">例题 4　$\displaystyle\int \tan x\,\mathrm{d}x$ —— 看公式是怎么"长"出来的</div>
+        <div class="eg-body">
+          <div class="step"><div class="n">1</div><div class="t">化成 $\displaystyle\int\frac{\sin x}{\cos x}\,\mathrm{d}x$。</div></div>
+          <div class="step"><div class="n">2</div><div class="t">$(\cos x)'=-\sin x$，所以 $\sin x\,\mathrm{d}x=-\mathrm{d}(\cos x)$。</div></div>
+          <div class="step"><div class="n">3</div><div class="t">原式 $=-\displaystyle\int\frac{\mathrm{d}(\cos x)}{\cos x}=-\ln|\cos x|+C$。</div></div>
+        </div>
+      </div>
+
+      <div class="box warn">
+        <span class="tag">三个高频错误</span>
+        <p><strong>1. 忘了配平系数。</strong>$\displaystyle\int e^{2x}\mathrm{d}x\neq e^{2x}$，正确是 $\dfrac{1}{2}e^{2x}+C$。因为 $\mathrm{d}(2x)=2\,\mathrm{d}x$，你先"多"了一个 2，必须除掉。</p>
+        <p><strong>2. 强行凑。</strong>$\displaystyle\int e^{x^2}\mathrm{d}x$ 凑不出来 —— 它属于"积不出"（第 7 节）。凑微分要求<em>被积函数里真有那个导数因子</em>，没有就是没有。</p>
+        <p style="margin-bottom:0"><strong>3. 忘了回代。</strong>答案里如果还留着 $u$，那就不是最终答案。</p>
+      </div>
+    </section>
+
+    <!-- ============ 4 ============ -->
+    <section id="sec-4">
+      <div class="sec-head"><span class="sec-no">04</span><h2>方法二：三角代换（第二类换元）</h2></div>
+      <p class="sec-sub">专治"根号底下是平方加减"的题。目的只有一个：把根号拆掉。</p>
+
+      <h3>先记住这张对应表</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th style="width:32%">遇到</th><th style="width:26%">换元</th><th>依据的恒等式</th></tr></thead>
+          <tbody>
+            <tr><td class="m">$\sqrt{a^2-x^2}$</td><td class="m">$x=a\sin t$</td><td>$1-\sin^2t=\cos^2t$</td></tr>
+            <tr><td class="m">$\sqrt{a^2+x^2}$</td><td class="m">$x=a\tan t$</td><td>$1+\tan^2t=\sec^2t$</td></tr>
+            <tr><td class="m">$\sqrt{x^2-a^2}$</td><td class="m">$x=a\sec t$</td><td>$\sec^2t-1=\tan^2t$</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="box tip">
+        <span class="tag">口诀</span>
+        <p style="margin-bottom:0"><strong>"减用正弦，加用正切，$x$ 在前用正割。"</strong><br>
+        减（$a^2-x^2$）→ $\sin$；加（$a^2+x^2$）→ $\tan$；$x^2$ 在前面（$x^2-a^2$）→ $\sec$。<br>
+        另外三种换元都要注明 $t$ 的范围（如 $x=a\sin t$ 取 $t\in[-\frac{\pi}{2},\frac{\pi}{2}]$），保证根号开出来是正的。</p>
+      </div>
+
+      <h3>四步流程</h3>
+      <div class="card">
+        <div class="step"><div class="n">1</div><div class="t"><strong>换元</strong>：令 $x=a\sin t$，同时算出 $\mathrm{d}x=a\cos t\,\mathrm{d}t$。<em>这一步最容易漏 $\mathrm{d}x$。</em></div></div>
+        <div class="step"><div class="n">2</div><div class="t"><strong>化简</strong>：根号变成 $a\cos t$，与被积函数约掉，得到一个纯三角积分。</div></div>
+        <div class="step"><div class="n">3</div><div class="t"><strong>积分</strong>：用降幂公式 $\sin^2t=\frac{1-\cos2t}{2}$ 之类化成可积形式。</div></div>
+        <div class="step"><div class="n">4</div><div class="t"><strong>回代</strong>：把 $t$ 换回 $x$。技巧在下面。</div></div>
+      </div>
+
+      <h3>回代技巧：画一个直角三角形</h3>
+      <p>已知 $\sin t=\dfrac{x}{a}$，就画个直角三角形：<strong>对边</strong>标 $x$，<strong>斜边</strong>标 $a$，那么<strong>邻边</strong>只能是 $\sqrt{a^2-x^2}$。<br>
+      然后所有需要的三角函数都从图上直接读：</p>
+      <p style="text-align:center">$$\cos t=\frac{\sqrt{a^2-x^2}}{a},\qquad \tan t=\frac{x}{\sqrt{a^2-x^2}},\qquad \sin t=\frac{x}{a}$$</p>
+
+      <div class="eg">
+        <div class="eg-head">例题　$\displaystyle\int\sqrt{1-x^2}\,\mathrm{d}x$（这题必考，背也要背下来）</div>
+        <div class="eg-body">
+          <div class="step"><div class="n">1</div><div class="t">属于 $\sqrt{a^2-x^2}$ 型，$a=1$：令 $x=\sin t$，$t\in[-\frac{\pi}{2},\frac{\pi}{2}]$，$\mathrm{d}x=\cos t\,\mathrm{d}t$。</div></div>
+          <div class="step"><div class="n">2</div><div class="t">$\sqrt{1-x^2}=\cos t$，原式 $=\displaystyle\int\cos t\cdot\cos t\,\mathrm{d}t=\int\cos^2t\,\mathrm{d}t$。</div></div>
+          <div class="step"><div class="n">3</div><div class="t">降幂：$\cos^2t=\dfrac{1+\cos2t}{2}$，得 $=\dfrac{t}{2}+\dfrac{\sin2t}{4}+C$。</div></div>
+          <div class="step"><div class="n">4</div><div class="t">回代：$t=\arcsin x$；$\dfrac{\sin2t}{4}=\dfrac{2\sin t\cos t}{4}=\dfrac{x\sqrt{1-x^2}}{2}$。</div></div>
+          <div class="step"><div class="n">5</div><div class="t">结果：$\displaystyle\int\sqrt{1-x^2}\,\mathrm{d}x=\dfrac{1}{2}\arcsin x+\dfrac{1}{2}x\sqrt{1-x^2}+C$。</div></div>
+        </div>
+      </div>
+
+      <div class="box why">
+        <span class="tag">这个答案的几何意义</span>
+        <p style="margin-bottom:0">$\int\sqrt{1-x^2}\mathrm{d}x$ 算的是<strong>单位圆上方面积</strong>。答案里那两项，正好对应图中一个扇形（$\arcsin$ 那块）加一个三角形（$x\sqrt{1-x^2}$ 那块）。看懂这一点，你就再也不会记错了。</p>
+      </div>
+
+      <div class="box warn">
+        <span class="tag">易错</span>
+        <p style="margin-bottom:0"><strong>回代时把 $t$ 留在答案里</strong>，是最常见的失分点。$\sin2t$ 一定要展开成 $\sin t\cos t$ 再换成 $x$，不能直接写成 $\frac{\sin 2t}{4}$。</p>
+      </div>
+    </section>
+
+    <!-- ============ 5 ============ -->
+    <section id="sec-5">
+      <div class="sec-head"><span class="sec-no">05</span><h2>方法三：分部积分</h2></div>
+      <p class="sec-sub">专治"两类不同函数相乘"。核心是把自己的难题变成更简单的题。</p>
+
+      <h3>公式怎么来的</h3>
+      <p>从乘积求导公式出发：$(uv)'=u'v+uv'$。两边积分：$uv=\displaystyle\int u'v\,\mathrm{d}x+\int uv'\,\mathrm{d}x$，移项就得到</p>
+      <p style="text-align:center">$$\int u\,\mathrm{d}v=uv-\int v\,\mathrm{d}u$$</p>
+      <p>这个公式的威力在于：<em>把 $\int u\,\mathrm{d}v$ 换成了 $\int v\,\mathrm{d}u$</em>。如果新的积分更简单，就赚了。</p>
+
+      <h3>选谁当 $u$：口诀"反对幂指三"</h3>
+      <div class="card">
+        <p style="margin-top:0;font-family:var(--serif);font-size:19px;text-align:center;letter-spacing:.08em">
+          反　对　幂　指　三
+        </p>
+        <p style="text-align:center;margin:2px 0 12px;font-size:14px;color:var(--ink-3)">反三角 · 对数 · 幂函数 · 指数 · 三角函数</p>
+        <p style="margin-bottom:0"><strong>排在前面的当 $u$。</strong>理由有两条：$u$ 要被求导，而排在前面的一求导就"变简单"（$\ln x\to\frac{1}{x}$，$x\to 1$，$\arctan x\to\frac{1}{1+x^2}$）；剩下的部分当 $\mathrm{d}v$，必须能积出来（$e^x$、$\sin x$、$\mathrm{d}x$ 都好积）。</p>
+      </div>
+
+      <h3>三类题型，三套打法</h3>
+
+      <h4>类型 A：降次型 —— 多项式 × 指数/三角</h4>
+      <div class="eg">
+        <div class="eg-head">例　$\displaystyle\int x\cos x\,\mathrm{d}x$</div>
+        <div class="eg-body">
+          <div class="step"><div class="n">1</div><div class="t">"幂"在"三"前面，所以 $u=x$，$\mathrm{d}v=\cos x\,\mathrm{d}x$。</div></div>
+          <div class="step"><div class="n">2</div><div class="t">算 $v$：$\displaystyle\int\cos x\,\mathrm{d}x=\sin x$，所以 $v=\sin x$。</div></div>
+          <div class="step"><div class="n">3</div><div class="t">套公式：$=x\sin x-\displaystyle\int\sin x\,\mathrm{d}x$。</div></div>
+          <div class="step"><div class="n">4</div><div class="t">$=x\sin x+\cos x+C$。验算：求导得 $\sin x+x\cos x-\sin x=x\cos x$ ✓</div></div>
+        </div>
+      </div>
+
+      <div class="eg">
+        <div class="eg-head">例　$\displaystyle\int \ln x\,\mathrm{d}x$ —— 只有一个函数也能用</div>
+        <div class="eg-body">
+          <div class="step"><div class="n">1</div><div class="t">技巧：把 $\ln x$ 看成 $\ln x\cdot 1$，令 $u=\ln x$，$\mathrm{d}v=\mathrm{d}x$。</div></div>
+          <div class="step"><div class="n">2</div><div class="t">$v=x$，$\mathrm{d}u=\dfrac{1}{x}\mathrm{d}x$。</div></div>
+          <div class="step"><div class="n">3</div><div class="t">$=x\ln x-\displaystyle\int x\cdot\frac{1}{x}\mathrm{d}x=x\ln x-x+C$。</div></div>
+        </div>
+      </div>
+
+      <h4>类型 B：循环型 —— 积两次回到原点，移项解方程</h4>
+      <div class="eg">
+        <div class="eg-head">例　$\displaystyle I=\int e^{x}\sin x\,\mathrm{d}x$</div>
+        <div class="eg-body">
+          <div class="step"><div class="n">1</div><div class="t">"指"在"三"前面：$u=\sin x$（用指数凑 $v$ 更容易），$\mathrm{d}v=e^x\mathrm{d}x$，$v=e^x$。</div></div>
+          <div class="step"><div class="n">2</div><div class="t">$I=e^x\sin x-\displaystyle\int e^x\cos x\,\mathrm{d}x$。</div></div>
+          <div class="step"><div class="n">3</div><div class="t">对后面那个再分部一次（这次 $u=\cos x$）：$\displaystyle\int e^x\cos x\,\mathrm{d}x=e^x\cos x+\int e^x\sin x\,\mathrm{d}x=e^x\cos x+I$。</div></div>
+          <div class="step"><div class="n">4</div><div class="t">代回：$I=e^x\sin x-e^x\cos x-I$，移项得 $2I=e^x(\sin x-\cos x)$。</div></div>
+          <div class="step"><div class="n">5</div><div class="t">$I=\dfrac{1}{2}e^{x}(\sin x-\cos x)+C$。<em>别忘了最后的 $+C$，此时才出现。</em></div></div>
+        </div>
+      </div>
+
+      <h4>类型 C：递推型 —— 用分部积分造出"自己"，再解出来</h4>
+      <p>如 $\displaystyle\int\sec^3x\,\mathrm{d}x$、$\displaystyle\int\frac{\mathrm{d}x}{(x^2+a^2)^2}$，做法同 B：分部一次，出现与原式相同的项，移项即可。$\sec^3x$ 的结果是</p>
+      <p style="text-align:center">$$\int\sec^3x\,\mathrm{d}x=\frac{1}{2}\Big(\sec x\tan x+\ln|\sec x+\tan x|\Big)+C$$</p>
+
+      <div class="box warn">
+        <span class="tag">易错</span>
+        <p><strong>1. $u$ 选反了。</strong>取 $u=x$ 时，$\mathrm{d}v=\ln x\,\mathrm{d}x$ 要求先把 $\ln x$ 积出来（$v=x\ln x-x$），换来的新积分 $\displaystyle\int(x\ln x-x)\mathrm{d}x$ 比原题更难 —— 越算越远。正确做法是 $u=\ln x$，让对数一求导就消掉。</p>
+        <p style="margin-bottom:0"><strong>2. 循环型忘了除 2。</strong>移项后 $2I=\cdots$，一定要写 $I=\frac{1}{2}(\cdots)$，很多答案错在这一步。</p>
+      </div>
+    </section>
+
+    <!-- ============ 6 ============ -->
+    <section id="sec-6">
+      <div class="sec-head"><span class="sec-no">06</span><h2>方法四：有理函数积分</h2></div>
+      <p class="sec-sub">看着吓人，其实是唯一有"固定流程图"的积分类型。</p>
+
+      <h3>标准流程</h3>
+      <div class="card">
+        <div class="step"><div class="n">1</div><div class="t"><strong>看次数</strong>：分子次数 ≥ 分母次数（假分式）？先做多项式除法，拆出多项式部分 + 真分式。</div></div>
+        <div class="step"><div class="n">2</div><div class="t"><strong>分解分母</strong>：在实数范围内拆成一次因子 $(x-a)$、重因子 $(x-a)^k$、不可约二次因子 $(x^2+px+q)$。</div></div>
+        <div class="step"><div class="n">3</div><div class="t"><strong>待定系数拆项</strong>：按下面三种模式写，通分比较系数求解。</div></div>
+        <div class="step"><div class="n">4</div><div class="t"><strong>逐项积分</strong>：每一小块都落在 $\ln$、$\arctan$、幂函数上。</div></div>
+      </div>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th style="width:34%">分母的因子</th><th style="width:36%">拆成</th><th>积分后变成</th></tr></thead>
+          <tbody>
+            <tr><td class="m">$(x-a)$</td><td class="m">$\dfrac{A}{x-a}$</td><td>$\ln|x-a|$</td></tr>
+            <tr><td class="m">$(x-a)^k$</td><td class="m">$\dfrac{A_1}{x-a}+\cdots+\dfrac{A_k}{(x-a)^k}$</td><td>幂函数（除最后一项外）</td></tr>
+            <tr><td class="m">$(x^2+px+q)$</td><td class="m">$\dfrac{Bx+C}{x^2+px+q}$</td><td>拆成 $\dfrac{2x+p}{x^2+px+q}$（$\to\ln$）$+$ 常数项（$\to\arctan$）</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="eg">
+        <div class="eg-head">例 1　$\displaystyle\int\frac{2x+3}{(x+1)(x+2)}\,\mathrm{d}x$</div>
+        <div class="eg-body">
+          <div class="step"><div class="n">1</div><div class="t">设 $\dfrac{2x+3}{(x+1)(x+2)}=\dfrac{A}{x+1}+\dfrac{B}{x+2}$，通分得 $A(x+2)+B(x+1)=2x+3$。</div></div>
+          <div class="step"><div class="n">2</div><div class="t">比较系数：$A+B=2$，$2A+B=3$，解得 $A=1,\;B=1$。</div></div>
+          <div class="step"><div class="n">3</div><div class="t">积分：$=\ln|x+1|+\ln|x+2|+C$。</div></div>
+        </div>
+      </div>
+
+      <div class="eg">
+        <div class="eg-head">例 2　$\displaystyle\int\frac{\mathrm{d}x}{x^2+4x+5}$ —— 分母不能分解时先配方</div>
+        <div class="eg-body">
+          <div class="step"><div class="n">1</div><div class="t">$x^2+4x+5=(x+2)^2+1$，配方是唯一出路。</div></div>
+          <div class="step"><div class="n">2</div><div class="t">令 $u=x+2$，$\mathrm{d}u=\mathrm{d}x$，原式 $=\displaystyle\int\frac{\mathrm{d}u}{u^2+1}$。</div></div>
+          <div class="step"><div class="n">3</div><div class="t">$=\arctan u+C=\arctan(x+2)+C$。</div></div>
+        </div>
+      </div>
+
+      <div class="box tip">
+        <span class="tag">判别口诀</span>
+        <p style="margin-bottom:0">分母能分解 → <strong>拆项</strong>（结果是对数）；分母不能分解 → <strong>配方</strong>（结果是反正切）。看到二次分母，先算判别式 $\Delta=p^2-4q$ 定方向。</p>
+      </div>
+    </section>
+
+    <!-- ============ 7 ============ -->
+    <section id="sec-7">
+      <div class="sec-head"><span class="sec-no">07</span><h2>六个难点，逐个拆开</h2></div>
+      <p class="sec-sub">这些是真正让分数掉下来的地方，比方法本身更值得花时间。</p>
+
+      <h3>难点 1　$+C$ 到底什么时候写</h3>
+      <p>不定积分的答案<strong>必须写 $C$</strong>。但有三个场合它会被"定下来"：</p>
+      <ul style="font-size:15.2px">
+        <li><strong>定积分</strong>里不需要 $C$（上下限相减时抵消）。</li>
+        <li><strong>微分方程</strong>的通解里写成 $C$，但代入初始条件后变成具体数值。</li>
+        <li><strong>物理问题</strong>里 $C$ 通常由初始位置、初始速度确定。</li>
+      </ul>
+      <p>所以 $C$ 不是"形式主义"，它代表<em>你还没有的信息</em>。</p>
+
+      <h3>难点 2　绝对值是从哪冒出来的</h3>
+      <p>$\displaystyle\int\frac{\mathrm{d}x}{x}=\ln|x|+C$，为什么要绝对值？因为 $\ln$ 只对正数有定义，而 $x$ 可以是负数。分成 $x\gt 0$（结果 $\ln x$）和 $x\lt 0$（结果 $\ln(-x)$）两种情况，两种情况的导数都是 $\frac{1}{x}$，所以合并写成 $\ln|x|$。</p>
+      <p>同理 $\displaystyle\int\tan x\,\mathrm{d}x=-\ln|\cos x|+C$ 里的绝对值也不能省。</p>
+
+      <h3>难点 3　三角代换后怎么回代</h3>
+      <p>回到第 4 节的"画三角形"：已知哪个三角函数值，就把对应的两条边标上，第三条边用勾股定理算出来。<strong>从图上直接读</strong>，比背公式快十倍。</p>
+
+      <h3>难点 4　分部积分里 $u$ 选错会怎样</h3>
+      <p>选错不是"算错"，而是<em>越算越复杂</em>。比如 $\displaystyle\int x\ln x\,\mathrm{d}x$，若令 $u=x$、$\mathrm{d}v=\ln x\,\mathrm{d}x$，你得先积出 $\int\ln x\,\mathrm{d}x$（这本身又是一道题），然后新积分比原题还难 —— 这是典型的"绕远路"。</p>
+      <p>判断标准很简单：<strong>选了 $u$ 之后，$\mathrm{d}u$ 应该比 $u$ 简单；选了 $\mathrm{d}v$ 之后，$v$ 必须能算出来。</strong></p>
+
+      <h3>难点 5　循环积分怎么收尾</h3>
+      <p>$\displaystyle\int e^x\sin x\,\mathrm{d}x$ 积两次会"回到自己"，这时把它当成一个<strong>方程</strong>来解：把 $I$ 移到左边，除以系数。记住两点：移项后系数是 2 不是 1；$+C$ 留到最后一步才写。</p>
+
+      <h3>难点 6　有些积分是真的"积不出"</h3>
+      <p>这类题最坑人 —— 你会以为自己方法不对，其实它<strong>不存在初等原函数</strong>（刘维尔定理保证）。遇到它们不要死磕：</p>
+      <div class="card" style="background:#fbfcff">
+        <p style="text-align:center;margin:6px 0;font-size:16px">
+          $\displaystyle\int e^{-x^2}\mathrm{d}x$　　
+          $\displaystyle\int\frac{\sin x}{x}\mathrm{d}x$　　
+          $\displaystyle\int\frac{\mathrm{d}x}{\ln x}$　　
+          $\displaystyle\int\sqrt{1+x^3}\,\mathrm{d}x$
+        </p>
+        <p style="margin:8px 0 0;font-size:14px;color:var(--ink-3);text-align:center">这些函数在概率论、光学、数论里非常重要，但它们的积分只能用数值方法或级数表示。</p>
+      </div>
+      <p>课本里"积不出"的清单值得单独记一遍 —— 考场上看到它们，直接跳过，别浪费时间。</p>
+
+      <div class="box warn">
+        <span class="tag">三个致命错误（考试必扣分）</span>
+        <p><strong>①</strong> $\displaystyle\int f(x)g(x)\,\mathrm{d}x\neq\int f(x)\mathrm{d}x\cdot\int g(x)\mathrm{d}x$。积分对乘法<strong>没有</strong>分配律，这是最常见的臆造公式。</p>
+        <p><strong>②</strong> $\displaystyle\int\frac{\mathrm{d}x}{x^2}=-\frac{1}{x}+C$，<strong>不是</strong> $\ln x^2$。只有分母是 $x$ 的一次方才出对数。</p>
+        <p style="margin-bottom:0"><strong>③</strong> 带 $a$ 的公式忘了 $\frac{1}{a}$：$\displaystyle\int\frac{\mathrm{d}x}{4+x^2}=\frac{1}{2}\arctan\frac{x}{2}+C$，不是 $\arctan\frac{x}{2}+C$。</p>
+      </div>
+    </section>
+
+    <!-- ============ 8 ============ -->
+    <section id="sec-8">
+      <div class="sec-head"><span class="sec-no">08</span><h2>分层习题：33 题，从模仿到压轴</h2></div>
+      <p class="sec-sub">A 组练公式与凑微分（必须全对），B 组练方法选择，C 组拔高，D 组是真题级压轴。做完一题勾一个框。</p>
+
+      <div class="ex-head-bar">
+        <div>已完成 <b id="doneCount">0</b> / <b id="totalCount">33</b> 题</div>
+        <div class="btns">
+          <button class="mini" id="openAll">展开全部答案</button>
+          <button class="mini" id="closeAll">收起全部答案</button>
+        </div>
+      </div>
+
+      <div class="group-title">A 组 · 公式与凑微分（10 题）</div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">A1</span>$\displaystyle\int(3x^2-2x+1)\,\mathrm{d}x$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details class="ans"><summary>答案</summary><div class="body">$=x^3-x^2+x+C$。逐项用 $\displaystyle\int x^a\mathrm{d}x=\frac{x^{a+1}}{a+1}$。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">A2</span>$\displaystyle\int\left(\sqrt{x}+\frac{1}{\sqrt{x}}\right)\mathrm{d}x$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details><summary>提示</summary><div class="body">先写成幂：$\sqrt{x}=x^{1/2}$，$\dfrac{1}{\sqrt{x}}=x^{-1/2}$。</div></details>
+        <details class="ans"><summary>答案</summary><div class="body">$=\dfrac{2}{3}x^{3/2}+2\sqrt{x}+C$。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">A3</span>$\displaystyle\int(2^x+e^x)\,\mathrm{d}x$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details class="ans"><summary>答案</summary><div class="body">$=\dfrac{2^x}{\ln 2}+e^x+C$。注意 $2^x$ 那一项的分母 $\ln 2$。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">A4</span>$\displaystyle\int(\sin x-2\cos x)\,\mathrm{d}x$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details class="ans"><summary>答案</summary><div class="body">$=-\cos x-2\sin x+C$。$\sin$ 积出负号，$\cos$ 积出正号。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">A5</span>$\displaystyle\int\left(\sec^2x+\frac{1}{x}\right)\mathrm{d}x$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details class="ans"><summary>答案</summary><div class="body">$=\tan x+\ln|x|+C$。第二项不要漏绝对值。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">A6</span>$\displaystyle\int x(x^2+1)^3\,\mathrm{d}x$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details><summary>提示</summary><div class="body">$(x^2+1)'=2x$，把 $x\,\mathrm{d}x$ 凑成 $\frac{1}{2}\mathrm{d}(x^2+1)$。</div></details>
+        <details class="ans"><summary>答案</summary><div class="body">$=\dfrac{1}{2}\displaystyle\int u^3\mathrm{d}u=\dfrac{u^4}{8}+C=\dfrac{(x^2+1)^4}{8}+C$。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">A7</span>$\displaystyle\int e^{3x}\,\mathrm{d}x$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details class="ans"><summary>答案</summary><div class="body">$=\dfrac{1}{3}e^{3x}+C$。这是"配平系数"最典型的考点。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">A8</span>$\displaystyle\int\frac{\mathrm{d}x}{2x+1}$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details class="ans"><summary>答案</summary><div class="body">$=\dfrac{1}{2}\ln|2x+1|+C$。因为 $\mathrm{d}(2x+1)=2\mathrm{d}x$。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">A9</span>$\displaystyle\int\sin 2x\,\mathrm{d}x$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details class="ans"><summary>答案</summary><div class="body">$=-\dfrac{1}{2}\cos 2x+C$。负号和 $\frac{1}{2}$ 都不能丢。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">A10</span>$\displaystyle\int\frac{\mathrm{d}x}{1+4x^2}$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details><summary>提示</summary><div class="body">写成 $\dfrac{1}{1+(2x)^2}$，$a=1$，把 $2x$ 当整体。</div></details>
+        <details class="ans"><summary>答案</summary><div class="body">$=\dfrac{1}{2}\arctan(2x)+C$。$\mathrm{d}(2x)=2\mathrm{d}x$，外面补 $\frac{1}{2}$。</div></details>
+      </div>
+
+      <div class="group-title">B 组 · 方法选择（10 题）</div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">B1</span>$\displaystyle\int x e^{x^2}\,\mathrm{d}x$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details class="ans"><summary>答案</summary><div class="body">$=\dfrac{1}{2}e^{x^2}+C$。凑微分：$x\mathrm{d}x=\frac{1}{2}\mathrm{d}(x^2)$。这题<strong>不能</strong>用分部积分（会越算越复杂）。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">B2</span>$\displaystyle\int\ln x\,\mathrm{d}x$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details><summary>提示</summary><div class="body">把它看成 $\ln x\cdot 1$，$u=\ln x$，$\mathrm{d}v=\mathrm{d}x$。</div></details>
+        <details class="ans"><summary>答案</summary><div class="body">$=x\ln x-x+C$。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">B3</span>$\displaystyle\int x\cos x\,\mathrm{d}x$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details class="ans"><summary>答案</summary><div class="body">$=x\sin x+\cos x+C$。分部一次即得，注意第二项是 $+\cos x$（因为 $-\int\sin x\mathrm{d}x=\cos x$）。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">B4</span>$\displaystyle\int\frac{\mathrm{d}x}{x^2+4x+5}$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details><summary>提示</summary><div class="body">先配方：$x^2+4x+5=(x+2)^2+1$。判别式 $\Delta\lt 0$，所以走 $\arctan$ 路线。</div></details>
+        <details class="ans"><summary>答案</summary><div class="body">$=\arctan(x+2)+C$。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">B5</span>$\displaystyle\int\frac{\mathrm{d}x}{x^2-3x+2}$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details><summary>提示</summary><div class="body">分母 $=(x-1)(x-2)$，可分解 → 拆项：$\dfrac{1}{(x-1)(x-2)}=\dfrac{-1}{x-1}+\dfrac{1}{x-2}$。</div></details>
+        <details class="ans"><summary>答案</summary><div class="body">$=\ln\left|\dfrac{x-2}{x-1}\right|+C$。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">B6</span>$\displaystyle\int\sin^2x\,\mathrm{d}x$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details><summary>提示</summary><div class="body">降幂：$\sin^2x=\dfrac{1-\cos 2x}{2}$。偶次幂一律先降幂。</div></details>
+        <details class="ans"><summary>答案</summary><div class="body">$=\dfrac{x}{2}-\dfrac{\sin 2x}{4}+C$。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">B7</span>$\displaystyle\int\tan x\,\mathrm{d}x$（要求写出推导）</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details class="ans"><summary>答案</summary><div class="body">$=-\ln|\cos x|+C$。推导：$\displaystyle\int\frac{\sin x}{\cos x}\mathrm{d}x=-\int\frac{\mathrm{d}(\cos x)}{\cos x}=-\ln|\cos x|$。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">B8</span>$\displaystyle\int x^2\ln x\,\mathrm{d}x$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details><summary>提示</summary><div class="body">"反对幂指三"：对数在幂前面，所以 $u=\ln x$，$\mathrm{d}v=x^2\mathrm{d}x$，$v=\frac{x^3}{3}$。</div></details>
+        <details class="ans"><summary>答案</summary><div class="body">$=\dfrac{x^3}{3}\ln x-\displaystyle\int\frac{x^3}{3}\cdot\frac{1}{x}\mathrm{d}x=\dfrac{x^3}{3}\ln x-\frac{x^3}{9}+C$。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">B9</span>$\displaystyle\int e^x\sin x\,\mathrm{d}x$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details class="ans"><summary>答案</summary><div class="body">$=\dfrac{1}{2}e^x(\sin x-\cos x)+C$。循环型：分部两次回到自己，移项后除以 2。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">B10</span>$\displaystyle\int\frac{\mathrm{d}x}{\sqrt{9-x^2}}$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details class="ans"><summary>答案</summary><div class="body">$=\arcsin\dfrac{x}{3}+C$。直接套带 $a$ 的公式，$a=3$。注意 $\arcsin$ 那条<strong>不需要</strong>再乘 $\frac{1}{a}$。</div></details>
+      </div>
+
+      <div class="group-title">C 组 · 拔高（6 题）</div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">C1</span>$\displaystyle\int\sqrt{a^2-x^2}\,\mathrm{d}x$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details><summary>提示</summary><div class="body">令 $x=a\sin t$，$\mathrm{d}x=a\cos t\,\mathrm{d}t$，根号变成 $a\cos t$，得 $a^2\int\cos^2t\,\mathrm{d}t$。</div></details>
+        <details class="ans"><summary>答案</summary><div class="body">$=\dfrac{1}{2}\left[x\sqrt{a^2-x^2}+a^2\arcsin\dfrac{x}{a}\right]+C$。回代时 $\sin t\cos t=\dfrac{x\sqrt{a^2-x^2}}{a^2}$。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">C2</span>$\displaystyle\int\frac{\mathrm{d}x}{1+\sqrt{x}}$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details><summary>提示</summary><div class="body">根号单独出现时，用 $t=\sqrt{x}$，则 $x=t^2$，$\mathrm{d}x=2t\,\mathrm{d}t$，根号就消失了。</div></details>
+        <details class="ans"><summary>答案</summary><div class="body">$=2\displaystyle\int\frac{t\,\mathrm{d}t}{1+t}=2\int\left(1-\frac{1}{1+t}\right)\mathrm{d}t=2\sqrt{x}-2\ln(1+\sqrt{x})+C$。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">C3</span>$\displaystyle\int\sec^3x\,\mathrm{d}x$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details><summary>提示</summary><div class="body">拆成 $\sec x\cdot\sec^2x$，令 $u=\sec x$，$\mathrm{d}v=\sec^2x\,\mathrm{d}x$，$v=\tan x$。分部后出现 $\int\sec x\tan^2x$，再用 $\tan^2x=\sec^2x-1$ 变回自己。</div></details>
+        <details class="ans"><summary>答案</summary><div class="body">$=\dfrac{1}{2}\Big(\sec x\tan x+\ln|\sec x+\tan x|\Big)+C$。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">C4</span>$\displaystyle\int\frac{x}{1+x^4}\,\mathrm{d}x$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details><summary>提示</summary><div class="body">$x^4=(x^2)^2$，把 $x^2$ 当整体：$x\,\mathrm{d}x=\frac{1}{2}\mathrm{d}(x^2)$。</div></details>
+        <details class="ans"><summary>答案</summary><div class="body">$=\dfrac{1}{2}\arctan(x^2)+C$。这题看起来像有理函数，其实是凑微分，别急着拆项。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">C5</span>$\displaystyle\int\frac{\mathrm{d}x}{e^x+1}$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details><summary>提示</summary><div class="body">令 $u=e^x$，$\mathrm{d}x=\dfrac{\mathrm{d}u}{u}$，化为 $\displaystyle\int\frac{\mathrm{d}u}{u(u+1)}$，再拆项。</div></details>
+        <details class="ans"><summary>答案</summary><div class="body">$=\displaystyle\int\left(\frac{1}{u}-\frac{1}{u+1}\right)\mathrm{d}u=\ln e^x-\ln(e^x+1)+C=x-\ln(e^x+1)+C$。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">C6</span>$\displaystyle\int\arctan x\,\mathrm{d}x$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details><summary>提示</summary><div class="body">与 $\int\ln x\,\mathrm{d}x$ 同一套路：$u=\arctan x$，$\mathrm{d}v=\mathrm{d}x$，$v=x$。</div></details>
+        <details class="ans"><summary>答案</summary><div class="body">$=x\arctan x-\displaystyle\int\frac{x}{1+x^2}\mathrm{d}x=x\arctan x-\frac{1}{2}\ln(1+x^2)+C$。后面那个小积分正好是第 3 节例题 2。</div></details>
+      </div>
+
+      <div class="group-title">D 组 · 压轴：真题级难度（7 题）</div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">D1</span>$\displaystyle\int\frac{\mathrm{d}x}{1+\sin x}$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details><summary>提示</summary><div class="body">分子分母同乘 $1-\sin x$，把分母变成 $1-\sin^2x=\cos^2x$，拆成两项就都是基本公式了。</div></details>
+        <details class="ans"><summary>答案</summary><div class="body">$=\displaystyle\int\left(\sec^2x-\sec x\tan x\right)\mathrm{d}x=\tan x-\sec x+C$。另一种写法是 $-\dfrac{2}{1+\tan\frac{x}{2}}+C$（万能代换），两者只差常数。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">D2</span>$\displaystyle\int\frac{\sin x}{\sin x+\cos x}\,\mathrm{d}x$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details><summary>提示</summary><div class="body">把分子拆成"分母 + 分母的导数的相反数"：$\sin x=\frac12\big[(\sin x+\cos x)+(\sin x-\cos x)\big]$，而 $(\sin x+\cos x)'=\cos x-\sin x$。</div></details>
+        <details class="ans"><summary>答案</summary><div class="body">$=\dfrac{x}{2}-\dfrac12\ln\lvert\sin x+\cos x\rvert+C$。第一项积出 $\frac{x}{2}$，第二项凑成 $-\frac12\int\frac{(\sin x+\cos x)'}{\sin x+\cos x}\mathrm{d}x$。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">D3</span>$\displaystyle\int\ln\left(x+\sqrt{1+x^2}\right)\mathrm{d}x$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details><summary>提示</summary><div class="body">直接分部（$u=\ln(\cdot)$，$\mathrm{d}v=\mathrm{d}x$）。关键导数：$\left[\ln\left(x+\sqrt{1+x^2}\right)\right]'=\dfrac{1}{\sqrt{1+x^2}}$。</div></details>
+        <details class="ans"><summary>答案</summary><div class="body">$=x\ln\left(x+\sqrt{1+x^2}\right)-\displaystyle\int\frac{x}{\sqrt{1+x^2}}\mathrm{d}x=x\ln\left(x+\sqrt{1+x^2}\right)-\sqrt{1+x^2}+C$。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">D4</span>$\displaystyle\int\frac{x^2}{(1+x^2)^2}\,\mathrm{d}x$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details><summary>提示</summary><div class="body">令 $x=\tan t$：$\mathrm{d}x=\sec^2t\,\mathrm{d}t$，$1+x^2=\sec^2t$，被积函数化简为 $\sin^2t$。回代用 $\sin 2t=\dfrac{2x}{1+x^2}$。</div></details>
+        <details class="ans"><summary>答案</summary><div class="body">$=\displaystyle\int\sin^2t\,\mathrm{d}t=\frac{t}{2}-\frac{\sin 2t}{4}+C=\dfrac12\arctan x-\dfrac{x}{2(1+x^2)}+C$。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">D5</span>$\displaystyle\int e^{2x}\sin 3x\,\mathrm{d}x$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details><summary>提示</summary><div class="body">分部两次会"绕回自己"，移项解方程即可；也可以直接用公式 $\int e^{ax}\sin bx\,\mathrm{d}x=\dfrac{e^{ax}}{a^2+b^2}(a\sin bx-b\cos bx)+C$。</div></details>
+        <details class="ans"><summary>答案</summary><div class="body">$=\dfrac{e^{2x}}{13}\big(2\sin 3x-3\cos 3x\big)+C$。别忘了除以 $a^2+b^2=13$，这是循环积分最容易漏的一步。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">D6</span>$\displaystyle\int\frac{\mathrm{d}x}{\sqrt{x}+\sqrt[3]{x}}$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details><summary>提示</summary><div class="body">两个根指数是 $2$ 和 $3$，取最小公倍数 $6$：令 $x=t^6$，则 $\sqrt{x}=t^3$、$\sqrt[3]{x}=t^2$、$\mathrm{d}x=6t^5\mathrm{d}t$，根号一次性全消掉。</div></details>
+        <details class="ans"><summary>答案</summary><div class="body">$=6\displaystyle\int\frac{t^3}{t+1}\mathrm{d}t=6\displaystyle\int\left(t^2-t+1-\frac{1}{t+1}\right)\mathrm{d}t=2t^3-3t^2+6t-6\ln(t+1)+C$，其中 $t=\sqrt[6]{x}$。</div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top">
+          <div class="ex-q"><span class="ex-no">D7</span>$\displaystyle\int\frac{\ln x}{(1+x)^2}\,\mathrm{d}x\quad(x \gt 0)$</div>
+          <label class="chk"><input type="checkbox" class="done"> 已掌握</label>
+        </div>
+        <details><summary>提示</summary><div class="body">取 $u=\ln x$，$\mathrm{d}v=\dfrac{\mathrm{d}x}{(1+x)^2}$，则 $v=-\dfrac{1}{1+x}$；剩下的有理式拆成 $\frac1x-\frac1{1+x}$。</div></details>
+        <details class="ans"><summary>答案</summary><div class="body">$=-\dfrac{\ln x}{1+x}+\displaystyle\int\frac{\mathrm{d}x}{x(1+x)}=-\dfrac{\ln x}{1+x}+\ln x-\ln(1+x)+C$。可求导验回去。</div></details>
+      </div>
+
+    </section>
+
+    <!-- ============ 9 ============ -->
+    <section id="sec-9">
+      <div class="sec-head"><span class="sec-no">09</span><h2>考前检查清单</h2></div>
+      <p class="sec-sub">做完题对照一遍，打勾的才是真会了。</p>
+
+      <ul class="check-list">
+        <li><span class="mark">✓</span><div>我能不看表写出 $\displaystyle\int\frac{\mathrm{d}x}{x}$、$\displaystyle\int\frac{\mathrm{d}x}{1+x^2}$、$\displaystyle\int\frac{\mathrm{d}x}{\sqrt{1-x^2}}$ 三条，并说出它们的区别。</div></li>
+        <li><span class="mark">✓</span><div>我知道 $\displaystyle\int x^{-1}\mathrm{d}x$ 为什么特殊（落成对数），而 $\displaystyle\int x^{-2}\mathrm{d}x$ 不是。</div></li>
+        <li><span class="mark">✓</span><div>我能一眼看出"被积函数里含有另一个因子的导数"，并正确配平系数。</div></li>
+        <li><span class="mark">✓</span><div>看到 $\sqrt{a^2-x^2}$、$\sqrt{a^2+x^2}$、$\sqrt{x^2-a^2}$ 时，我能立刻说出用 $\sin$、$\tan$、$\sec$ 中的哪一个。</div></li>
+        <li><span class="mark">✓</span><div>三角代换后我会用直角三角形回代，不会把 $t$ 留在答案里。</div></li>
+        <li><span class="mark">✓</span><div>我能背出"反对幂指三"，并解释为什么排在前面当 $u$。</div></li>
+        <li><span class="mark">✓</span><div>遇到 $\displaystyle\int e^x\sin x\,\mathrm{d}x$ 这类循环积分，我知道要分部两次再移项，且记得除以 2。</div></li>
+        <li><span class="mark">✓</span><div>看到二次分母，我会先算判别式：能分解就拆项，不能分解就配方。</div></li>
+        <li><span class="mark">✓</span><div>我记住了 4 个"积不出"的典型，不会在考场上死磕。</div></li>
+        <li><span class="mark">✓</span><div>每道题算完，我都会求导验回去。</div></li>
+      </ul>
+
+      <div class="box tip">
+        <span class="tag">最后一句</span>
+        <p style="margin-bottom:0">不定积分学的不是"技巧量"，而是<strong>反应速度</strong>。看到题的前三秒决定用哪个方法 —— 这个判断力只能靠重复练出来。把 A 组 10 题做到不用思考，B 组做到 30 秒内定方法，你这章就稳了。</p>
+      </div>
+    </section>
+
+
+    <!-- ============ 10 ============ -->
+    <section id="sec-10">
+      <div class="sec-head"><span class="sec-no">10</span><h2>加餐：定积分，从「面积」到牛顿-莱布尼茨</h2></div>
+      <p class="sec-sub">不定积分算出的是<strong>一族函数</strong>，定积分算出的是<strong>一个数</strong>。这一栏把两者接起来，也顺带把下一章的地图画好。</p>
+
+      <div class="box why">
+        <span class="tag">先说人话</span>
+        <p>要求曲线 $y=f(x)$ 下方、$x=a$ 到 $x=b$ 之间那块"曲边梯形"的面积：把它切成很多很窄的竖条，每条近似看成矩形（高取条内某点的 $f(\xi_i)$，宽 $\Delta x_i$），把所有小矩形加起来，再让窄条无限变细。这个极限就是定积分。所以<strong>定积分的本质是"连续量的累加"</strong>，面积只是它最直观的一种解释。</p>
+      </div>
+
+      <h3>1. 定义：四个动作</h3>
+      <p>分割 $a=x_0 \lt x_1 \lt \cdots \lt x_n=b$ → 取点 $\xi_i\in[x_{i-1},x_i]$ 近似 → 求和 $\sum f(\xi_i)\Delta x_i$ → 令 $\lambda=\max\Delta x_i\to0$ 取极限：</p>
+      <div class="card"><div class="eg-body">
+        $$\int_a^b f(x)\,\mathrm{d}x=\lim_{\lambda\to 0}\sum_{i=1}^{n}f(\xi_i)\,\Delta x_i$$
+        <p class="muted" style="margin-bottom:0;font-size:14px">极限存在且与分法、取点无关时，称 $f$ 在 $[a,b]$ 上<strong>可积</strong>。连续一定可积；有界且只有有限个间断点也可积。注意这里的 $\mathrm{d}x$ 只是记号，积分号 $\int$ 是"求和"（sum）拉长的 S。</p>
+      </div></div>
+
+      <h3>2. 牛顿-莱布尼茨公式：整章唯一的主角</h3>
+      <div class="box tip">
+        <span class="tag">核心公式</span>
+        <p style="margin:2px 0">$$\int_a^b f(x)\,\mathrm{d}x=F(b)-F(a),\qquad F'(x)=f(x)$$</p>
+        <p style="margin-bottom:0">意思是：<strong>不用再辛辛苦苦累加了</strong>，只要找到任意一个原函数 $F$，把上限、下限代进去相减就行。前面九节练的所有求原函数的技巧，到这里才真正派上用场。这也是本章与上一章的连接点。</p>
+      </div>
+      <div class="eg">
+        <div class="eg-head">例 · 第一道定积分</div>
+        <div class="eg-body">
+          <div class="step"><span class="n">1</span><span class="t">$\displaystyle\int_0^1 x^2\,\mathrm{d}x$，原函数是 $F(x)=\dfrac{x^3}{3}$。</span></div>
+          <div class="step"><span class="n">2</span><span class="t">代限相减：$F(1)-F(0)=\dfrac13-0=\dfrac13$。</span></div>
+          <div class="step"><span class="n">3</span><span class="t">结果是<strong>数</strong>，不要写 $+C$；也不要选带常数的原函数（会自己抵消）。</span></div>
+        </div>
+      </div>
+
+      <h3>3. 常用性质（$a \lt b$，以下都假设可积）</h3>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th style="width:28%">性质</th><th>写法</th></tr></thead>
+        <tbody>
+          <tr><td class="m">线性</td><td class="m">$\int_a^b(\alpha f+\beta g)=\alpha\int_a^b f+\beta\int_a^b g$</td></tr>
+          <tr><td class="m">区间可加</td><td class="m">$\int_a^b f=\int_a^c f+\int_c^b f$（$c$ 在区间外也成立，只要可积）</td></tr>
+          <tr><td class="m">交换上下限</td><td class="m">$\int_b^a f=-\int_a^b f$；$\int_a^a f=0$</td></tr>
+          <tr><td class="m">比较与估值</td><td class="m">若 $f\le g$ 则 $\int_a^b f\le\int_a^b g$；$m(b-a)\le\int_a^b f\le M(b-a)$</td></tr>
+          <tr><td class="m">绝对值</td><td class="m">$\left\lvert\int_a^b f\right\rvert\le\int_a^b\lvert f\rvert$</td></tr>
+          <tr><td class="m">积分中值定理</td><td class="m">$f$ 连续时 $\int_a^b f=f(\xi)(b-a)$，$\xi\in(a,b)$（$f(\xi)$ 就是平均值）</td></tr>
+          <tr class="group-row"><td colspan="2">对称区间先看奇偶 —— 最省时间的技巧</td></tr>
+          <tr><td class="m">奇函数</td><td class="m">$\int_{-a}^a f=0$</td></tr>
+          <tr><td class="m">偶函数</td><td class="m">$\int_{-a}^a f=2\int_0^a f$</td></tr>
+          <tr><td class="m">周期函数</td><td class="m">$\int_a^{a+T}f=\int_0^T f$（$T$ 为周期，与起点无关）</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>4. 变上限积分：把"积分"重新变成"函数"</h3>
+      <p>固定下限，让上限动起来，得到一个新函数 $\Phi(x)=\displaystyle\int_a^x f(t)\,\mathrm{d}t$。注意被积变量写成 $t$ 是为了和上限 $x$ 区分开。</p>
+      <div class="card"><div class="eg-body">
+        <p style="margin:2px 0"><strong>原函数存在定理</strong>：若 $f$ 连续，则 $\Phi'(x)=f(x)$，也就是说 $\Phi$ 就是 $f$ 的一个原函数 —— 牛莱公式正是由此证明的。</p>
+        <p style="margin:8px 0 2px"><strong>一般形式（上下限都变，必须乘上限/下限的导数）</strong>：</p>
+        $$\frac{\mathrm{d}}{\mathrm{d}x}\int_{\alpha(x)}^{\beta(x)}f(t)\,\mathrm{d}t=f(\beta(x))\beta'(x)-f(\alpha(x))\alpha'(x)$$
+      </div></div>
+      <div class="eg">
+        <div class="eg-head">例 · 变上限求导</div>
+        <div class="eg-body">
+          <p style="margin:2px 0">$\Phi(x)=\displaystyle\int_0^{x^2}e^{t^2}\mathrm{d}t$，则 $\Phi'(x)=e^{(x^2)^2}\cdot(x^2)'=2x\,e^{x^4}$。</p>
+          <p style="margin-bottom:0" class="muted">易错：把 $e^{t^2}$ 里的 $t$ 换成 $x^2$ 之后<strong>还要乘 $2x$</strong>；不少人写成 $e^{x^4}$ 就停了。</p>
+        </div>
+      </div>
+
+      <h3>5. 定积分的换元与分部</h3>
+      <div class="grid-2">
+        <div class="card"><div class="eg-body">
+          <h4 style="margin-top:0">换元：换元必换限</h4>
+          <p style="margin:2px 0">令 $x=\varphi(t)$，$\varphi(\alpha)=a$、$\varphi(\beta)=b$：</p>
+          <p style="margin:2px 0">$$\int_a^b f(x)\mathrm{d}x=\int_\alpha^\beta f(\varphi(t))\varphi'(t)\mathrm{d}t$$</p>
+          <p style="margin-bottom:0" class="muted">与不定积分最大的不同：<strong>换完直接在新限上算完，不用回代</strong>。</p>
+        </div></div>
+        <div class="card"><div class="eg-body">
+          <h4 style="margin-top:0">分部：先代限</h4>
+          <p style="margin:2px 0">$$\int_a^b u\,\mathrm{d}v=\big[uv\big]_a^b-\int_a^b v\,\mathrm{d}u$$</p>
+          <p style="margin-bottom:0" class="muted">$uv$ 那一项<strong>立刻代限算出数</strong>，别把它留到最后和后面的积分混在一起。</p>
+        </div></div>
+      </div>
+      <div class="box plain">
+        <p style="margin-bottom:0"><strong>点火公式（华里士公式）</strong>，$\displaystyle I_n=\int_0^{\pi/2}\sin^n x\,\mathrm{d}x=\int_0^{\pi/2}\cos^n x\,\mathrm{d}x$：$I_n=\dfrac{n-1}{n}I_{n-2}$，$I_1=1$，$I_0=\dfrac{\pi}{2}$。于是 $I_2=\dfrac{\pi}{4}$，$I_3=\dfrac23$，$I_4=\dfrac{3\pi}{16}$。遇到高次正余弦的定积分，别硬展开，直接递推。</p>
+      </div>
+
+      <h3>6. 反常积分：积到无穷 / 被积函数无界</h3>
+      <p>把定积分的两个前提（区间有限、函数有界）放开一个，就是反常积分。做法只有一个：<strong>先在有界范围上积分，再取极限</strong>。</p>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>类型</th><th>定义</th><th>结论</th></tr></thead>
+        <tbody>
+          <tr><td class="m">无穷区间</td><td class="m">$\int_a^{+\infty}f=\lim\limits_{t\to+\infty}\int_a^t f$</td><td class="m">$\int_1^{+\infty}\frac{\mathrm{d}x}{x^p}$ 收敛 $\Leftrightarrow p>1$</td></tr>
+          <tr><td class="m">无界函数（瑕积分）</td><td class="m">$\int_a^b f=\lim\limits_{\varepsilon\to0^+}\int_{a+\varepsilon}^{b} f$（$a$ 为瑕点）</td><td class="m">$\int_0^1\frac{\mathrm{d}x}{x^p}$ 收敛 $\Leftrightarrow p<1$</td></tr>
+        </tbody>
+      </table></div>
+      <div class="box warn">
+        <span class="tag">最容易翻车的一题</span>
+        <p style="margin-bottom:0">$\displaystyle\int_{-1}^{1}\frac{\mathrm{d}x}{x^2}$ <strong>发散</strong>。若直接套 $[-1/x]_{-1}^{1}=-1-1=-2$，就错了 —— $x=0$ 是瑕点，牛莱公式只允许在连续区间上用。正确做法必须拆成 $\int_{-1}^{0}+\int_0^{1}$ 各自取极限，两段都发散。</p>
+      </div>
+
+      <h3>7. 难点与易错点清单</h3>
+      <ul class="check-list">
+        <li><span class="mark">✓</span><div>定积分结果是<strong>数</strong>，不加 $C$；$\int_a^b f$ 与 $\int f\,\mathrm{d}x$ 是两个不同对象。</div></li>
+        <li><span class="mark">✓</span><div>换元时上下限<strong>必须一起换</strong>，且换完后不回代。</div></li>
+        <li><span class="mark">✓</span><div>对称区间先判奇偶；周期函数与起点无关；被积函数分段就分段积分。</div></li>
+        <li><span class="mark">✓</span><div>变上限求导要乘上限的导数；若被积函数里也含 $x$，先设法把 $x$ 提到积分号外再求导。</div></li>
+        <li><span class="mark">✓</span><div>遇到瑕点、无穷限，先取极限，绝不直接套牛莱公式。</div></li>
+        <li><span class="mark">✓</span><div>$\int_a^b f$ 允许 $a \gt b$（值为负），但比较性质 $f\le g\Rightarrow\int_a^b f\le\int_a^b g$ 只在 $a \lt b$ 时成立。</div></li>
+      </ul>
+
+      <h3>8. 配套习题（9 题，点开看答案）</h3>
+      <p class="sec-sub">做完不定积分再看这些，会发现"求原函数"只是第一步，真正决定对错的是代限、换限和对称性。</p>
+
+      <div class="ex">
+        <div class="ex-top"><div class="ex-q"><span class="ex-no">定1</span>$\displaystyle\int_0^1\left(3x^2+2x\right)\mathrm{d}x$</div></div>
+        <details class="ans"><summary>答案</summary><div class="body">$=[x^3+x^2]_0^1=2$。最直接的牛莱公式练习。</div></details>
+      </div>
+      <div class="ex">
+        <div class="ex-top"><div class="ex-q"><span class="ex-no">定2</span>$\displaystyle\int_0^{\pi}\sin x\,\mathrm{d}x$</div></div>
+        <details class="ans"><summary>答案</summary><div class="body">$=[-\cos x]_0^{\pi}=1-(-1)=2$。</div></details>
+      </div>
+      <div class="ex">
+        <div class="ex-top"><div class="ex-q"><span class="ex-no">定3</span>$\displaystyle\int_{-1}^{1}\left(x^3+\sin x+\frac{1}{1+x^2}\right)\mathrm{d}x$</div></div>
+        <details><summary>提示</summary><div class="body">$x^3$、$\sin x$ 都是奇函数，在对称区间上积分为 $0$。</div></details>
+        <details class="ans"><summary>答案</summary><div class="body">只剩 $\displaystyle\int_{-1}^{1}\frac{\mathrm{d}x}{1+x^2}=[\arctan x]_{-1}^{1}=\frac{\pi}{4}-\left(-\frac{\pi}{4}\right)=\frac{\pi}{2}$。</div></details>
+      </div>
+      <div class="ex">
+        <div class="ex-top"><div class="ex-q"><span class="ex-no">定4</span>设 $\Phi(x)=\displaystyle\int_0^{x^2}e^{t^2}\,\mathrm{d}t$，求 $\Phi'(x)$。</div></div>
+        <details class="ans"><summary>答案</summary><div class="body">$\Phi'(x)=e^{(x^2)^2}\cdot 2x=2x\,e^{x^4}$。变上限求导的链式法则，别漏 $2x$。</div></details>
+      </div>
+      <div class="ex">
+        <div class="ex-top"><div class="ex-q"><span class="ex-no">定5</span>$\displaystyle\int_0^1\frac{x}{1+x^2}\,\mathrm{d}x$</div></div>
+        <details class="ans"><summary>答案</summary><div class="body">$=\frac12[\ln(1+x^2)]_0^1=\frac12\ln 2$。凑微分：$x\mathrm{d}x=\frac12\mathrm{d}(1+x^2)$。</div></details>
+      </div>
+      <div class="ex">
+        <div class="ex-top"><div class="ex-q"><span class="ex-no">定6</span>$\displaystyle\int_0^{\pi/2}\sin^2x\,\mathrm{d}x$</div></div>
+        <details><summary>提示</summary><div class="body">用点火公式 $I_2=\frac{1}{2}\cdot I_0$，或降幂 $\sin^2x=\frac{1-\cos 2x}{2}$。</div></details>
+        <details class="ans"><summary>答案</summary><div class="body">$=\dfrac{\pi}{4}$。</div></details>
+      </div>
+      <div class="ex">
+        <div class="ex-top"><div class="ex-q"><span class="ex-no">定7</span>$\displaystyle\int_1^{e}\frac{\ln x}{x}\,\mathrm{d}x$</div></div>
+        <details class="ans"><summary>答案</summary><div class="body">令 $u=\ln x$，限变成 $0\to1$，$\displaystyle\int_0^1 u\,\mathrm{d}u=\frac12$。<strong>换元必换限</strong>：$x=1\Rightarrow u=0$，$x=e\Rightarrow u=1$。</div></details>
+      </div>
+      <div class="ex">
+        <div class="ex-top"><div class="ex-q"><span class="ex-no">定8</span>$\displaystyle\int_1^{+\infty}\frac{\mathrm{d}x}{x^2}$</div></div>
+        <details><summary>提示</summary><div class="body">反常积分先写成 $\lim\limits_{t\to+\infty}\int_1^t$。</div></details>
+        <details class="ans"><summary>答案</summary><div class="body">$=\lim\limits_{t\to+\infty}\left[-\frac1x\right]_1^t=\lim\limits_{t\to+\infty}\left(1-\frac1t\right)=1$，<strong>收敛</strong>。</div></details>
+      </div>
+      <div class="ex">
+        <div class="ex-top"><div class="ex-q"><span class="ex-no">定9</span>$\displaystyle\lim_{x\to0}\frac{\int_0^x\sin(t^2)\,\mathrm{d}t}{x^3}$</div></div>
+        <details><summary>提示</summary><div class="body">$\frac00$ 型，用洛必达：分子导数是 $\sin(x^2)\sim x^2$。</div></details>
+        <details class="ans"><summary>答案</summary><div class="body">$=\lim\limits_{x\to0}\frac{\sin(x^2)}{3x^2}=\frac13$。把变上限积分、洛必达、等价无穷小串起来了。</div></details>
+      </div>
+
+      <div class="box tip">
+        <span class="tag">这一栏的落点</span>
+        <p style="margin-bottom:0">定积分的题，<strong>八成工夫花在"求原函数"上，两成花在"代限与对称性"上</strong> —— 而这八成正好就是前面九节练的东西。所以顺序是：先把 D 组压轴题做顺，再回来做这一栏的 9 道题，会明显轻松。做完记得用求导或几何意义验回去。</p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <b>不定积分 · 定积分学习笔记</b>　|　配套《高等数学（第一册）》第三章、第四章
+  <br>公式排版由本地 MathJax 渲染，双击公式可查看 LaTeX 源码
+</footer>
+
+<script>
+(function(){
+  // 顶部进度条
+  var bar = document.getElementById('bar');
+  var linksAll = Array.prototype.slice.call(document.querySelectorAll('#toc a'));
+  var secsAll = linksAll.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+
+  function markActive(){
+    var y = window.scrollY || document.documentElement.scrollTop;
+    var idx = 0;
+    for (var k = 0; k < secsAll.length; k++){
+      if (secsAll[k] && secsAll[k].getBoundingClientRect().top <= 140) idx = k;
+    }
+    linksAll.forEach(function(a, i){ a.classList.toggle('on', i === idx); });
+  }
+
+  function onScroll(){
+    var h = document.documentElement;
+    var p = h.scrollTop / (h.scrollHeight - h.clientHeight || 1);
+    bar.style.width = Math.min(100, Math.max(0, p*100)) + '%';
+    markActive();
+  }
+  document.addEventListener('scroll', onScroll, {passive:true});
+  window.addEventListener('load', onScroll);
+  onScroll();
+
+  // 目录高亮
+  var links = Array.prototype.slice.call(document.querySelectorAll('#toc a'));
+  var secs = links.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if (en.isIntersecting){
+          var id = '#' + en.target.id;
+          links.forEach(function(a){ a.classList.toggle('on', a.getAttribute('href') === id); });
+        }
+      });
+    }, {rootMargin:'-15% 0px -70% 0px', threshold:0});
+    secs.forEach(function(s){ if(s) io.observe(s); });
+  }
+
+  // 全部展开 / 收起
+  document.getElementById('openAll').addEventListener('click', function(){
+    document.querySelectorAll('details').forEach(function(d){ d.open = true; });
+  });
+  document.getElementById('closeAll').addEventListener('click', function(){
+    document.querySelectorAll('details').forEach(function(d){ d.open = false; });
+  });
+
+  // 打卡计数
+  var boxes = document.querySelectorAll('input.done');
+  var doneEl = document.getElementById('doneCount');
+  var totalEl = document.getElementById('totalCount');
+  totalEl.textContent = boxes.length;
+  function refresh(){
+    var n = 0;
+    boxes.forEach(function(b){ if (b.checked) n++; });
+    doneEl.textContent = n;
+  }
+  boxes.forEach(function(b){ b.addEventListener('change', refresh); });
+  refresh();
+})();
+</script>
+</body>
+</html>
