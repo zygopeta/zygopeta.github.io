@@ -1,0 +1,11 @@
+# 临时校验产物 / 浏览器探针页 / 截图
+_probe_*.html
+_*_check.png
+*.log
+working/
+
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+*.swp
+*~

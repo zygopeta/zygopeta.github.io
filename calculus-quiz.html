@@ -184,6 +184,24 @@
     .anscard:not([open]) .ansbody{display:block}
     mjx-container{color:#000}
   }
+
+  /* MJX_MOBILE_FIX_CSS */
+  /* 移动端公式：字形内联后不依赖全局 sprite；长公式可横向滑动，不撑破版面 */
+  mjx-container{max-width:100%}
+  mjx-container[display="true"]{overflow-x:auto;overflow-y:hidden;max-width:100%}
+  mjx-container svg{max-width:none}
+  @media (max-width:640px){
+    mjx-container[display="true"]{font-size:.94em}
+    /* 手机窄屏排版收紧 */
+    body{font-size:15.5px}
+    header.hero{padding:36px 18px 28px}
+    h1{font-size:30px;line-height:1.32}
+    h1 .h1sub{font-size:17px}
+    .lead{font-size:15px}
+    .wrap{padding:0 16px}
+    .card{padding:18px 16px}
+  }
+
 </style>
 <script>
   window.MathJax = {
@@ -192,12 +210,23 @@
       displayMath: [['$$','$$'],['\\[','\\]']],
       processEscapes: true
     },
-    svg: { fontCache: 'global' },
+    svg: { fontCache: 'none' },
     options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] },
     startup: { typeset: false }
   };
 </script>
-<script defer src="vendor/tex-svg.js"></script>
+<script>
+  /* 本地 MathJax 加载失败时自动切换备用源（移动弱网 / 大文件被截断 / 404） */
+  window.__mjLoadBackup = function(){
+    if (window.__mjBackupTried) return;
+    window.__mjBackupTried = true;
+    var s = document.createElement('script');
+    s.src = 'https://cdn.bootcdn.net/ajax/libs/mathjax/3.2.2/es5/tex-svg.js';
+    s.onerror = function(){ window.__mjLoadFailed = true; };
+    document.head.appendChild(s);
+  };
+</script>
+<script defer src="vendor/tex-svg.js" onerror="window.__mjLoadBackup()"></script>
 </head>
 <body>
 
@@ -911,5 +940,50 @@ window.addEventListener("beforeprint", function(){
 
 document.addEventListener("DOMContentLoaded", buildAll);
 </script>
+
+<!-- MJX_MOBILE_FIX_JS -->
+<script>
+(function(){
+  function fail(){
+    if (document.getElementById('mj-fallback')) return;
+    var d = document.createElement('div');
+    d.id = 'mj-fallback';
+    d.style.cssText = 'position:fixed;left:12px;right:12px;bottom:12px;z-index:99999;'
+      + 'background:#fff4e6;border:1px solid #f0b27a;color:#8a4b08;padding:12px 14px;'
+      + 'border-radius:10px;font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;'
+      + 'box-shadow:0 6px 20px rgba(0,0,0,.14)';
+    d.innerHTML = '公式渲染组件没加载出来（多为网络较慢）。'
+      + '<a href="#" id="mj-retry" style="color:#c2410c;font-weight:700">点这里重试</a>';
+    document.body.appendChild(d);
+    document.getElementById('mj-retry').onclick = function(e){
+      e.preventDefault();
+      try {
+        var u = new URL(location.href);
+        u.searchParams.set('mjretry', Date.now());
+        location.replace(u.toString());
+      } catch(err){ location.reload(); }
+    };
+  }
+  function ready(){
+    return !window.__mjLoadFailed
+      && window.MathJax && window.MathJax.typesetPromise
+      && document.querySelectorAll('mjx-container').length > 0;
+  }
+  window.addEventListener('load', function(){
+    var elapsed = 0;
+    var timer = setInterval(function(){
+      elapsed += 500;
+      if (ready()) {
+        var tip = document.getElementById('mj-fallback');
+        if (tip) tip.parentNode.removeChild(tip);
+        clearInterval(timer); return;
+      }
+      if (elapsed >= 15000) { clearInterval(timer); fail(); }
+    }, 500);
+  });
+  setTimeout(function(){ if (window.__mjLoadFailed && !ready()) fail(); }, 3000);
+})();
+</script>
+
 </body>
 </html>
