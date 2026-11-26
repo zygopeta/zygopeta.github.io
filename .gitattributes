@@ -1,0 +1,14 @@
+# bash 脚本必须是 LF，否则 Git Bash 执行时报 "bash\r: No such file or directory"
+*.sh       text eol=lf
+push.sh    text eol=lf
+
+# Windows 批处理保持 CRLF
+*.bat      text eol=crlf
+push.bat   text eol=crlf
+
+# 网页与其它文本文件统一用 LF
+*.html     text eol=lf
+*.js       text eol=lf
+*.css      text eol=lf
+*.md       text eol=lf
+.gitignore text eol=lf
